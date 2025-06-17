@@ -226,7 +226,7 @@ aws secretsmanager create-secret --name <secret name> --secret-string $postgresq
 ```
 
 On the next page you can define a name for the secret.
-Automatic credentials rotation is currently not supported by SIMPHERA, but you can <a href="#rotating-credentials">rotate secrets manually</a>.
+Automatic credentials rotation is currently not supported by SIMPHERA, but you can <a href="https://github.com/dspace-group/dspace-reference-architecture-aws/blob/main/MAINTENANCE.md#rotating-credentials">rotate secrets manually</a>.
 
 #### OpenSearch (IVS)
 Master username and master password for the OpenSearch databases are stored in AWS Secrets Manager.
