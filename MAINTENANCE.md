@@ -33,6 +33,7 @@ To rotate the password for the PostgreSQL databases, change the password manuall
 ```bash
 terraform apply
 ```
+> **Note:** Before running `terraform apply`, ensure that all unrelated infrastructure changes have already been applied. This helps avoid introducing unintended updates during the password rotation process.
 
 # Updating CA certificate
 
