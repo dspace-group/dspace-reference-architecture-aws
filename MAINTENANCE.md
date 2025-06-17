@@ -28,6 +28,12 @@ helm delete simphera -n <namespace> --kubeconfig <path_to_kubeconfig>
 Reinstall the SIMPHERA Quickstart Helmchart so that all Kubernetes pods and jobs will retrieve the new credentials.
 Important: During credentials rotation, SIMPHERA will not be available for a short period.
 
+To rotate the password for the PostgreSQL databases, change the password manually in Secrets Manager console and then run:
+
+```bash
+terraform apply
+```
+
 # Updating CA certificate
 
 ## Updating by using AWS CLI
