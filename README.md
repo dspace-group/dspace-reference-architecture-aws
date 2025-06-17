@@ -372,51 +372,7 @@ You can update your _kubeconfig_ using the [aws cli update-kubeconfig command](h
 aws eks --region <region> update-kubeconfig --name <cluster_name> --kubeconfig <filename>
 ```
 
-## Backup and Restore (SIMPHERA)
-
-SIMPHERA stores data in the PostgreSQL database and in S3 buckets (MinIO) that needs to be backed up.
-AWS supports continuous backups for Amazon RDS for PostgreSQL and S3 that allows point-in-time recovery.
-[Point-in-time recovery](https://docs.aws.amazon.com/aws-backup/latest/devguide/point-in-time-recovery.html) lets you restore your data to any point in time within a defined retention period.
-
-This Terraform module creates an AWS backup plan that makes continuous backups of the PostgreSQL database and S3 buckets.
-The backups are stored in an AWS backup vault per SIMPHERA instance.
-An IAM role is also automatically created that has proper permissions to create backups.
-To enable backups for your SIMPHERA instance, make sure you have the flag `enable_backup_service` et in your `.tfvars` file:
-
-```hcl
-simpheraInstances = {
-  "production" = {
-        enable_backup_service    = true
-    }
-}
-```
-
-### Amazon RDS for PostgreSQL (SIMPHERA)
-
-Create an target RDS instance (backup server) that is a copy of a source RDS instance (production server) of a specific point-in-time.
-The command [`restore-db-instance-to-point-in-time`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/rds/restore-db-instance-to-point-in-time.html) creates the target database.
-Most of the configuration settings are copied from the source database.
-To be able to connect to the target instance the easiest way is to explicitly set the same security group and subnet group as used for the source instance.
-
-Restoring an RDS instance can be done via Powershell as described in the remainder:
-
-```bash
-aws rds restore-db-instance-to-point-in-time --source-db-instance-identifier simphera-reference-production-simphera --target-db-instance simphera-reference-production-simphera-backup --vpc-security-group-ids sg-0b954a0e25cd11b6d --db-subnet-group-name simphera-reference-vpc --restore-time 2022-06-16T23:45:00.000Z --tags Key=timestamp,Value=2022-06-16T23:45:00.000Z
-```
-
-Execute the following command to create the pgdump pod using the standard postgres image and open a bash:
-
-```bash
-kubectl run pgdump -ti -n simphera --image postgres --kubeconfig .\kube.config -- bash
-```
-
-In the pod's Bash, use the pg_dump and pg_restore commands to stream the data from the backup server to the production server:
-
-```bash
-pg_dump -h simphera-reference-production-simphera-backup.cexy8brfkmxk.eu-central-1.rds.amazonaws.com -p 5432 -U dbuser -Fc simpherareferenceproductionsimphera | pg_restore --clean --if-exists -h simphera-reference-production-simphera.cexy8brfkmxk.eu-central-1.rds.amazonaws.com -p 5432 -U dbuser -d simpherareferenceproductionsimphera
-```
-
-Alternatively, you can [restore the RDS instance via the AWS console](https://docs.aws.amazon.com/aws-backup/latest/devguide/restoring-rds.html).
+## Backup and Restore S3
 
 ### S3
 
