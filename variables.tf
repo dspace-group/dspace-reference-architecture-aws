@@ -40,6 +40,12 @@ variable "linuxExecutionNodeSize" {
   default     = ["m6a.4xlarge", "m5a.4xlarge", "m5.4xlarge", "m6i.4xlarge", "m4.4xlarge", "m7i.4xlarge", "m7a.4xlarge"]
 }
 
+variable "linuxExecutionNodeCapacityType" {
+  type        = string
+  description = "The capacity type of the Linux nodes to be used. Defaults to 'ON_DEMAND' and can be changed to 'SPOT'. Be ware that using spot instances can result in abrupt termination of simulation/validation jobs and corresponding 'error' results."
+  default     = "ON_DEMAND"
+}
+
 variable "linuxExecutionNodeCountMin" {
   type        = number
   description = "The minimum number of Linux nodes for the job execution"
@@ -304,9 +310,15 @@ variable "simphera_monitoring_namespace" {
 
 variable "ivsInstances" {
   type = map(object({
-    k8s_namespace                        = string
-    dataBucketName                       = string
-    rawDataBucketName                    = string
+    k8s_namespace = string
+    data_bucket = object({
+      name   = string
+      create = optional(bool, true)
+    })
+    raw_data_bucket = object({
+      name   = string
+      create = optional(bool, true)
+    })
     goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })
     opensearch = optional(object({
       enable                  = optional(bool, false)
@@ -327,9 +339,13 @@ variable "ivsInstances" {
   description = "A list containing the individual IVS instances, such as 'staging' and 'production'. 'opensearch' object is used for enabling AWS OpenSearch Domain creation.'opensearch.master_user_secret_name' is an AWS secret containing key 'master_user' and 'master_password'. 'opensearch.instance_type' must have option for ebs storage, check available type at https://aws.amazon.com/opensearch-service/pricing/"
   default = {
     "production" = {
-      k8s_namespace     = "ivs"
-      dataBucketName    = "demo-ivs"
-      rawDataBucketName = "demo-ivs-rawdata"
+      k8s_namespace = "ivs"
+      data_bucket = {
+        name = "demo-ivs"
+      }
+      raw_data_bucket = {
+        name = "demo-ivs-rawdata"
+      }
       opensearch = {
         enable = false
       }
@@ -496,6 +512,7 @@ variable "windows_execution_node" {
   type = object({
     enable         = bool
     node_size      = list(string)
+    capacity_type  = string
     disk_size      = number
     node_count_min = number
     node_count_max = number
@@ -504,6 +521,7 @@ variable "windows_execution_node" {
   default = {
     enable         = false
     node_size      = ["m6a.4xlarge", "m5a.4xlarge", "m5.4xlarge", "m6i.4xlarge", "m4.4xlarge", "m7i.4xlarge", "m7a.4xlarge"]
+    capacity_type  = "ON_DEMAND"
     disk_size      = 200
     node_count_min = 0
     node_count_max = 2

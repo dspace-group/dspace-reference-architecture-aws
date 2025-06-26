@@ -111,12 +111,16 @@ ivsGpuNodeSize = [
 # 'opensearch.instance_type' must have option for ebs storage, check available type at https://aws.amazon.com/opensearch-service/pricing/.
 ivsInstances = {
   "production": {
-    "dataBucketName": "demo-ivs",
+    "data_bucket": {
+      "name": "demo-ivs"
+    },
     "k8s_namespace": "ivs",
     "opensearch": {
       "enable": false
     },
-    "rawDataBucketName": "demo-ivs-rawdata"
+    "raw_data_bucket": {
+      "name": "demo-ivs-rawdata"
+    }
   }
 }
 
@@ -125,6 +129,11 @@ kubernetesVersion = "1.32"
 
 # Specifies whether a license server VM will be created.
 licenseServer = false
+
+# The capacity type of the Linux nodes to be used.
+# Defaults to 'ON_DEMAND' and can be changed to 'SPOT'.
+# Be ware that using spot instances can result in abrupt termination of simulation/validation jobs and corresponding 'error' results.
+linuxExecutionNodeCapacityType = "ON_DEMAND"
 
 # The maximum number of Linux nodes for the job execution
 linuxExecutionNodeCountMax = 10
@@ -256,6 +265,7 @@ vpcPublicSubnets = [
 # 'node_count_min' stands for the minimum number of the nodes for the job execution.
 # 'node_count_max' stand for the maximum number of the nodes for the job execution.
 windows_execution_node = {
+  "capacity_type": "ON_DEMAND",
   "disk_size": 200,
   "enable": false,
   "node_count_max": 2,

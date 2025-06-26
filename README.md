@@ -69,6 +69,9 @@ To create the AWS resources that are required for operating the dSPACE Cloud Pro
 1. install Terraform on your local administration PC
 1. register an AWS account where the resources needed for dSPACE Cloud Products are created
 1. create an IAM user with least privileges required to create the resources for dSPACE Cloud Products
+  - to deploy all products use [deploy_all_policy.json](./templates/least_permissions/deploy_all_policy.json)
+  - for SIMPHERA deployment use [deploy_simphera_policy.json](./templates/least_permissions/deploy_simphera_policy.json)
+  - for IVS deployment use [deploy_ivs_policy.json](./templates/least_permissions/deploy_ivs_policy.json)
 1. create security credentials for that IAM user
 1. request service quota increase for gpu instances if needed
 1. create non-public S3 bucket for Terraform state
@@ -223,7 +226,7 @@ aws secretsmanager create-secret --name <secret name> --secret-string $postgresq
 ```
 
 On the next page you can define a name for the secret.
-Automatic credentials rotation is currently not supported by SIMPHERA, but you can <a href="#rotating-credentials">rotate secrets manually</a>.
+Automatic credentials rotation is currently not supported by SIMPHERA, but you can <a href="https://github.com/dspace-group/dspace-reference-architecture-aws/blob/main/MAINTENANCE.md#rotating-credentials">rotate secrets manually</a>.
 
 #### OpenSearch (IVS)
 Master username and master password for the OpenSearch databases are stored in AWS Secrets Manager.
@@ -369,51 +372,7 @@ You can update your _kubeconfig_ using the [aws cli update-kubeconfig command](h
 aws eks --region <region> update-kubeconfig --name <cluster_name> --kubeconfig <filename>
 ```
 
-## Backup and Restore (SIMPHERA)
-
-SIMPHERA stores data in the PostgreSQL database and in S3 buckets (MinIO) that needs to be backed up.
-AWS supports continuous backups for Amazon RDS for PostgreSQL and S3 that allows point-in-time recovery.
-[Point-in-time recovery](https://docs.aws.amazon.com/aws-backup/latest/devguide/point-in-time-recovery.html) lets you restore your data to any point in time within a defined retention period.
-
-This Terraform module creates an AWS backup plan that makes continuous backups of the PostgreSQL database and S3 buckets.
-The backups are stored in an AWS backup vault per SIMPHERA instance.
-An IAM role is also automatically created that has proper permissions to create backups.
-To enable backups for your SIMPHERA instance, make sure you have the flag `enable_backup_service` et in your `.tfvars` file:
-
-```hcl
-simpheraInstances = {
-  "production" = {
-        enable_backup_service    = true
-    }
-}
-```
-
-### Amazon RDS for PostgreSQL (SIMPHERA)
-
-Create an target RDS instance (backup server) that is a copy of a source RDS instance (production server) of a specific point-in-time.
-The command [`restore-db-instance-to-point-in-time`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/rds/restore-db-instance-to-point-in-time.html) creates the target database.
-Most of the configuration settings are copied from the source database.
-To be able to connect to the target instance the easiest way is to explicitly set the same security group and subnet group as used for the source instance.
-
-Restoring an RDS instance can be done via Powershell as described in the remainder:
-
-```bash
-aws rds restore-db-instance-to-point-in-time --source-db-instance-identifier simphera-reference-production-simphera --target-db-instance simphera-reference-production-simphera-backup --vpc-security-group-ids sg-0b954a0e25cd11b6d --db-subnet-group-name simphera-reference-vpc --restore-time 2022-06-16T23:45:00.000Z --tags Key=timestamp,Value=2022-06-16T23:45:00.000Z
-```
-
-Execute the following command to create the pgdump pod using the standard postgres image and open a bash:
-
-```bash
-kubectl run pgdump -ti -n simphera --image postgres --kubeconfig .\kube.config -- bash
-```
-
-In the pod's Bash, use the pg_dump and pg_restore commands to stream the data from the backup server to the production server:
-
-```bash
-pg_dump -h simphera-reference-production-simphera-backup.cexy8brfkmxk.eu-central-1.rds.amazonaws.com -p 5432 -U dbuser -Fc simpherareferenceproductionsimphera | pg_restore --clean --if-exists -h simphera-reference-production-simphera.cexy8brfkmxk.eu-central-1.rds.amazonaws.com -p 5432 -U dbuser -d simpherareferenceproductionsimphera
-```
-
-Alternatively, you can [restore the RDS instance via the AWS console](https://docs.aws.amazon.com/aws-backup/latest/devguide/restoring-rds.html).
+## Backup and Restore S3
 
 ### S3
 
@@ -451,7 +410,7 @@ You can restore the S3 data in-place, into another existing bucket, or into a ne
 $uuid = New-Guid
 $metadata = @"
 {
-  "DestinationBucketName": "man-validation-platform-int-results",
+  "DestinationBucketName": "DESTINATION_BUCKET_NAME",
   "NewBucket": "true",
   "RestoreTime": "2022-06-20T23:45:00.000Z",
   "Encrypted": "false",
@@ -526,11 +485,20 @@ curl -XPOST -u 'USERNAME:PASSWORD' 'https://OPENSEARCH_DOMAIN/INDEX_NAME/_open
 
 Encryption is enabled at all AWS resources that are created by Terraform:
 
+- EKS/secrets
+  - encrypted using Customer managed KMS key created at [kms.tf](.\modules\eks\kms.tf)
 - PostgreSQL databases
+  - RDS DB instances storage is encrypted by AWS managed KMS key of alias `aws/rds`
 - S3 buckets
+  - encrypted by Server-side encryption with AWS Key Management Service keys (SSE-KMS), AWS managed KMS of alias `aws/s3` is used
 - EFS (Elastic file system)
+  - encrypted using AWS managed KMS key of alias `aws/elasticfilesystem`
+- EBS volumes attached to EC2 instances
+  - encrypted using AWS managed KMS key of alias `aws/ebs`
 - CloudWatch logs
+  - encrypted using Customer managed KMS key created at [logging.tf](.\logging.tf#L43)
 - Backup Vault
+  - encrypted using AWS managed KMS key of alias `aws/backup`
 
 ## List of tools with versions needed for dSPACE cloud products reference architecture deployment
 
@@ -660,9 +628,10 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | <a name="input_ivsGpuNodeDiskSize"></a> [ivsGpuNodeDiskSize](#input\_ivsGpuNodeDiskSize) | The disk size in GiB of the nodes for the IVS gpu job execution | `number` | `100` | no |
 | <a name="input_ivsGpuNodePool"></a> [ivsGpuNodePool](#input\_ivsGpuNodePool) | Specifies whether an additional node pool for IVS gpu job execution is added to the kubernetes cluster | `bool` | `false` | no |
 | <a name="input_ivsGpuNodeSize"></a> [ivsGpuNodeSize](#input\_ivsGpuNodeSize) | The machine size of the GPU nodes for IVS jobs | `list(string)` | <pre>[<br>  "g4dn.2xlarge"<br>]</pre> | no |
-| <a name="input_ivsInstances"></a> [ivsInstances](#input\_ivsInstances) | A list containing the individual IVS instances, such as 'staging' and 'production'. 'opensearch' object is used for enabling AWS OpenSearch Domain creation.'opensearch.master\_user\_secret\_name' is an AWS secret containing key 'master\_user' and 'master\_password'. 'opensearch.instance\_type' must have option for ebs storage, check available type at https://aws.amazon.com/opensearch-service/pricing/ | <pre>map(object({<br>    k8s_namespace                        = string<br>    dataBucketName                       = string<br>    rawDataBucketName                    = string<br>    goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })<br>    opensearch = optional(object({<br>      enable                  = optional(bool, false)<br>      engine_version          = optional(string, "OpenSearch_2.17")<br>      instance_type           = optional(string, "m7g.medium.search")<br>      instance_count          = optional(number, 1)<br>      volume_size             = optional(number, 100)<br>      master_user_secret_name = optional(string, null)<br>      }),<br>      {}<br>    )<br>    ivs_release_name           = optional(string, "ivs")<br>    backup_service_enable      = optional(bool, false)<br>    backup_retention           = optional(number, 7)<br>    backup_schedule            = optional(string, "cron(0 1 * * ? *)")<br>    enable_deletion_protection = optional(bool, true)<br>  }))</pre> | <pre>{<br>  "production": {<br>    "dataBucketName": "demo-ivs",<br>    "k8s_namespace": "ivs",<br>    "opensearch": {<br>      "enable": false<br>    },<br>    "rawDataBucketName": "demo-ivs-rawdata"<br>  }<br>}</pre> | no |
+| <a name="input_ivsInstances"></a> [ivsInstances](#input\_ivsInstances) | A list containing the individual IVS instances, such as 'staging' and 'production'. 'opensearch' object is used for enabling AWS OpenSearch Domain creation.'opensearch.master\_user\_secret\_name' is an AWS secret containing key 'master\_user' and 'master\_password'. 'opensearch.instance\_type' must have option for ebs storage, check available type at https://aws.amazon.com/opensearch-service/pricing/ | <pre>map(object({<br>    k8s_namespace = string<br>    data_bucket = object({<br>      name   = string<br>      create = optional(bool, true)<br>    })<br>    raw_data_bucket = object({<br>      name   = string<br>      create = optional(bool, true)<br>    })<br>    goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })<br>    opensearch = optional(object({<br>      enable                  = optional(bool, false)<br>      engine_version          = optional(string, "OpenSearch_2.17")<br>      instance_type           = optional(string, "m7g.medium.search")<br>      instance_count          = optional(number, 1)<br>      volume_size             = optional(number, 100)<br>      master_user_secret_name = optional(string, null)<br>      }),<br>      {}<br>    )<br>    ivs_release_name           = optional(string, "ivs")<br>    backup_service_enable      = optional(bool, false)<br>    backup_retention           = optional(number, 7)<br>    backup_schedule            = optional(string, "cron(0 1 * * ? *)")<br>    enable_deletion_protection = optional(bool, true)<br>  }))</pre> | <pre>{<br>  "production": {<br>    "data_bucket": {<br>      "name": "demo-ivs"<br>    },<br>    "k8s_namespace": "ivs",<br>    "opensearch": {<br>      "enable": false<br>    },<br>    "raw_data_bucket": {<br>      "name": "demo-ivs-rawdata"<br>    }<br>  }<br>}</pre> | no |
 | <a name="input_kubernetesVersion"></a> [kubernetesVersion](#input\_kubernetesVersion) | The kubernetes version of the EKS cluster. | `string` | `"1.32"` | no |
 | <a name="input_licenseServer"></a> [licenseServer](#input\_licenseServer) | Specifies whether a license server VM will be created. | `bool` | `false` | no |
+| <a name="input_linuxExecutionNodeCapacityType"></a> [linuxExecutionNodeCapacityType](#input\_linuxExecutionNodeCapacityType) | The capacity type of the Linux nodes to be used. Defaults to 'ON\_DEMAND' and can be changed to 'SPOT'. Be ware that using spot instances can result in abrupt termination of simulation/validation jobs and corresponding 'error' results. | `string` | `"ON_DEMAND"` | no |
 | <a name="input_linuxExecutionNodeCountMax"></a> [linuxExecutionNodeCountMax](#input\_linuxExecutionNodeCountMax) | The maximum number of Linux nodes for the job execution | `number` | `10` | no |
 | <a name="input_linuxExecutionNodeCountMin"></a> [linuxExecutionNodeCountMin](#input\_linuxExecutionNodeCountMin) | The minimum number of Linux nodes for the job execution | `number` | `0` | no |
 | <a name="input_linuxExecutionNodeDiskSize"></a> [linuxExecutionNodeDiskSize](#input\_linuxExecutionNodeDiskSize) | The disk size in GiB of the nodes for the job execution | `number` | `200` | no |
@@ -687,7 +656,7 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | <a name="input_vpcId"></a> [vpcId](#input\_vpcId) | The ID of preconfigured VPC. Change from 'null' to use already existing VPC. | `string` | `null` | no |
 | <a name="input_vpcPrivateSubnets"></a> [vpcPrivateSubnets](#input\_vpcPrivateSubnets) | List of CIDRs for the private subnets. | `list(any)` | <pre>[<br>  "10.1.0.0/22",<br>  "10.1.4.0/22",<br>  "10.1.8.0/22"<br>]</pre> | no |
 | <a name="input_vpcPublicSubnets"></a> [vpcPublicSubnets](#input\_vpcPublicSubnets) | List of CIDRs for the public subnets. | `list(any)` | <pre>[<br>  "10.1.12.0/22",<br>  "10.1.16.0/22",<br>  "10.1.20.0/22"<br>]</pre> | no |
-| <a name="input_windows_execution_node"></a> [windows\_execution\_node](#input\_windows\_execution\_node) | Configuration for Windows node group. 'node\_size' stands for the machine size of the nodes for the job execution, user must check the availability of the instance types for the region. The list is ordered by priority where the first instance type gets the highest priority. 'disk\_size' stands for the disk size in GiB of the nodes for the job execution. 'node\_count\_min' stands for the minimum number of the nodes for the job execution. 'node\_count\_max' stand for the maximum number of the nodes for the job execution | <pre>object({<br>    enable         = bool<br>    node_size      = list(string)<br>    disk_size      = number<br>    node_count_min = number<br>    node_count_max = number<br>  })</pre> | <pre>{<br>  "disk_size": 200,<br>  "enable": false,<br>  "node_count_max": 2,<br>  "node_count_min": 0,<br>  "node_size": [<br>    "m6a.4xlarge",<br>    "m5a.4xlarge",<br>    "m5.4xlarge",<br>    "m6i.4xlarge",<br>    "m4.4xlarge",<br>    "m7i.4xlarge",<br>    "m7a.4xlarge"<br>  ]<br>}</pre> | no |
+| <a name="input_windows_execution_node"></a> [windows\_execution\_node](#input\_windows\_execution\_node) | Configuration for Windows node group. 'node\_size' stands for the machine size of the nodes for the job execution, user must check the availability of the instance types for the region. The list is ordered by priority where the first instance type gets the highest priority. 'disk\_size' stands for the disk size in GiB of the nodes for the job execution. 'node\_count\_min' stands for the minimum number of the nodes for the job execution. 'node\_count\_max' stand for the maximum number of the nodes for the job execution | <pre>object({<br>    enable         = bool<br>    node_size      = list(string)<br>    capacity_type  = string<br>    disk_size      = number<br>    node_count_min = number<br>    node_count_max = number<br>  })</pre> | <pre>{<br>  "capacity_type": "ON_DEMAND",<br>  "disk_size": 200,<br>  "enable": false,<br>  "node_count_max": 2,<br>  "node_count_min": 0,<br>  "node_size": [<br>    "m6a.4xlarge",<br>    "m5a.4xlarge",<br>    "m5.4xlarge",<br>    "m6i.4xlarge",<br>    "m4.4xlarge",<br>    "m7i.4xlarge",<br>    "m7a.4xlarge"<br>  ]<br>}</pre> | no |
 
 ## Outputs
 
@@ -699,6 +668,7 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | <a name="output_database_identifiers"></a> [database\_identifiers](#output\_database\_identifiers) | Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances. |
 | <a name="output_eks_cluster_id"></a> [eks\_cluster\_id](#output\_eks\_cluster\_id) | Amazon EKS Cluster Name |
 | <a name="output_ivs_buckets_service_accounts"></a> [ivs\_buckets\_service\_accounts](#output\_ivs\_buckets\_service\_accounts) | List of K8s service account names with access to the IVS buckets |
+| <a name="output_ivs_node_groups_roles"></a> [ivs\_node\_groups\_roles](#output\_ivs\_node\_groups\_roles) | n/a |
 | <a name="output_opensearch_domain_endpoints"></a> [opensearch\_domain\_endpoints](#output\_opensearch\_domain\_endpoints) | List of OpenSearch Domains endpoints of IVS instances |
 | <a name="output_pullthrough_cache_prefix"></a> [pullthrough\_cache\_prefix](#output\_pullthrough\_cache\_prefix) | n/a |
 | <a name="output_s3_buckets"></a> [s3\_buckets](#output\_s3\_buckets) | S3 buckets managed by terraform. |
