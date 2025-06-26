@@ -1,0 +1,2124 @@
+data.aws_availability_zones.available: Reading...
+data.aws_partition.current: Reading...
+data.aws_ami.al2gpu_ami: Reading...
+data.aws_caller_identity.current: Reading...
+data.aws_partition.current: Read complete after 0s [id=aws]
+data.aws_region.current: Reading...
+data.aws_ami.amazon_linux_kernel5: Reading...
+data.aws_region.current: Read complete after 0s [id=eu-central-1]
+data.aws_caller_identity.current: Read complete after 0s [id=778206098013]
+data.aws_iam_session_context.current: Reading...
+data.aws_availability_zones.available: Read complete after 0s [id=eu-central-1]
+data.aws_ami.al2gpu_ami: Read complete after 1s [id=ami-0a7b2db1b69b584b3]
+data.aws_iam_session_context.current: Read complete after 1s [id=arn:aws:sts::778206098013:assumed-role/AWSReservedSSO_AdministratorAccess_502b833e8d90b2dc/RNair@dspace.de]
+data.aws_ami.amazon_linux_kernel5: Read complete after 1s [id=ami-0c8db01b2e8e5298d]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+  # data.aws_eks_cluster.cluster will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_eks_cluster" "cluster" {
+      + access_config             = (known after apply)
+      + arn                       = (known after apply)
+      + certificate_authority     = (known after apply)
+      + cluster_id                = (known after apply)
+      + created_at                = (known after apply)
+      + enabled_cluster_log_types = (known after apply)
+      + endpoint                  = (known after apply)
+      + id                        = (known after apply)
+      + identity                  = (known after apply)
+      + kubernetes_network_config = (known after apply)
+      + name                      = (known after apply)
+      + outpost_config            = (known after apply)
+      + platform_version          = (known after apply)
+      + role_arn                  = (known after apply)
+      + status                    = (known after apply)
+      + tags                      = (known after apply)
+      + version                   = (known after apply)
+      + vpc_config                = (known after apply)
+    }
+
+  # data.aws_eks_cluster_auth.cluster will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_eks_cluster_auth" "cluster" {
+      + id    = (known after apply)
+      + name  = (known after apply)
+      + token = (sensitive value)
+    }
+
+  # aws_cloudwatch_log_group.flowlogs[0] will be created
+  + resource "aws_cloudwatch_log_group" "flowlogs" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + kms_key_id        = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = (known after apply)
+      + name_prefix       = (known after apply)
+      + retention_in_days = 7
+      + skip_destroy      = false
+      + tags_all          = (known after apply)
+    }
+
+  # aws_flow_log.flowlog[0] will be created
+  + resource "aws_flow_log" "flowlog" {
+      + arn                      = (known after apply)
+      + iam_role_arn             = (known after apply)
+      + id                       = (known after apply)
+      + log_destination          = (known after apply)
+      + log_destination_type     = "cloud-watch-logs"
+      + log_format               = (known after apply)
+      + log_group_name           = (known after apply)
+      + max_aggregation_interval = 600
+      + tags_all                 = (known after apply)
+      + traffic_type             = "ALL"
+      + vpc_id                   = (known after apply)
+    }
+
+  # aws_iam_policy.flowlogs_policy[0] will be created
+  + resource "aws_iam_policy" "flowlogs_policy" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + id               = (known after apply)
+      + name             = "rn-cluster-flowlogs-policy"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action   = [
+                          + "logs:CreateLogStream",
+                          + "logs:PutLogEvents",
+                          + "logs:DescribeLogGroups",
+                          + "logs:DescribeLogStreams",
+                        ]
+                      + Effect   = "Allow"
+                      + Resource = "*"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + policy_id        = (known after apply)
+      + tags_all         = (known after apply)
+    }
+
+  # aws_iam_role.flowlogs_role[0] will be created
+  + resource "aws_iam_role" "flowlogs_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "vpc-flow-logs.amazonaws.com"
+                        }
+                      + Sid       = ""
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "rn-cluster-flowlogs-role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # aws_iam_role_policy_attachment.flowlogs_attachment[0] will be created
+  + resource "aws_iam_role_policy_attachment" "flowlogs_attachment" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = (known after apply)
+    }
+
+  # aws_kms_key.kms_key_cloudwatch_log_group will be created
+  + resource "aws_kms_key" "kms_key_cloudwatch_log_group" {
+      + arn                                = (known after apply)
+      + bypass_policy_lockout_safety_check = false
+      + customer_master_key_spec           = "SYMMETRIC_DEFAULT"
+      + description                        = "KMS key used to encrypt Kubernetes, VPC Flow, Amazon RDS for PostgreSQL and SSM Patch manager log groups within infrastructure rn-cluster"
+      + enable_key_rotation                = true
+      + id                                 = (known after apply)
+      + is_enabled                         = true
+      + key_id                             = (known after apply)
+      + key_usage                          = "ENCRYPT_DECRYPT"
+      + multi_region                       = (known after apply)
+      + policy                             = jsonencode(
+            {
+              + Id        = "key-default-1"
+              + Statement = [
+                  + {
+                      + Action    = "kms:*"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + AWS = "arn:aws:iam::778206098013:root"
+                        }
+                      + Resource  = "*"
+                      + Sid       = "Enable IAM User Permissions"
+                    },
+                  + {
+                      + Action    = [
+                          + "kms:Encrypt*",
+                          + "kms:Decrypt*",
+                          + "kms:ReEncrypt*",
+                          + "kms:GenerateDataKey*",
+                          + "kms:Describe*",
+                        ]
+                      + Condition = {
+                          + ArnLike = {
+                              + "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:eu-central-1:778206098013:*"
+                            }
+                        }
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "logs.eu-central-1.amazonaws.com"
+                        }
+                      + Resource  = "*"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + rotation_period_in_days            = (known after apply)
+      + tags_all                           = (known after apply)
+    }
+
+  # aws_s3_bucket.bucket_logs will be created
+  + resource "aws_s3_bucket" "bucket_logs" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = "rn-cluster-logs"
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags_all                    = (known after apply)
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # aws_s3_bucket_logging.logging will be created
+  + resource "aws_s3_bucket_logging" "logging" {
+      + bucket        = (known after apply)
+      + id            = (known after apply)
+      + target_bucket = (known after apply)
+      + target_prefix = (known after apply)
+    }
+
+  # aws_s3_bucket_policy.buckets_logs_ssl will be created
+  + resource "aws_s3_bucket_policy" "buckets_logs_ssl" {
+      + bucket = "rn-cluster-logs"
+      + id     = (known after apply)
+      + policy = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "s3:*"
+                      + Condition = {
+                          + Bool = {
+                              + "aws:SecureTransport" = "false"
+                            }
+                        }
+                      + Effect    = "Deny"
+                      + Principal = "*"
+                      + Resource  = [
+                          + "arn:aws:s3:::rn-cluster-logs",
+                          + "arn:aws:s3:::rn-cluster-logs/*",
+                        ]
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+    }
+
+  # aws_s3_bucket_public_access_block.buckets_logs_access will be created
+  + resource "aws_s3_bucket_public_access_block" "buckets_logs_access" {
+      + block_public_acls       = true
+      + block_public_policy     = true
+      + bucket                  = (known after apply)
+      + id                      = (known after apply)
+      + ignore_public_acls      = true
+      + restrict_public_buckets = true
+    }
+
+  # aws_s3_bucket_server_side_encryption_configuration.bucket_logs_encryption will be created
+  + resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_logs_encryption" {
+      + bucket = "rn-cluster-logs"
+      + id     = (known after apply)
+
+      + rule {
+          + apply_server_side_encryption_by_default {
+              + sse_algorithm     = "aws:kms"
+                # (1 unchanged attribute hidden)
+            }
+        }
+    }
+
+  # module.eks.data.aws_eks_addon_version.aws_vpc_cni will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_eks_addon_version" "aws_vpc_cni" {
+      + addon_name         = "vpc-cni"
+      + id                 = (known after apply)
+      + kubernetes_version = "1.30"
+      + version            = (known after apply)
+    }
+
+  # module.eks.data.aws_eks_cluster.cluster will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_eks_cluster" "cluster" {
+      + access_config             = (known after apply)
+      + arn                       = (known after apply)
+      + certificate_authority     = (known after apply)
+      + cluster_id                = (known after apply)
+      + created_at                = (known after apply)
+      + enabled_cluster_log_types = (known after apply)
+      + endpoint                  = (known after apply)
+      + id                        = (known after apply)
+      + identity                  = (known after apply)
+      + kubernetes_network_config = (known after apply)
+      + name                      = (known after apply)
+      + outpost_config            = (known after apply)
+      + platform_version          = (known after apply)
+      + role_arn                  = (known after apply)
+      + status                    = (known after apply)
+      + tags                      = (known after apply)
+      + version                   = (known after apply)
+      + vpc_config                = (known after apply)
+    }
+
+  # module.eks.data.aws_iam_policy_document.assume_role_policy will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_iam_policy_document" "assume_role_policy" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions = [
+              + "sts:AssumeRole",
+            ]
+          + sid     = "EKSClusterAssumeRole"
+
+          + principals {
+              + identifiers = [
+                  + "eks.amazonaws.com",
+                ]
+              + type        = "Service"
+            }
+        }
+    }
+
+  # module.eks.data.aws_iam_policy_document.eks_key will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_iam_policy_document" "eks_key" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "kms:CreateGrant",
+              + "kms:Decrypt",
+              + "kms:DescribeKey",
+              + "kms:Encrypt",
+              + "kms:GenerateDataKey*",
+              + "kms:ReEncrypt*",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+          + sid       = "Allow access for all principals in the account that are authorized"
+
+          + condition {
+              + test     = "StringEquals"
+              + values   = [
+                  + "778206098013",
+                ]
+              + variable = "kms:CallerAccount"
+            }
+          + condition {
+              + test     = "StringEquals"
+              + values   = [
+                  + "eks.eu-central-1.amazonaws.com",
+                ]
+              + variable = "kms:ViaService"
+            }
+
+          + principals {
+              + identifiers = [
+                  + "arn:aws:iam::778206098013:root",
+                ]
+              + type        = "AWS"
+            }
+        }
+      + statement {
+          + actions   = [
+              + "kms:Describe*",
+              + "kms:Get*",
+              + "kms:List*",
+              + "kms:RevokeGrant",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+          + sid       = "Allow direct access to key metadata to the account"
+
+          + principals {
+              + identifiers = [
+                  + "arn:aws:iam::778206098013:root",
+                ]
+              + type        = "AWS"
+            }
+        }
+      + statement {
+          + actions   = [
+              + "kms:*",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+          + sid       = "Allow access for Key Administrators"
+
+          + principals {
+              + identifiers = [
+                  + "arn:aws:iam::778206098013:role/aws-reserved/sso.amazonaws.com/eu-central-1/AWSReservedSSO_AdministratorAccess_502b833e8d90b2dc",
+                ]
+              + type        = "AWS"
+            }
+        }
+      + statement {
+          + actions   = [
+              + "kms:Decrypt",
+              + "kms:DescribeKey",
+              + "kms:Encrypt",
+              + "kms:GenerateDataKey*",
+              + "kms:ReEncrypt*",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+          + sid       = "Allow use of the key"
+
+          + principals {
+              + identifiers = [
+                  + "arn:aws:iam::778206098013:role/rn-cluster-cluster-role",
+                ]
+              + type        = "AWS"
+            }
+        }
+      + statement {
+          + actions   = [
+              + "kms:CreateGrant",
+              + "kms:ListGrants",
+              + "kms:RevokeGrant",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+          + sid       = "Allow attachment of persistent resources"
+
+          + condition {
+              + test     = "Bool"
+              + values   = [
+                  + "true",
+                ]
+              + variable = "kms:GrantIsForAWSResource"
+            }
+
+          + principals {
+              + identifiers = [
+                  + "arn:aws:iam::778206098013:role/rn-cluster-cluster-role",
+                ]
+              + type        = "AWS"
+            }
+        }
+    }
+
+  # module.eks.data.http.eks_cluster_readiness will be read during apply
+  # (config refers to values not yet known)
+ <= data "http" "eks_cluster_readiness" {
+      + body                 = (known after apply)
+      + ca_cert_pem          = (known after apply)
+      + id                   = (known after apply)
+      + request_timeout_ms   = 600000
+      + response_body        = (known after apply)
+      + response_body_base64 = (known after apply)
+      + response_headers     = (known after apply)
+      + status_code          = (known after apply)
+      + url                  = (known after apply)
+    }
+
+  # module.eks.data.tls_certificate.cluster_certificate will be read during apply
+  # (config refers to values not yet known)
+ <= data "tls_certificate" "cluster_certificate" {
+      + certificates = (known after apply)
+      + id           = (known after apply)
+      + url          = (known after apply)
+    }
+
+  # module.eks.aws_cloudwatch_log_group.log_group[0] will be created
+  + resource "aws_cloudwatch_log_group" "log_group" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + kms_key_id        = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/aws/eks/rn-cluster/cluster"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 7
+      + skip_destroy      = false
+      + tags_all          = (known after apply)
+    }
+
+  # module.eks.aws_eks_addon.aws_vpc_cni will be created
+  + resource "aws_eks_addon" "aws_vpc_cni" {
+      + addon_name                  = "vpc-cni"
+      + addon_version               = (known after apply)
+      + arn                         = (known after apply)
+      + cluster_name                = (known after apply)
+      + configuration_values        = (known after apply)
+      + created_at                  = (known after apply)
+      + id                          = (known after apply)
+      + modified_at                 = (known after apply)
+      + preserve                    = true
+      + resolve_conflicts_on_create = "OVERWRITE"
+      + resolve_conflicts_on_update = "OVERWRITE"
+      + service_account_role_arn    = (known after apply)
+      + tags_all                    = (known after apply)
+    }
+
+  # module.eks.aws_eks_cluster.eks will be created
+  + resource "aws_eks_cluster" "eks" {
+      + arn                           = (known after apply)
+      + bootstrap_self_managed_addons = false
+      + certificate_authority         = (known after apply)
+      + cluster_id                    = (known after apply)
+      + created_at                    = (known after apply)
+      + enabled_cluster_log_types     = [
+          + "api",
+          + "audit",
+          + "authenticator",
+        ]
+      + endpoint                      = (known after apply)
+      + id                            = (known after apply)
+      + identity                      = (known after apply)
+      + name                          = "rn-cluster"
+      + platform_version              = (known after apply)
+      + role_arn                      = (known after apply)
+      + status                        = (known after apply)
+      + tags_all                      = (known after apply)
+      + version                       = "1.30"
+
+      + access_config {
+          + authentication_mode                         = "CONFIG_MAP"
+          + bootstrap_cluster_creator_admin_permissions = true
+        }
+
+      + encryption_config {
+          + resources = [
+              + "secrets",
+            ]
+
+          + provider {
+              + key_arn = (known after apply)
+            }
+        }
+
+      + kubernetes_network_config {
+          + ip_family         = "ipv4"
+          + service_ipv4_cidr = (known after apply)
+          + service_ipv6_cidr = (known after apply)
+        }
+
+      + timeouts {
+          + create = "60m"
+          + delete = "60m"
+          + update = "60m"
+        }
+
+      + vpc_config {
+          + cluster_security_group_id = (known after apply)
+          + endpoint_private_access   = false
+          + endpoint_public_access    = true
+          + public_access_cidrs       = [
+              + "0.0.0.0/0",
+            ]
+          + subnet_ids                = (known after apply)
+          + vpc_id                    = (known after apply)
+        }
+    }
+
+  # module.eks.aws_iam_openid_connect_provider.oidc_provider will be created
+  + resource "aws_iam_openid_connect_provider" "oidc_provider" {
+      + arn             = (known after apply)
+      + client_id_list  = [
+          + "sts.amazonaws.com",
+        ]
+      + id              = (known after apply)
+      + tags            = {
+          + "Name" = "rn-cluster-eks-irsa"
+        }
+      + tags_all        = {
+          + "Name" = "rn-cluster-eks-irsa"
+        }
+      + thumbprint_list = (known after apply)
+      + url             = (known after apply)
+    }
+
+  # module.eks.aws_iam_role.aws_vpc_cni_role will be created
+  + resource "aws_iam_role" "aws_vpc_cni_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = (known after apply)
+      + create_date           = (known after apply)
+      + description           = "AWS IAM Role for the Kubernetes service account aws-node."
+      + force_detach_policies = true
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = (known after apply)
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.eks.aws_iam_role.cluster_role will be created
+  + resource "aws_iam_role" "cluster_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = (known after apply)
+      + create_date           = (known after apply)
+      + force_detach_policies = true
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "rn-cluster-cluster-role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy {
+          + name   = "rn-cluster-cluster-role"
+          + policy = (known after apply)
+        }
+    }
+
+  # module.eks.aws_iam_role_policy_attachment.aws_vpc_cni_policy_attachment will be created
+  + resource "aws_iam_role_policy_attachment" "aws_vpc_cni_policy_attachment" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+      + role       = (known after apply)
+    }
+
+  # module.eks.aws_iam_role_policy_attachment.cluster_role["arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"] will be created
+  + resource "aws_iam_role_policy_attachment" "cluster_role" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+      + role       = "rn-cluster-cluster-role"
+    }
+
+  # module.eks.aws_iam_role_policy_attachment.cluster_role["arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"] will be created
+  + resource "aws_iam_role_policy_attachment" "cluster_role" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+      + role       = "rn-cluster-cluster-role"
+    }
+
+  # module.eks.aws_kms_alias.cluster will be created
+  + resource "aws_kms_alias" "cluster" {
+      + arn            = (known after apply)
+      + id             = (known after apply)
+      + name           = "alias/rn-cluster"
+      + name_prefix    = (known after apply)
+      + target_key_arn = (known after apply)
+      + target_key_id  = (known after apply)
+    }
+
+  # module.eks.aws_kms_key.cluster will be created
+  + resource "aws_kms_key" "cluster" {
+      + arn                                = (known after apply)
+      + bypass_policy_lockout_safety_check = false
+      + customer_master_key_spec           = "SYMMETRIC_DEFAULT"
+      + deletion_window_in_days            = 30
+      + description                        = "rn-cluster EKS cluster secret encryption key"
+      + enable_key_rotation                = true
+      + id                                 = (known after apply)
+      + is_enabled                         = true
+      + key_id                             = (known after apply)
+      + key_usage                          = "ENCRYPT_DECRYPT"
+      + multi_region                       = (known after apply)
+      + policy                             = (known after apply)
+      + rotation_period_in_days            = (known after apply)
+      + tags_all                           = (known after apply)
+    }
+
+  # module.eks.kubernetes_config_map.aws_auth will be created
+  + resource "kubernetes_config_map" "aws_auth" {
+      + data = (known after apply)
+      + id   = (known after apply)
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "app.kubernetes.io/created-by" = "terraform"
+              + "app.kubernetes.io/managed-by" = "terraform"
+            }
+          + name             = "aws-auth"
+          + namespace        = "kube-system"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # module.ivs_instance["production"].aws_iam_role.s3_iam_role will be created
+  + resource "aws_iam_role" "s3_iam_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = (known after apply)
+      + create_date           = (known after apply)
+      + description           = "IAM role for the s3 service account"
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "rn-cluster-ivs-prod-s3-role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.ivs_instance["production"].aws_iam_role_policy.eks_node_s3_access_policy["default"] will be created
+  + resource "aws_iam_role_policy" "eks_node_s3_access_policy" {
+      + id          = (known after apply)
+      + name        = "s3-access-policy"
+      + name_prefix = (known after apply)
+      + policy      = (known after apply)
+      + role        = (known after apply)
+    }
+
+  # module.ivs_instance["production"].aws_iam_role_policy.eks_node_s3_access_policy["execnodes"] will be created
+  + resource "aws_iam_role_policy" "eks_node_s3_access_policy" {
+      + id          = (known after apply)
+      + name        = "s3-access-policy"
+      + name_prefix = (known after apply)
+      + policy      = (known after apply)
+      + role        = (known after apply)
+    }
+
+  # module.ivs_instance["production"].aws_s3_bucket.data_bucket will be created
+  + resource "aws_s3_bucket" "data_bucket" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = "demo-ivs-rn"
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags_all                    = (known after apply)
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # module.ivs_instance["production"].aws_s3_bucket.rawdata_bucket will be created
+  + resource "aws_s3_bucket" "rawdata_bucket" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = "demo-ivs-rawdata-rn"
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags_all                    = (known after apply)
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # module.k8s_eks_addons.data.aws_eks_addon_version.aws_ebs_csi_driver will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_eks_addon_version" "aws_ebs_csi_driver" {
+      + addon_name         = "aws-ebs-csi-driver"
+      + id                 = (known after apply)
+      + kubernetes_version = "1.30"
+      + version            = (known after apply)
+    }
+
+  # module.k8s_eks_addons.data.aws_eks_addon_version.coredns[0] will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_eks_addon_version" "coredns" {
+      + addon_name         = "coredns"
+      + id                 = (known after apply)
+      + kubernetes_version = "1.30"
+      + version            = (known after apply)
+    }
+
+  # module.k8s_eks_addons.data.aws_eks_addon_version.kube_proxy will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_eks_addon_version" "kube_proxy" {
+      + addon_name         = "kube-proxy"
+      + id                 = (known after apply)
+      + kubernetes_version = "1.30"
+      + version            = (known after apply)
+    }
+
+  # module.k8s_eks_addons.data.aws_iam_policy_document.cluster_autoscaler[0] will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "cluster_autoscaler" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "autoscaling:DescribeAutoScalingGroups",
+              + "autoscaling:DescribeAutoScalingInstances",
+              + "autoscaling:DescribeLaunchConfigurations",
+              + "autoscaling:DescribeTags",
+              + "ec2:DescribeInstanceTypes",
+              + "ec2:DescribeLaunchTemplateVersions",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+            # (1 unchanged attribute hidden)
+        }
+      + statement {
+          + actions   = [
+              + "ec2:DescribeInstanceTypes",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "*",
+            ]
+            # (1 unchanged attribute hidden)
+
+          + condition {
+              + test     = "StringEquals"
+              + values   = [
+                  + "owned",
+                ]
+              + variable = (known after apply)
+            }
+        }
+      + statement {
+          + actions   = [
+              + "autoscaling:SetDesiredCapacity",
+              + "autoscaling:TerminateInstanceInAutoScalingGroup",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + "arn:aws:autoscaling:eu-central-1:778206098013:autoScalingGroup:*",
+            ]
+            # (1 unchanged attribute hidden)
+
+          + condition {
+              + test     = "StringEquals"
+              + values   = [
+                  + "owned",
+                ]
+              + variable = (known after apply)
+            }
+        }
+      + statement {
+          + actions   = [
+              + "eks:DescribeNodegroup",
+            ]
+          + effect    = "Allow"
+          + resources = [
+              + (known after apply),
+            ]
+            # (1 unchanged attribute hidden)
+
+          + condition {
+              + test     = "StringEquals"
+              + values   = [
+                  + "owned",
+                ]
+              + variable = (known after apply)
+            }
+        }
+    }
+
+  # module.k8s_eks_addons.aws_eks_addon.aws_ebs_csi_driver will be created
+  + resource "aws_eks_addon" "aws_ebs_csi_driver" {
+      + addon_name                  = "aws-ebs-csi-driver"
+      + addon_version               = (known after apply)
+      + arn                         = (known after apply)
+      + cluster_name                = (known after apply)
+      + configuration_values        = <<-EOT
+            sidecars:
+              snapshotter:
+                forceEnable: false
+        EOT
+      + created_at                  = (known after apply)
+      + id                          = (known after apply)
+      + modified_at                 = (known after apply)
+      + preserve                    = true
+      + resolve_conflicts_on_create = "OVERWRITE"
+      + resolve_conflicts_on_update = "OVERWRITE"
+      + service_account_role_arn    = (known after apply)
+      + tags_all                    = (known after apply)
+    }
+
+  # module.k8s_eks_addons.aws_eks_addon.coredns[0] will be created
+  + resource "aws_eks_addon" "coredns" {
+      + addon_name                  = "coredns"
+      + addon_version               = (known after apply)
+      + arn                         = (known after apply)
+      + cluster_name                = (known after apply)
+      + configuration_values        = (known after apply)
+      + created_at                  = (known after apply)
+      + id                          = (known after apply)
+      + modified_at                 = (known after apply)
+      + preserve                    = true
+      + resolve_conflicts_on_create = "OVERWRITE"
+      + resolve_conflicts_on_update = "OVERWRITE"
+      + tags_all                    = (known after apply)
+    }
+
+  # module.k8s_eks_addons.aws_eks_addon.kube_proxy will be created
+  + resource "aws_eks_addon" "kube_proxy" {
+      + addon_name                  = "kube-proxy"
+      + addon_version               = (known after apply)
+      + arn                         = (known after apply)
+      + cluster_name                = (known after apply)
+      + configuration_values        = (known after apply)
+      + created_at                  = (known after apply)
+      + id                          = (known after apply)
+      + modified_at                 = (known after apply)
+      + preserve                    = true
+      + resolve_conflicts_on_create = "OVERWRITE"
+      + resolve_conflicts_on_update = "OVERWRITE"
+      + tags_all                    = (known after apply)
+    }
+
+  # module.k8s_eks_addons.aws_iam_policy.cluster_autoscaler[0] will be created
+  + resource "aws_iam_policy" "cluster_autoscaler" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "Cluster Autoscaler IAM policy"
+      + id               = (known after apply)
+      + name             = (known after apply)
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = (known after apply)
+      + policy_id        = (known after apply)
+      + tags_all         = (known after apply)
+    }
+
+  # module.k8s_eks_addons.aws_iam_role.cluster_autoscaler[0] will be created
+  + resource "aws_iam_role" "cluster_autoscaler" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = (known after apply)
+      + create_date           = (known after apply)
+      + description           = "AWS IAM Role for the Kubernetes service account cluster-autoscaler-sa."
+      + force_detach_policies = true
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = (known after apply)
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.k8s_eks_addons.aws_iam_role.ebs_csi_driver_role will be created
+  + resource "aws_iam_role" "ebs_csi_driver_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = (known after apply)
+      + create_date           = (known after apply)
+      + description           = "AWS IAM Role for the Kubernetes service account ebs-csi-controller-sa."
+      + force_detach_policies = true
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = (known after apply)
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.k8s_eks_addons.aws_iam_role_policy_attachment.cluster_autoscaler[0] will be created
+  + resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = (known after apply)
+    }
+
+  # module.k8s_eks_addons.aws_iam_role_policy_attachment.ebs_csi_driver_policy_attachment will be created
+  + resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy_attachment" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+      + role       = (known after apply)
+    }
+
+  # module.k8s_eks_addons.helm_release.cluster_autoscaler[0] will be created
+  + resource "helm_release" "cluster_autoscaler" {
+      + atomic                     = false
+      + chart                      = "cluster-autoscaler"
+      + cleanup_on_fail            = false
+      + create_namespace           = false
+      + dependency_update          = true
+      + description                = "Cluster AutoScaler helm Chart deployment configuration."
+      + disable_crd_hooks          = false
+      + disable_openapi_validation = false
+      + disable_webhooks           = false
+      + force_update               = false
+      + id                         = (known after apply)
+      + lint                       = false
+      + manifest                   = (known after apply)
+      + max_history                = 0
+      + metadata                   = (known after apply)
+      + name                       = "cluster-autoscaler"
+      + namespace                  = "kube-system"
+      + pass_credentials           = false
+      + recreate_pods              = false
+      + render_subchart_notes      = true
+      + replace                    = false
+      + repository                 = "https://kubernetes.github.io/autoscaler"
+      + reset_values               = false
+      + reuse_values               = false
+      + skip_crds                  = false
+      + status                     = "deployed"
+      + timeout                    = 1200
+      + values                     = (known after apply)
+      + verify                     = false
+      + version                    = "9.37.0"
+      + wait                       = true
+      + wait_for_jobs              = false
+    }
+
+  # module.k8s_eks_addons.helm_release.ingress_nginx[0] will be created
+  + resource "helm_release" "ingress_nginx" {
+      + atomic                     = false
+      + chart                      = "ingress-nginx"
+      + cleanup_on_fail            = false
+      + create_namespace           = false
+      + dependency_update          = true
+      + description                = "The NGINX HelmChart Ingress Controller deployment configuration"
+      + disable_crd_hooks          = false
+      + disable_openapi_validation = false
+      + disable_webhooks           = false
+      + force_update               = false
+      + id                         = (known after apply)
+      + lint                       = false
+      + manifest                   = (known after apply)
+      + max_history                = 0
+      + metadata                   = (known after apply)
+      + name                       = "ingress-nginx"
+      + namespace                  = "nginx"
+      + pass_credentials           = false
+      + recreate_pods              = false
+      + render_subchart_notes      = true
+      + replace                    = false
+      + repository                 = "https://kubernetes.github.io/ingress-nginx"
+      + reset_values               = false
+      + reuse_values               = false
+      + skip_crds                  = false
+      + status                     = "deployed"
+      + timeout                    = 1200
+      + values                     = (known after apply)
+      + verify                     = false
+      + version                    = "4.1.4"
+      + wait                       = true
+      + wait_for_jobs              = false
+    }
+
+  # module.k8s_eks_addons.kubernetes_namespace_v1.ingress_nginx[0] will be created
+  + resource "kubernetes_namespace_v1" "ingress_nginx" {
+      + id                               = (known after apply)
+      + wait_for_default_service_account = false
+
+      + metadata {
+          + generation       = (known after apply)
+          + name             = "nginx"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # module.k8s_eks_addons.kubernetes_service_account_v1.cluster_autoscaler[0] will be created
+  + resource "kubernetes_service_account_v1" "cluster_autoscaler" {
+      + automount_service_account_token = true
+      + default_secret_name             = (known after apply)
+      + id                              = (known after apply)
+
+      + metadata {
+          + annotations      = (known after apply)
+          + generation       = (known after apply)
+          + name             = "cluster-autoscaler-sa"
+          + namespace        = "kube-system"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # module.security_group.aws_security_group.this_name_prefix[0] will be created
+  + resource "aws_security_group" "this_name_prefix" {
+      + arn                    = (known after apply)
+      + description            = "PostgreSQL security group"
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = "rn-cluster-db-sg-"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "rn-cluster-db-sg"
+        }
+      + tags_all               = {
+          + "Name" = "rn-cluster-db-sg"
+        }
+      + vpc_id                 = (known after apply)
+
+      + timeouts {
+          + create = "10m"
+          + delete = "15m"
+        }
+    }
+
+  # module.security_group.aws_security_group_rule.ingress_with_cidr_blocks[0] will be created
+  + resource "aws_security_group_rule" "ingress_with_cidr_blocks" {
+      + cidr_blocks              = [
+          + "10.1.0.0/18",
+        ]
+      + description              = "PostgreSQL access from within VPC"
+      + from_port                = 5432
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + security_group_rule_id   = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 5432
+      + type                     = "ingress"
+    }
+
+  # module.vpc[0].aws_default_network_acl.this[0] will be created
+  + resource "aws_default_network_acl" "this" {
+      + arn                    = (known after apply)
+      + default_network_acl_id = (known after apply)
+      + id                     = (known after apply)
+      + owner_id               = (known after apply)
+      + tags                   = {
+          + "Name" = "rn-cluster-vpc-default"
+        }
+      + tags_all               = {
+          + "Name" = "rn-cluster-vpc-default"
+        }
+      + vpc_id                 = (known after apply)
+
+      + egress {
+          + action          = "allow"
+          + from_port       = 0
+          + ipv6_cidr_block = "::/0"
+          + protocol        = "-1"
+          + rule_no         = 101
+          + to_port         = 0
+            # (1 unchanged attribute hidden)
+        }
+      + egress {
+          + action          = "allow"
+          + cidr_block      = "0.0.0.0/0"
+          + from_port       = 0
+          + protocol        = "-1"
+          + rule_no         = 100
+          + to_port         = 0
+            # (1 unchanged attribute hidden)
+        }
+
+      + ingress {
+          + action          = "allow"
+          + from_port       = 0
+          + ipv6_cidr_block = "::/0"
+          + protocol        = "-1"
+          + rule_no         = 101
+          + to_port         = 0
+            # (1 unchanged attribute hidden)
+        }
+      + ingress {
+          + action          = "allow"
+          + cidr_block      = "0.0.0.0/0"
+          + from_port       = 0
+          + protocol        = "-1"
+          + rule_no         = 100
+          + to_port         = 0
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # module.vpc[0].aws_default_route_table.default[0] will be created
+  + resource "aws_default_route_table" "default" {
+      + arn                    = (known after apply)
+      + default_route_table_id = (known after apply)
+      + id                     = (known after apply)
+      + owner_id               = (known after apply)
+      + route                  = (known after apply)
+      + tags                   = {
+          + "Name" = "rn-cluster-vpc-default"
+        }
+      + tags_all               = {
+          + "Name" = "rn-cluster-vpc-default"
+        }
+      + vpc_id                 = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+          + update = "5m"
+        }
+    }
+
+  # module.vpc[0].aws_default_security_group.this[0] will be created
+  + resource "aws_default_security_group" "this" {
+      + arn                    = (known after apply)
+      + description            = (known after apply)
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name" = "rn-cluster-vpc-default"
+        }
+      + tags_all               = {
+          + "Name" = "rn-cluster-vpc-default"
+        }
+      + vpc_id                 = (known after apply)
+    }
+
+  # module.vpc[0].aws_eip.nat[0] will be created
+  + resource "aws_eip" "nat" {
+      + allocation_id        = (known after apply)
+      + arn                  = (known after apply)
+      + association_id       = (known after apply)
+      + carrier_ip           = (known after apply)
+      + customer_owned_ip    = (known after apply)
+      + domain               = "vpc"
+      + id                   = (known after apply)
+      + instance             = (known after apply)
+      + network_border_group = (known after apply)
+      + network_interface    = (known after apply)
+      + private_dns          = (known after apply)
+      + private_ip           = (known after apply)
+      + ptr_record           = (known after apply)
+      + public_dns           = (known after apply)
+      + public_ip            = (known after apply)
+      + public_ipv4_pool     = (known after apply)
+      + tags                 = {
+          + "Name" = "rn-cluster-vpc-eu-central-1a"
+        }
+      + tags_all             = {
+          + "Name" = "rn-cluster-vpc-eu-central-1a"
+        }
+      + vpc                  = (known after apply)
+    }
+
+  # module.vpc[0].aws_internet_gateway.this[0] will be created
+  + resource "aws_internet_gateway" "this" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + owner_id = (known after apply)
+      + tags     = {
+          + "Name" = "rn-cluster-vpc"
+        }
+      + tags_all = {
+          + "Name" = "rn-cluster-vpc"
+        }
+      + vpc_id   = (known after apply)
+    }
+
+  # module.vpc[0].aws_nat_gateway.this[0] will be created
+  + resource "aws_nat_gateway" "this" {
+      + allocation_id                      = (known after apply)
+      + association_id                     = (known after apply)
+      + connectivity_type                  = "public"
+      + id                                 = (known after apply)
+      + network_interface_id               = (known after apply)
+      + private_ip                         = (known after apply)
+      + public_ip                          = (known after apply)
+      + secondary_private_ip_address_count = (known after apply)
+      + secondary_private_ip_addresses     = (known after apply)
+      + subnet_id                          = (known after apply)
+      + tags                               = {
+          + "Name" = "rn-cluster-vpc-eu-central-1a"
+        }
+      + tags_all                           = {
+          + "Name" = "rn-cluster-vpc-eu-central-1a"
+        }
+    }
+
+  # module.vpc[0].aws_route.private_nat_gateway[0] will be created
+  + resource "aws_route" "private_nat_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + nat_gateway_id         = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpc[0].aws_route.public_internet_gateway[0] will be created
+  + resource "aws_route" "public_internet_gateway" {
+      + destination_cidr_block = "0.0.0.0/0"
+      + gateway_id             = (known after apply)
+      + id                     = (known after apply)
+      + instance_id            = (known after apply)
+      + instance_owner_id      = (known after apply)
+      + network_interface_id   = (known after apply)
+      + origin                 = (known after apply)
+      + route_table_id         = (known after apply)
+      + state                  = (known after apply)
+
+      + timeouts {
+          + create = "5m"
+        }
+    }
+
+  # module.vpc[0].aws_route_table.private[0] will be created
+  + resource "aws_route_table" "private" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "rn-cluster-vpc-private"
+        }
+      + tags_all         = {
+          + "Name" = "rn-cluster-vpc-private"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpc[0].aws_route_table.public[0] will be created
+  + resource "aws_route_table" "public" {
+      + arn              = (known after apply)
+      + id               = (known after apply)
+      + owner_id         = (known after apply)
+      + propagating_vgws = (known after apply)
+      + route            = (known after apply)
+      + tags             = {
+          + "Name" = "rn-cluster-vpc-public"
+        }
+      + tags_all         = {
+          + "Name" = "rn-cluster-vpc-public"
+        }
+      + vpc_id           = (known after apply)
+    }
+
+  # module.vpc[0].aws_route_table_association.private[0] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc[0].aws_route_table_association.private[1] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc[0].aws_route_table_association.private[2] will be created
+  + resource "aws_route_table_association" "private" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc[0].aws_route_table_association.public[0] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc[0].aws_route_table_association.public[1] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc[0].aws_route_table_association.public[2] will be created
+  + resource "aws_route_table_association" "public" {
+      + id             = (known after apply)
+      + route_table_id = (known after apply)
+      + subnet_id      = (known after apply)
+    }
+
+  # module.vpc[0].aws_subnet.private[0] will be created
+  + resource "aws_subnet" "private" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.1.0.0/22"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"                             = "rn-cluster-vpc-private-eu-central-1a"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/internal-elb"  = "1"
+          + "purpose"                          = "private"
+        }
+      + tags_all                                       = {
+          + "Name"                             = "rn-cluster-vpc-private-eu-central-1a"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/internal-elb"  = "1"
+          + "purpose"                          = "private"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc[0].aws_subnet.private[1] will be created
+  + resource "aws_subnet" "private" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.1.4.0/22"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"                             = "rn-cluster-vpc-private-eu-central-1b"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/internal-elb"  = "1"
+          + "purpose"                          = "private"
+        }
+      + tags_all                                       = {
+          + "Name"                             = "rn-cluster-vpc-private-eu-central-1b"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/internal-elb"  = "1"
+          + "purpose"                          = "private"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc[0].aws_subnet.private[2] will be created
+  + resource "aws_subnet" "private" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1c"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.1.8.0/22"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"                             = "rn-cluster-vpc-private-eu-central-1c"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/internal-elb"  = "1"
+          + "purpose"                          = "private"
+        }
+      + tags_all                                       = {
+          + "Name"                             = "rn-cluster-vpc-private-eu-central-1c"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/internal-elb"  = "1"
+          + "purpose"                          = "private"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc[0].aws_subnet.public[0] will be created
+  + resource "aws_subnet" "public" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1a"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.1.12.0/22"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"                             = "rn-cluster-vpc-public-eu-central-1a"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/elb"           = "1"
+          + "purpose"                          = "public"
+        }
+      + tags_all                                       = {
+          + "Name"                             = "rn-cluster-vpc-public-eu-central-1a"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/elb"           = "1"
+          + "purpose"                          = "public"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc[0].aws_subnet.public[1] will be created
+  + resource "aws_subnet" "public" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.1.16.0/22"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"                             = "rn-cluster-vpc-public-eu-central-1b"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/elb"           = "1"
+          + "purpose"                          = "public"
+        }
+      + tags_all                                       = {
+          + "Name"                             = "rn-cluster-vpc-public-eu-central-1b"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/elb"           = "1"
+          + "purpose"                          = "public"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc[0].aws_subnet.public[2] will be created
+  + resource "aws_subnet" "public" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "eu-central-1c"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.1.20.0/22"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name"                             = "rn-cluster-vpc-public-eu-central-1c"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/elb"           = "1"
+          + "purpose"                          = "public"
+        }
+      + tags_all                                       = {
+          + "Name"                             = "rn-cluster-vpc-public-eu-central-1c"
+          + "kubernetes.io/cluster/rn-cluster" = "shared"
+          + "kubernetes.io/role/elb"           = "1"
+          + "purpose"                          = "public"
+        }
+      + vpc_id                                         = (known after apply)
+    }
+
+  # module.vpc[0].aws_vpc.this[0] will be created
+  + resource "aws_vpc" "this" {
+      + arn                                  = (known after apply)
+      + cidr_block                           = "10.1.0.0/18"
+      + default_network_acl_id               = (known after apply)
+      + default_route_table_id               = (known after apply)
+      + default_security_group_id            = (known after apply)
+      + dhcp_options_id                      = (known after apply)
+      + enable_dns_hostnames                 = true
+      + enable_dns_support                   = true
+      + enable_network_address_usage_metrics = (known after apply)
+      + id                                   = (known after apply)
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name" = "rn-cluster-vpc"
+        }
+      + tags_all                             = {
+          + "Name" = "rn-cluster-vpc"
+        }
+    }
+
+  # module.eks.module.node_group["default"].data.aws_iam_policy_document.node_group_assume_role_policy will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_iam_policy_document" "node_group_assume_role_policy" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions = [
+              + "sts:AssumeRole",
+            ]
+          + sid     = "EKSWorkerAssumeRole"
+
+          + principals {
+              + identifiers = [
+                  + "ec2.amazonaws.com",
+                ]
+              + type        = "Service"
+            }
+        }
+    }
+
+  # module.eks.module.node_group["default"].aws_autoscaling_group_tag.ephemeral_storage will be created
+  + resource "aws_autoscaling_group_tag" "ephemeral_storage" {
+      + autoscaling_group_name = (known after apply)
+      + id                     = (known after apply)
+
+      + tag {
+          + key                 = "k8s.io/cluster-autoscaler/node-template/resources/ephemeral-storage"
+          + propagate_at_launch = true
+          + value               = "200G"
+        }
+    }
+
+  # module.eks.module.node_group["default"].aws_eks_node_group.node_group will be created
+  + resource "aws_eks_node_group" "node_group" {
+      + ami_type               = "AL2_x86_64"
+      + arn                    = (known after apply)
+      + capacity_type          = "ON_DEMAND"
+      + cluster_name           = (known after apply)
+      + disk_size              = (known after apply)
+      + id                     = (known after apply)
+      + instance_types         = [
+          + "m6a.4xlarge",
+          + "m5a.4xlarge",
+          + "m5.4xlarge",
+          + "m6i.4xlarge",
+          + "m4.4xlarge",
+          + "m7i.4xlarge",
+          + "m7a.4xlarge",
+        ]
+      + node_group_name        = (known after apply)
+      + node_group_name_prefix = "default-"
+      + node_role_arn          = (known after apply)
+      + release_version        = (known after apply)
+      + resources              = (known after apply)
+      + status                 = (known after apply)
+      + subnet_ids             = (known after apply)
+      + tags                   = (known after apply)
+      + tags_all               = (known after apply)
+      + version                = "1.30"
+
+      + launch_template {
+          + id      = (known after apply)
+          + name    = (known after apply)
+          + version = (known after apply)
+        }
+
+      + scaling_config {
+          + desired_size = 1
+          + max_size     = 12
+          + min_size     = 1
+        }
+
+      + timeouts {
+          + create = "30m"
+          + delete = "30m"
+          + update = "2h"
+        }
+
+      + update_config {
+          + max_unavailable = 1
+        }
+    }
+
+  # module.eks.module.node_group["default"].aws_iam_instance_profile.node_group will be created
+  + resource "aws_iam_instance_profile" "node_group" {
+      + arn         = (known after apply)
+      + create_date = (known after apply)
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + name_prefix = (known after apply)
+      + path        = "/"
+      + role        = (known after apply)
+      + tags_all    = (known after apply)
+      + unique_id   = (known after apply)
+    }
+
+  # module.eks.module.node_group["default"].aws_iam_role.node_group will be created
+  + resource "aws_iam_role" "node_group" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = (known after apply)
+      + create_date           = (known after apply)
+      + description           = "EKS Managed Node group IAM Role"
+      + force_detach_policies = true
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = (known after apply)
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.eks.module.node_group["default"].aws_iam_role_policy_attachment.node_group["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"] will be created
+  + resource "aws_iam_role_policy_attachment" "node_group" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      + role       = (known after apply)
+    }
+
+  # module.eks.module.node_group["default"].aws_iam_role_policy_attachment.node_group["arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"] will be created
+  + resource "aws_iam_role_policy_attachment" "node_group" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+      + role       = (known after apply)
+    }
+
+  # module.eks.module.node_group["default"].aws_iam_role_policy_attachment.node_group["arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"] will be created
+  + resource "aws_iam_role_policy_attachment" "node_group" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+      + role       = (known after apply)
+    }
+
+  # module.eks.module.node_group["default"].aws_iam_role_policy_attachment.node_group["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"] will be created
+  + resource "aws_iam_role_policy_attachment" "node_group" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      + role       = (known after apply)
+    }
+
+  # module.eks.module.node_group["default"].aws_launch_template.node_group will be created
+  + resource "aws_launch_template" "node_group" {
+      + arn                    = (known after apply)
+      + default_version        = (known after apply)
+      + description            = "Launch Template for EKS Managed Node Groups"
+      + ebs_optimized          = "true"
+      + id                     = (known after apply)
+      + latest_version         = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = (known after apply)
+      + tags_all               = (known after apply)
+      + update_default_version = true
+      + user_data              = "TUlNRS1WZXJzaW9uOiAxLjAKQ29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSIvLyIKCi0tLy8KQ29udGVudC1UeXBlOiB0ZXh0L3gtc2hlbGxzY3JpcHQ7IGNoYXJzZXQ9InVzLWFzY2lpIgojIS9iaW4vYmFzaApzZXQgLWV4CgotLS8vLS0K"
+        # (1 unchanged attribute hidden)
+
+      + block_device_mappings {
+          + device_name = "/dev/xvda"
+
+          + ebs {
+              + delete_on_termination = "true"
+              + encrypted             = "true"
+              + iops                  = 3000
+              + throughput            = 125
+              + volume_size           = 200
+              + volume_type           = "gp3"
+            }
+        }
+
+      + metadata_options {
+          + http_endpoint               = "enabled"
+          + http_protocol_ipv6          = (known after apply)
+          + http_put_response_hop_limit = 2
+          + http_tokens                 = "required"
+          + instance_metadata_tags      = (known after apply)
+        }
+
+      + monitoring {
+          + enabled = true
+        }
+
+      + network_interfaces {
+          + security_groups = (known after apply)
+        }
+
+      + tag_specifications {
+          + resource_type = "instance"
+          + tags          = (known after apply)
+        }
+      + tag_specifications {
+          + resource_type = "network-interface"
+          + tags          = (known after apply)
+        }
+      + tag_specifications {
+          + resource_type = "volume"
+          + tags          = (known after apply)
+        }
+    }
+
+  # module.eks.module.node_group["execnodes"].data.aws_iam_policy_document.node_group_assume_role_policy will be read during apply
+  # (depends on a resource or a module with changes pending)
+ <= data "aws_iam_policy_document" "node_group_assume_role_policy" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions = [
+              + "sts:AssumeRole",
+            ]
+          + sid     = "EKSWorkerAssumeRole"
+
+          + principals {
+              + identifiers = [
+                  + "ec2.amazonaws.com",
+                ]
+              + type        = "Service"
+            }
+        }
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_autoscaling_group_tag.ephemeral_storage will be created
+  + resource "aws_autoscaling_group_tag" "ephemeral_storage" {
+      + autoscaling_group_name = (known after apply)
+      + id                     = (known after apply)
+
+      + tag {
+          + key                 = "k8s.io/cluster-autoscaler/node-template/resources/ephemeral-storage"
+          + propagate_at_launch = true
+          + value               = "200G"
+        }
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_autoscaling_group_tag.labels["purpose"] will be created
+  + resource "aws_autoscaling_group_tag" "labels" {
+      + autoscaling_group_name = (known after apply)
+      + id                     = (known after apply)
+
+      + tag {
+          + key                 = "k8s.io/cluster-autoscaler/node-template/label/purpose"
+          + propagate_at_launch = true
+          + value               = "execution"
+        }
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_eks_node_group.node_group will be created
+  + resource "aws_eks_node_group" "node_group" {
+      + ami_type               = "AL2_x86_64"
+      + arn                    = (known after apply)
+      + capacity_type          = "ON_DEMAND"
+      + cluster_name           = (known after apply)
+      + disk_size              = (known after apply)
+      + id                     = (known after apply)
+      + instance_types         = [
+          + "m6a.4xlarge",
+          + "m5a.4xlarge",
+          + "m5.4xlarge",
+          + "m6i.4xlarge",
+          + "m4.4xlarge",
+          + "m7i.4xlarge",
+          + "m7a.4xlarge",
+        ]
+      + labels                 = {
+          + "purpose" = "execution"
+        }
+      + node_group_name        = (known after apply)
+      + node_group_name_prefix = "execnodes-"
+      + node_role_arn          = (known after apply)
+      + release_version        = (known after apply)
+      + resources              = (known after apply)
+      + status                 = (known after apply)
+      + subnet_ids             = (known after apply)
+      + tags                   = (known after apply)
+      + tags_all               = (known after apply)
+      + version                = "1.30"
+
+      + launch_template {
+          + id      = (known after apply)
+          + name    = (known after apply)
+          + version = (known after apply)
+        }
+
+      + scaling_config {
+          + desired_size = 0
+          + max_size     = 10
+          + min_size     = 0
+        }
+
+      + taint {
+          + effect = "NO_SCHEDULE"
+          + key    = "purpose"
+          + value  = "execution"
+        }
+
+      + timeouts {
+          + create = "30m"
+          + delete = "30m"
+          + update = "2h"
+        }
+
+      + update_config {
+          + max_unavailable = 1
+        }
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_iam_instance_profile.node_group will be created
+  + resource "aws_iam_instance_profile" "node_group" {
+      + arn         = (known after apply)
+      + create_date = (known after apply)
+      + id          = (known after apply)
+      + name        = (known after apply)
+      + name_prefix = (known after apply)
+      + path        = "/"
+      + role        = (known after apply)
+      + tags_all    = (known after apply)
+      + unique_id   = (known after apply)
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_iam_role.node_group will be created
+  + resource "aws_iam_role" "node_group" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = (known after apply)
+      + create_date           = (known after apply)
+      + description           = "EKS Managed Node group IAM Role"
+      + force_detach_policies = true
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = (known after apply)
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_iam_role_policy_attachment.node_group["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"] will be created
+  + resource "aws_iam_role_policy_attachment" "node_group" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      + role       = (known after apply)
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_iam_role_policy_attachment.node_group["arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"] will be created
+  + resource "aws_iam_role_policy_attachment" "node_group" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+      + role       = (known after apply)
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_iam_role_policy_attachment.node_group["arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"] will be created
+  + resource "aws_iam_role_policy_attachment" "node_group" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+      + role       = (known after apply)
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_iam_role_policy_attachment.node_group["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"] will be created
+  + resource "aws_iam_role_policy_attachment" "node_group" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      + role       = (known after apply)
+    }
+
+  # module.eks.module.node_group["execnodes"].aws_launch_template.node_group will be created
+  + resource "aws_launch_template" "node_group" {
+      + arn                    = (known after apply)
+      + default_version        = (known after apply)
+      + description            = "Launch Template for EKS Managed Node Groups"
+      + ebs_optimized          = "true"
+      + id                     = (known after apply)
+      + latest_version         = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = (known after apply)
+      + tags_all               = (known after apply)
+      + update_default_version = true
+      + user_data              = "TUlNRS1WZXJzaW9uOiAxLjAKQ29udGVudC1UeXBlOiBtdWx0aXBhcnQvbWl4ZWQ7IGJvdW5kYXJ5PSIvLyIKCi0tLy8KQ29udGVudC1UeXBlOiB0ZXh0L3gtc2hlbGxzY3JpcHQ7IGNoYXJzZXQ9InVzLWFzY2lpIgojIS9iaW4vYmFzaApzZXQgLWV4CgotLS8vLS0K"
+        # (1 unchanged attribute hidden)
+
+      + block_device_mappings {
+          + device_name = "/dev/xvda"
+
+          + ebs {
+              + delete_on_termination = "true"
+              + encrypted             = "true"
+              + iops                  = 3000
+              + throughput            = 125
+              + volume_size           = 200
+              + volume_type           = "gp3"
+            }
+        }
+
+      + metadata_options {
+          + http_endpoint               = "enabled"
+          + http_protocol_ipv6          = (known after apply)
+          + http_put_response_hop_limit = 2
+          + http_tokens                 = "required"
+          + instance_metadata_tags      = (known after apply)
+        }
+
+      + monitoring {
+          + enabled = true
+        }
+
+      + network_interfaces {
+          + security_groups = (known after apply)
+        }
+
+      + tag_specifications {
+          + resource_type = "instance"
+          + tags          = (known after apply)
+        }
+      + tag_specifications {
+          + resource_type = "network-interface"
+          + tags          = (known after apply)
+        }
+      + tag_specifications {
+          + resource_type = "volume"
+          + tags          = (known after apply)
+        }
+    }
+
+Plan: 84 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + account_id                  = "778206098013"
+  + backup_vaults               = []
+  + database_endpoints          = []
+  + database_identifiers        = []
+  + eks_cluster_id              = (known after apply)
+  + opensearch_domain_endpoints = [
+      + null,
+    ]
+  + s3_buckets                  = [
+      + "rn-cluster-logs",
+    ]
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.
