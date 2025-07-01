@@ -6,8 +6,8 @@ resource "aws_s3_bucket" "data_bucket" {
 }
 
 resource "aws_s3_bucket_logging" "data_bucket_logging" {
-  count  = var.data_bucket.create ? 1 : 0
-  bucket = aws_s3_bucket.data_bucket[0].id
+  count         = var.data_bucket.create ? 1 : 0
+  bucket        = aws_s3_bucket.data_bucket[0].id
   target_bucket = var.log_bucket
   target_prefix = "logs/bucket/${aws_s3_bucket.data_bucket[0].id}/"
 }
@@ -20,8 +20,8 @@ resource "aws_s3_bucket" "rawdata_bucket" {
 }
 
 resource "aws_s3_bucket_logging" "rawdata_bucket_logging" {
-  count  = var.raw_data_bucket.create ? 1 : 0
-  bucket = aws_s3_bucket.rawdata_bucket[0].id
+  count         = var.raw_data_bucket.create ? 1 : 0
+  bucket        = aws_s3_bucket.rawdata_bucket[0].id
   target_bucket = var.log_bucket
   target_prefix = "logs/bucket/${aws_s3_bucket.rawdata_bucket[0].id}/"
 }
