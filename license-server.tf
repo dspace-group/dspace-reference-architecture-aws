@@ -159,6 +159,13 @@ resource "aws_s3_bucket_policy" "license_server_bucket_ssl" {
   policy = templatefile("${path.module}/templates/s3_ssl_policy.json", { bucket = aws_s3_bucket.license_server_bucket[0].id })
 }
 
+resource "aws_s3_bucket_logging" "license_server_bucket_logging" {
+  count         = var.licenseServer ? 1 : 0
+  bucket        = aws_s3_bucket.license_server_bucket[0].id
+  target_bucket = aws_s3_bucket.bucket_logs.id
+  target_prefix = "logs/bucket/${aws_s3_bucket.license_server_bucket[0].id}/"
+}
+
 resource "aws_iam_instance_profile" "license_server_profile" {
   count = var.licenseServer ? 1 : 0
   name  = local.license_server_instance_profile

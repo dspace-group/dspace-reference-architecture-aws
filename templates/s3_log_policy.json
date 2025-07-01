@@ -1,9 +1,8 @@
 {
   "Version": "2012-10-17",
-  "Id": "S3-Console-Auto-Gen-Policy-1747742934905",
   "Statement": [
     {
-      "Sid": "S3PolicyStmt-DO-NOT-MODIFY-1747742934780",
+      "Sid": "S3ServerAccessLogsPolicy",
       "Effect": "Allow",
       "Principal": {
         "Service": "logging.s3.amazonaws.com"
@@ -12,7 +11,7 @@
       "Resource": "arn:aws:s3:::${bucket}/*",
       "Condition": {
         "StringEquals": {
-          "aws:SourceAccount": "730335459808"
+          "aws:SourceAccount": "${account_id}"
         }
       }
     }
