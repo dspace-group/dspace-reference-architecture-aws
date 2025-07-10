@@ -111,6 +111,5 @@ variable "goofys_user_agent_sdk_and_go_version" {
 variable "log_bucket" {
   type        = string
   description = "Name of the S3 bucket where S3 server access logs are stored"
-  default     = ""
 }
 
