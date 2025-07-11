@@ -184,6 +184,12 @@ variable "vpcPublicSubnets" {
   default     = ["10.1.12.0/22", "10.1.16.0/22", "10.1.20.0/22"]
 }
 
+variable "eks_api_subnet_ids" {
+  type        = list(any)
+  description = "List of IDs for the EKS API subnets"
+  default     = []
+}
+
 variable "ecr_pullthrough_cache_rule_config" {
   type = object({
     enable = bool
