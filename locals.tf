@@ -41,7 +41,7 @@ locals {
     Version   = "2012-10-17"
     Statement = concat(local.s3_ssl_policy.Statement, local.s3_logging_policy.Statement)
   }
-  default_node_pools = {
+  default_node_pool = {
     "default" = {
       node_group_name = "default"
       instance_types  = var.linuxNodeSize
@@ -49,7 +49,9 @@ locals {
       max_size        = var.linuxNodeCountMax
       min_size        = var.linuxNodeCountMin
       volume_size     = var.linuxNodeDiskSize
-    },
+    }
+  }
+  execution_node_pool = {
     "execnodes" = {
       node_group_name = "execnodes"
       instance_types  = var.linuxExecutionNodeSize
@@ -142,7 +144,8 @@ locals {
     }
   }
   node_pools = merge(
-    local.default_node_pools,
+    local.default_node_pool,
+    var.execution_node_pool.enable ? local.execution_node_pool : {},
     var.gpuNodePool ? local.gpu_node_pool : {},
     var.ivsGpuNodePool ? local.ivsgpu_node_pool : {},
     var.windows_execution_node.enable ? local.ivs_windows_node_pool : {}
