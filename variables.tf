@@ -185,9 +185,13 @@ variable "vpcPublicSubnets" {
 }
 
 variable "eks_api_subnet_ids" {
-  type        = list(any)
+  type        = list(string)
   description = "List of IDs for the EKS API subnets"
   default     = []
+  validation {
+    condition     = alltrue([for id in var.eks_api_subnet_ids : can(regex("^subnet-[a-z0-9]+$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' and contain only lowercase letters and digits."
+  }
 }
 
 variable "ecr_pullthrough_cache_rule_config" {
