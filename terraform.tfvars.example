@@ -47,6 +47,11 @@ efs_csi_config = {
 # EKS nodes need to be updated manually.
 enable_patching = false
 
+# Deploy Execution node pool
+execution_node_pool = {
+  "enable": true
+}
+
 # The maximum number of nodes for gpu job execution
 gpuNodeCountMax = 12
 

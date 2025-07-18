@@ -527,3 +527,13 @@ variable "windows_execution_node" {
     node_count_max = 2
   }
 }
+
+variable "execution_node_pool" {
+  type = object({
+    enable = optional(bool, true)
+  })
+  description = "Deploy Execution node pool"
+  default = {
+    enable = true
+  }
+}
