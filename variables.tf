@@ -184,6 +184,16 @@ variable "vpcPublicSubnets" {
   default     = ["10.1.12.0/22", "10.1.16.0/22", "10.1.20.0/22"]
 }
 
+variable "eks_api_subnet_ids" {
+  type        = list(string)
+  description = "List of IDs for the EKS API subnets"
+  default     = []
+  validation {
+    condition     = alltrue([for id in var.eks_api_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
+  }
+}
+
 variable "ecr_pullthrough_cache_rule_config" {
   type = object({
     enable = bool

@@ -15,6 +15,7 @@
   "efs_csi_config": {
     "enable": true
   },
+  "eks_api_subnet_ids": [],
   "enable_patching": false,
   "gpuNodeCountMax": 12,
   "gpuNodeCountMin": 0,

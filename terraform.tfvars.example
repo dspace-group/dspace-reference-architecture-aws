@@ -42,6 +42,9 @@ efs_csi_config = {
   "enable": true
 }
 
+# List of IDs for the EKS API subnets
+eks_api_subnet_ids = []
+
 # Scans license server EC2 instance and EKS nodes for updates.
 # Installs patches on license server automatically.
 # EKS nodes need to be updated manually.
