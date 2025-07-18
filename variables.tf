@@ -189,8 +189,8 @@ variable "eks_api_subnet_ids" {
   description = "List of IDs for the EKS API subnets"
   default     = []
   validation {
-    condition     = alltrue([for id in var.eks_api_subnet_ids : can(regex("^subnet-[a-z0-9]+$", id))])
-    error_message = "Each subnet ID must start with 'subnet-' and contain only lowercase letters and digits."
+    condition     = alltrue([for id in var.eks_api_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
   }
 }
 
