@@ -16,6 +16,9 @@
     "enable": true
   },
   "enable_patching": false,
+  "execution_node_pool": {
+    "enable": true
+  },
   "gpuNodeCountMax": 12,
   "gpuNodeCountMin": 0,
   "gpuNodeDiskSize": 100,
