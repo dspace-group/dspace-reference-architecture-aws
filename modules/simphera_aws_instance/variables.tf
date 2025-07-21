@@ -148,7 +148,7 @@ variable "log_bucket" {
 }
 
 variable "private_subnets" {
-  type        = list(any)
+  type        = list(string)
   description = "List of CIDRs for the private subnets."
   default     = ["10.1.0.0/22", "10.1.4.0/22", "10.1.8.0/22"]
 }
