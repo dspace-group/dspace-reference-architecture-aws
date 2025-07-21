@@ -161,27 +161,45 @@ variable "vpcCidr" {
 }
 
 variable "private_subnet_ids" {
-  type        = list(any)
+  type        = list(string)
   description = "List of IDs for the private subnets."
   default     = []
+  validation {
+    condition     = alltrue([for id in var.private_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
+  }
 }
 
 variable "vpcPrivateSubnets" {
-  type        = list(any)
+  type        = list(string)
   description = "List of CIDRs for the private subnets."
   default     = ["10.1.0.0/22", "10.1.4.0/22", "10.1.8.0/22"]
+  validation {
+    condition = alltrue([
+    for cidr in var.vpcPrivateSubnets : can(regex("^((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/(3[0-2]|[12]?\\d)$", cidr) != null)])
+    error_message = "Each subnet CIDR must be a valid IPv4 CIDR block like '10.0.0.0/24'."
+  }
 }
 
 variable "public_subnet_ids" {
-  type        = list(any)
+  type        = list(string)
   description = "List of IDs for the public subnets."
   default     = []
+  validation {
+    condition     = alltrue([for id in var.public_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
+  }
 }
 
 variable "vpcPublicSubnets" {
-  type        = list(any)
+  type        = list(string)
   description = "List of CIDRs for the public subnets."
   default     = ["10.1.12.0/22", "10.1.16.0/22", "10.1.20.0/22"]
+  validation {
+    condition = alltrue([
+    for cidr in var.vpcPublicSubnets : can(regex("^((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/(3[0-2]|[12]?\\d)$", cidr) != null)])
+    error_message = "Each subnet CIDR must be a valid IPv4 CIDR block like '10.0.0.0/24'."
+  }
 }
 
 variable "eks_api_subnet_ids" {
