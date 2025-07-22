@@ -364,20 +364,31 @@ variable "scenarioGenerationInstances" {
     k8s_namespace                        = string
     secretname                           = string
     enable_deletion_protection           = bool
-
+    opensearch = optional(object({
+      enable         = optional(bool, false)
+      engine_version = optional(string, "OpenSearch_2.17")
+      instance_type  = optional(string, "m7g.medium.search")
+      instance_count = optional(number, 1)
+      volume_size    = optional(number, 100)
+      }),
+      {}
+    )
   }))
   description = "A list containing the individual Scenario Generation instances, such as 'staging' and 'production'."
   default = {
     "production" = {
-      name                       = "production"
-      postgresqlApplyImmediately = false
-      postgresqlVersion          = "16"
-      postgresqlStorage          = 20
-      postgresqlMaxStorage       = 100
-      db_instance_type_simphera  = "db.t4g.large"
-      k8s_namespace              = "scenario-generation"
-      secretname                 = "aws-scenario-generation-dev-production"
-      enable_deletion_protection = true
+      name                                 = "production"
+      postgresqlApplyImmediately           = false
+      postgresqlVersion                    = "16"
+      postgresqlStorage                    = 20
+      postgresqlMaxStorage                 = 100
+      db_instance_type_scenario_generation = "db.t4g.large"
+      k8s_namespace                        = "scenario-generation"
+      secretname                           = "aws-scenario-generation-dev-production"
+      enable_deletion_protection           = true
+      opensearch = {
+        enable = false
+      }
     }
   }
 }

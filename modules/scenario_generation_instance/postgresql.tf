@@ -15,7 +15,7 @@ resource "aws_db_instance" "scenario_generation" {
   engine_version                      = var.postgresqlVersion
   instance_class                      = var.db_instance_type_scenario_generation
   identifier                          = local.db_scenario_generation_id
-  db_name                             = "scenario-generation"
+  db_name                             = "scenariogeneration"
   username                            = local.secret_postgres_username
   password                            = local.secrets["postgresql_password"]
   multi_az                            = true # [RDS.5] RDS DB instances should be configured with multiple Availability Zones
