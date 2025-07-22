@@ -11,6 +11,16 @@ output "backup_vaults" {
   ])
 }
 
+output "scenario_generation_database_identifiers" {
+  description = "Identifiers of the Scenario Generation databases from all Scenario Generation instances."
+  value       = flatten([for name, instance in module.scenario_generation_instance : instance.database_identifiers])
+}
+
+output "scenario_generation_database_endpoints" {
+  description = "Identifiers of the Scenario Generation databases from all Scenario Generation instances."
+  value       = flatten([for name, instance in module.scenario_generation_instance : instance.database_endpoints])
+}
+
 output "database_identifiers" {
   description = "Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances."
   value       = flatten([for name, instance in module.simphera_instance : instance.database_identifiers])
@@ -31,9 +41,14 @@ output "eks_cluster_id" {
   value       = module.eks.eks_cluster_id
 }
 
-output "opensearch_domain_endpoints" {
+output "ivs_opensearch_domain_endpoints" {
   description = "List of OpenSearch Domains endpoints of IVS instances"
   value       = [for key, value in module.ivs_instance : value.opensearch_domain_endpoint]
+}
+
+output "scenario_generation_opensearch_domain_endpoints" {
+  description = "List of OpenSearch Domains endpoints of Scenario Generation instances"
+  value       = [for key, value in module.scenario_generation_instance : value.opensearch_domain_endpoint]
 }
 
 output "ivs_buckets_service_accounts" {
