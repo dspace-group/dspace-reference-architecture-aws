@@ -1,8 +1,3 @@
-variable "region" {
-  type        = string
-  description = "The AWS region to be used."
-  default     = "eu-central-1"
-}
 variable "infrastructurename" {
   type        = string
   description = "The name of the infrastructure. e.g. scenario-generation-infra"

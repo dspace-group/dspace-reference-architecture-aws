@@ -43,7 +43,7 @@ resource "aws_db_instance" "scenario_generation" {
 }
 
 data "http" "aws_tls_certificate" {
-  url = "https://truststore.pki.rds.amazonaws.com/${var.region}/${var.region}-bundle.pem"
+  url = "https://truststore.pki.rds.amazonaws.com/${var.aws_context.region_name}/${var.aws_context.region_name}-bundle.pem"
 }
 resource "kubernetes_secret" "aws_tls_certificate" {
   metadata {
