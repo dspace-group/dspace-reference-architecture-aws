@@ -666,17 +666,19 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | Name | Description |
 |------|-------------|
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | The AWS account id used for creating resources. |
-| <a name="output_backup_vaults"></a> [backup\_vaults](#output\_backup\_vaults) | Backups vaults from all dSPACE cloud products managed by terraform. |
 | <a name="output_eks_cluster_id"></a> [eks\_cluster\_id](#output\_eks\_cluster\_id) | Amazon EKS Cluster Name |
+| <a name="output_ivs_backup_vaults"></a> [ivs\_backup\_vaults](#output\_ivs\_backup\_vaults) | Backups vaults from IVS managed by terraform. |
 | <a name="output_ivs_buckets_service_accounts"></a> [ivs\_buckets\_service\_accounts](#output\_ivs\_buckets\_service\_accounts) | List of K8s service account names with access to the IVS buckets |
 | <a name="output_ivs_node_groups_roles"></a> [ivs\_node\_groups\_roles](#output\_ivs\_node\_groups\_roles) | n/a |
 | <a name="output_ivs_opensearch_domain_endpoints"></a> [ivs\_opensearch\_domain\_endpoints](#output\_ivs\_opensearch\_domain\_endpoints) | List of OpenSearch Domains endpoints of IVS instances |
 | <a name="output_pullthrough_cache_prefix"></a> [pullthrough\_cache\_prefix](#output\_pullthrough\_cache\_prefix) | n/a |
 | <a name="output_s3_buckets"></a> [s3\_buckets](#output\_s3\_buckets) | S3 buckets managed by terraform. |
+| <a name="output_scenario_generation_backup_vaults"></a> [scenario\_generation\_backup\_vaults](#output\_scenario\_generation\_backup\_vaults) | Backups vaults from Scenario Generation managed by terraform. |
 | <a name="output_scenario_generation_database_endpoints"></a> [scenario\_generation\_database\_endpoints](#output\_scenario\_generation\_database\_endpoints) | Identifiers of the Scenario Generation databases from all Scenario Generation instances. |
 | <a name="output_scenario_generation_database_identifiers"></a> [scenario\_generation\_database\_identifiers](#output\_scenario\_generation\_database\_identifiers) | Identifiers of the Scenario Generation databases from all Scenario Generation instances. |
 | <a name="output_scenario_generation_opensearch_domain_endpoints"></a> [scenario\_generation\_opensearch\_domain\_endpoints](#output\_scenario\_generation\_opensearch\_domain\_endpoints) | List of OpenSearch Domains endpoints of Scenario Generation instances |
 | <a name="output_scenario_generation_opensearch_service_accounts"></a> [scenario\_generation\_opensearch\_service\_accounts](#output\_scenario\_generation\_opensearch\_service\_accounts) | List of K8s service account names with access to OpenSearch |
+| <a name="output_simphera_backup_vaults"></a> [simphera\_backup\_vaults](#output\_simphera\_backup\_vaults) | Backups vaults from SIMPHERA managed by terraform. |
 | <a name="output_simphera_database_endpoints"></a> [simphera\_database\_endpoints](#output\_simphera\_database\_endpoints) | Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances. |
 | <a name="output_simphera_database_identifiers"></a> [simphera\_database\_identifiers](#output\_simphera\_database\_identifiers) | Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances. |
 <!-- END_TF_DOCS -->
