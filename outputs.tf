@@ -4,12 +4,18 @@ output "account_id" {
 }
 
 output "backup_vaults" {
-  description = "Backups vaults from all dSPACE cloud products managed by terraform."
-  value = flatten([
-    flatten([for name, instance in module.simphera_instance : instance.backup_vaults]),
-    flatten([for name, instance in module.ivs_instance : instance.backup_vaults]),
-    flatten([for name, instance in module.scenario_generation_instance : instance.backup_vaults])
-  ])
+  description = "Backups vaults from SIMPHERA managed by terraform."
+  value       = flatten([for name, instance in module.simphera_instance : instance.backup_vaults])
+}
+
+output "backup_vaults" {
+  description = "Backups vaults from IVS managed by terraform."
+  value       = flatten([for name, instance in module.ivs_instance : instance.backup_vaults])
+}
+
+output "backup_vaults" {
+  description = "Backups vaults from Scenario Generation managed by terraform."
+  value       = flatten([for name, instance in module.scenario_generation_instance : instance.backup_vaults])
 }
 
 output "scenario_generation_database_identifiers" {
