@@ -14,7 +14,7 @@ variable "postgresql_security_group_id" {
 }
 
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   description = "The tags to be added to all resources."
   default     = {}
 }
