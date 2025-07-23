@@ -27,7 +27,7 @@ variable "instancename" {
 }
 
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   description = "The tags to be added to all resources."
   default     = {}
 }
