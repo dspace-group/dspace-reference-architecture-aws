@@ -1,7 +1,6 @@
 module "scenario_generation_instance" {
   source                               = "./modules/scenario_generation_instance"
   for_each                             = var.scenarioGenerationInstances
-  region                               = local.region
   infrastructurename                   = local.infrastructurename
   tags                                 = var.tags
   eks_oidc_issuer_url                  = module.eks.eks_oidc_issuer_url
