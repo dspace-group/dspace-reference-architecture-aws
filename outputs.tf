@@ -7,7 +7,8 @@ output "backup_vaults" {
   description = "Backups vaults from all dSPACE cloud products managed by terraform."
   value = flatten([
     flatten([for name, instance in module.simphera_instance : instance.backup_vaults]),
-    flatten([for name, instance in module.ivs_instance : instance.backup_vaults])
+    flatten([for name, instance in module.ivs_instance : instance.backup_vaults]),
+    flatten([for name, instance in module.scenario_generation_instance : instance.backup_vaults])
   ])
 }
 
@@ -21,12 +22,12 @@ output "scenario_generation_database_endpoints" {
   value       = flatten([for name, instance in module.scenario_generation_instance : instance.database_endpoints])
 }
 
-output "database_identifiers" {
+output "simphera_database_identifiers" {
   description = "Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances."
   value       = flatten([for name, instance in module.simphera_instance : instance.database_identifiers])
 }
 
-output "database_endpoints" {
+output "simphera_database_endpoints" {
   description = "Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances."
   value       = flatten([for name, instance in module.simphera_instance : instance.database_endpoints])
 }
@@ -49,6 +50,11 @@ output "ivs_opensearch_domain_endpoints" {
 output "scenario_generation_opensearch_domain_endpoints" {
   description = "List of OpenSearch Domains endpoints of Scenario Generation instances"
   value       = [for key, value in module.scenario_generation_instance : value.opensearch_domain_endpoint]
+}
+
+output "scenario_generation_opensearch_service_accounts" {
+  description = "List of K8s service account names with access to OpenSearch"
+  value       = [for name, instance in module.scenario_generation_instance : instance.opensearch_service_account]
 }
 
 output "ivs_buckets_service_accounts" {

@@ -14,6 +14,8 @@ module "scenario_generation_instance" {
   db_instance_type_scenario_generation = each.value.db_instance_type_scenario_generation
   k8s_namespace                        = each.value.k8s_namespace
   secretname                           = each.value.secretname
+  enable_backup_service                = each.value.enable_backup_service
+  backup_retention                     = each.value.backup_retention
   cloudwatch_retention                 = var.cloudwatch_retention
   enable_deletion_protection           = each.value.enable_deletion_protection
   postgresql_security_group_id         = module.security_group.security_group_id

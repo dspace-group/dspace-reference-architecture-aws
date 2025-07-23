@@ -91,6 +91,17 @@ variable "eks_oidc_provider_arn" {
   description = "The ARN of the OIDC Provider if `enable_irsa = true`."
 }
 
+variable "enable_backup_service" {
+  default = false
+  type    = bool
+}
+
+variable "backup_retention" {
+  default     = 7
+  type        = number
+  description = "The retention period for continuous backups can be between 1 and 35 days."
+}
+
 variable "kms_key_cloudwatch" {
   type        = string
   description = "ARN of KMS encryption key used to encrypt CloudWatch log groups."

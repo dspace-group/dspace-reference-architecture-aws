@@ -363,9 +363,11 @@ variable "scenarioGenerationInstances" {
     db_instance_type_scenario_generation = string
     k8s_namespace                        = string
     secretname                           = string
+    enable_backup_service                = bool
+    backup_retention                     = number
     enable_deletion_protection           = bool
     opensearch = optional(object({
-      enable         = optional(bool, false)
+      enable         = optional(bool, true)
       engine_version = optional(string, "OpenSearch_2.17")
       instance_type  = optional(string, "m7g.medium.search")
       instance_count = optional(number, 1)
@@ -385,9 +387,11 @@ variable "scenarioGenerationInstances" {
       db_instance_type_scenario_generation = "db.t4g.large"
       k8s_namespace                        = "scenario-generation"
       secretname                           = "aws-scenario-generation-dev-production"
+      enable_backup_service                = true
+      backup_retention                     = 35
       enable_deletion_protection           = true
       opensearch = {
-        enable = false
+        enable = true
       }
     }
   }

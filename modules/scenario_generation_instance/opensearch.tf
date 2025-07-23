@@ -28,7 +28,7 @@ resource "kubernetes_service_account" "opensearch_service_account" {
     name      = local.opensearch_serviceaccount
     namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.opensearch_iam_role.arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.opensearch_iam_role[0].arn
     }
   }
   automount_service_account_token = false
@@ -42,7 +42,7 @@ resource "aws_opensearch_domain" "opensearch" {
     enabled                        = true
     internal_user_database_enabled = false
     master_user_options {
-      master_user_arn = aws_iam_role.opensearch_iam_role.arn
+      master_user_arn = aws_iam_role.opensearch_iam_role[0].arn
     }
   }
   node_to_node_encryption {
