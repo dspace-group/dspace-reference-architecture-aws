@@ -1,4 +1,5 @@
 resource "aws_iam_role" "opensearch_iam_role" {
+  count       = var.opensearch.enable ? 1 : 0
   name        = "${local.instancename}-opensearch-role"
   description = "IAM role for the OpenSearch service account"
   tags        = var.tags
@@ -22,6 +23,7 @@ resource "aws_iam_role" "opensearch_iam_role" {
 }
 
 resource "kubernetes_service_account" "opensearch_service_account" {
+  count = var.opensearch.enable ? 1 : 0
   metadata {
     name      = local.opensearch_serviceaccount
     namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
@@ -30,11 +32,6 @@ resource "kubernetes_service_account" "opensearch_service_account" {
     }
   }
   automount_service_account_token = false
-}
-
-resource "aws_iam_role_policy_attachment" "opensearch_policy_attachment" {
-  role       = aws_iam_role.opensearch_iam_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonOpenSearchServiceFullAccess"
 }
 
 resource "aws_opensearch_domain" "opensearch" {
