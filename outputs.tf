@@ -4,21 +4,49 @@ output "account_id" {
 }
 
 output "backup_vaults" {
-  description = "Backups vaults from all dSPACE cloud products managed by terraform."
-  value = flatten([
-    flatten([for name, instance in module.simphera_instance : instance.backup_vaults]),
-    flatten([for name, instance in module.ivs_instance : instance.backup_vaults])
-  ])
+  description = "Backups vaults managed by terraform."
+  value = {
+    simphera = {
+      for name, instance in module.simphera_instance :
+      name => flatten(instance.backup_vaults)
+    }
+    ivs = {
+      for name, instance in module.ivs_instance :
+      name => flatten(instance.backup_vaults)
+    }
+    scenario_generation = {
+      for name, instance in module.scenario_generation_instance :
+      name => flatten(instance.backup_vaults)
+    }
+  }
 }
 
 output "database_identifiers" {
-  description = "Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances."
-  value       = flatten([for name, instance in module.simphera_instance : instance.database_identifiers])
+  description = "Identifiers of the databases from all instances."
+  value = {
+    simphera = {
+      for name, instance in module.simphera_instance :
+      name => flatten(instance.database_identifiers)
+    }
+    scenario_generation = {
+      for name, instance in module.scenario_generation_instance :
+      name => flatten(instance.database_identifiers)
+    }
+  }
 }
 
 output "database_endpoints" {
-  description = "Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances."
-  value       = flatten([for name, instance in module.simphera_instance : instance.database_endpoints])
+  description = "Endpoints of the databases from all instances."
+  value = {
+    simphera = {
+      for name, instance in module.simphera_instance :
+      name => flatten(instance.database_endpoints)
+    }
+    scenario_generation = {
+      for name, instance in module.scenario_generation_instance :
+      name => flatten(instance.database_endpoints)
+    }
+  }
 }
 
 output "s3_buckets" {
@@ -32,13 +60,36 @@ output "eks_cluster_id" {
 }
 
 output "opensearch_domain_endpoints" {
-  description = "List of OpenSearch Domains endpoints of IVS instances"
-  value       = [for key, value in module.ivs_instance : value.opensearch_domain_endpoint]
+  description = "OpenSearch Domains endpoints of all the instances"
+  value = {
+    ivs = {
+      for name, instance in module.ivs_instance :
+      name => instance.opensearch_domain_endpoint
+    }
+    scenario_generation = {
+      for name, instance in module.scenario_generation_instance :
+      name => instance.opensearch_domain_endpoint
+    }
+  }
 }
 
-output "ivs_buckets_service_accounts" {
-  description = "List of K8s service account names with access to the IVS buckets"
-  value       = [for name, instance in module.ivs_instance : instance.ivs_buckets_service_account]
+
+output "service_accounts" {
+  description = "K8s service account names"
+  value = {
+    ivs = {
+      s3_buckets = {
+        for name, instance in module.ivs_instance :
+        name => instance.ivs_buckets_service_account
+      }
+    }
+    scenario_generation = {
+      opensearch = {
+        for name, instance in module.scenario_generation_instance :
+        name => instance.opensearch_service_account
+      }
+    }
+  }
 }
 
 output "ivs_node_groups_roles" {
