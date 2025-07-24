@@ -19,6 +19,6 @@ output "opensearch_domain_endpoint" {
 }
 
 output "opensearch_service_account" {
-  description = "K8s service account name with access to the IVS buckets"
+  description = "K8s service account name with access to OpenSearch"
   value       = local.opensearch_serviceaccount
 }

@@ -74,8 +74,7 @@ resource "aws_opensearch_domain" "opensearch" {
     throughput  = 125
   }
   vpc_options {
-    subnet_ids = slice(var.opensearch.subnet_ids, 0, var.opensearch.instance_count < 3 ? var.opensearch.instance_count : 3)
-
+    subnet_ids         = slice(var.opensearch.subnet_ids, 0, var.opensearch.instance_count < 3 ? var.opensearch.instance_count : 3)
     security_group_ids = var.opensearch.security_group_ids
   }
   access_policies = data.aws_iam_policy_document.opensearch_access[0].json
