@@ -12,3 +12,7 @@ data "aws_iam_policy_document" "opensearch_access" {
     resources = ["arn:aws:es:${var.aws_context.region_name}:${var.aws_context.caller_identity_account_id}:domain/${var.opensearch.domain_name}/*"]
   }
 }
+
+data "http" "aws_tls_certificate" {
+  url = "https://truststore.pki.rds.amazonaws.com/${var.aws_context.region_name}/${var.aws_context.region_name}-bundle.pem"
+}

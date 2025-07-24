@@ -5,7 +5,6 @@ resource "aws_db_subnet_group" "database" {
 }
 
 resource "aws_db_instance" "scenario_generation" {
-
   apply_immediately                   = var.postgresqlApplyImmediately
   allocated_storage                   = var.postgresqlStorage
   max_allocated_storage               = var.postgresqlMaxStorage
@@ -39,12 +38,8 @@ resource "aws_db_instance" "scenario_generation" {
     delete = "2h"
     update = "2h"
   }
-
 }
 
-data "http" "aws_tls_certificate" {
-  url = "https://truststore.pki.rds.amazonaws.com/${var.aws_context.region_name}/${var.aws_context.region_name}-bundle.pem"
-}
 resource "kubernetes_secret" "aws_tls_certificate" {
   metadata {
     name      = "customsslrootcertificate"
@@ -55,7 +50,6 @@ resource "kubernetes_secret" "aws_tls_certificate" {
   }
   type = "Opaque"
 }
-
 
 resource "aws_iam_role" "rds_enhanced_monitoring_role" {
   name        = "${var.name}-rds-enhanced-monitoring"
@@ -79,7 +73,6 @@ resource "aws_iam_role" "rds_enhanced_monitoring_role" {
       ]
     }
   )
-
   tags = var.tags
 
 }

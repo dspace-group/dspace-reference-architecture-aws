@@ -69,7 +69,6 @@ variable "enable_deletion_protection" {
   default     = true
 }
 
-
 variable "secretname" {
   description = "Secrets manager secret"
   type        = string
@@ -78,7 +77,6 @@ variable "secretname" {
 variable "eks_oidc_issuer_url" {
   type        = string
   description = "The URL on the EKS cluster OIDC Issuer"
-
 }
 
 variable "eks_oidc_provider_arn" {
@@ -136,4 +134,3 @@ variable "opensearch" {
   })
   description = "Input variables for configuring an AWS's OpenSearch domain"
 }
-
