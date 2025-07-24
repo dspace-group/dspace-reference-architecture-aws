@@ -26,7 +26,7 @@ locals {
   patchgroupid                              = "${var.infrastructurename}-patch-group"
   s3_instance_buckets                       = flatten([for name, instance in module.simphera_instance : instance.s3_buckets])
   license_server_bucket                     = var.licenseServer ? [aws_s3_bucket.license_server_bucket[0].bucket] : []
-  ivs_buckets                               = flatten([for name, instance in var.ivsInstances : [instance.dataBucketName, instance.rawDataBucketName]])
+  ivs_buckets                               = flatten([for name, instance in var.ivsInstances : concat(instance.data_bucket.create ? [instance.data_bucket.name] : [], instance.raw_data_bucket.create ? [instance.raw_data_bucket.name] : [])])
   s3_buckets                                = concat(local.s3_instance_buckets, [aws_s3_bucket.bucket_logs.bucket], local.license_server_bucket, local.ivs_buckets)
   private_subnets                           = local.create_vpc ? module.vpc[0].private_subnets : (local.use_private_subnets_ids ? var.private_subnet_ids : [for s in data.aws_subnet.private_subnet : s.id])
   public_subnets                            = local.create_vpc ? module.vpc[0].public_subnets : (local.use_public_subnet_ids ? var.public_subnet_ids : [for s in data.aws_subnet.public_subnet : s.id])
@@ -35,7 +35,12 @@ locals {
   create_efs                                = local.create_simphera_resources ? 1 : 0
   storage_subnets                           = local.create_efs > 0 ? { for index, zone in local.private_subnets : "zone${index}" => local.private_subnets[index] } : {}
   gpu_driver_versions_escaped               = { for driver in var.gpu_operator_config.driver_versions : driver => replace(driver, ".", "-") if var.gpu_operator_config.enable }
-
+  s3_ssl_policy                             = jsondecode(templatefile("${path.module}/templates/s3_ssl_policy.json", { bucket = aws_s3_bucket.bucket_logs.bucket }))
+  s3_logging_policy                         = jsondecode(templatefile("${path.module}/templates/s3_log_policy.json", { bucket = aws_s3_bucket.bucket_logs.bucket, account_id = local.account_id }))
+  log_bucket_policy = {
+    Version   = "2012-10-17"
+    Statement = concat(local.s3_ssl_policy.Statement, local.s3_logging_policy.Statement)
+  }
   default_node_pools = {
     "default" = {
       node_group_name = "default"
@@ -48,6 +53,7 @@ locals {
     "execnodes" = {
       node_group_name = "execnodes"
       instance_types  = var.linuxExecutionNodeSize
+      capacity_type   = var.linuxExecutionNodeCapacityType
       subnet_ids      = local.private_subnets
       max_size        = var.linuxExecutionNodeCountMax
       min_size        = var.linuxExecutionNodeCountMin
@@ -69,6 +75,7 @@ locals {
     "winexecnodes" = {
       node_group_name   = "winexecnodes"
       instance_types    = var.windows_execution_node.node_size
+      capacity_type     = var.windows_execution_node.capacity_type
       subnet_ids        = local.private_subnets
       max_size          = var.windows_execution_node.node_count_max
       min_size          = var.windows_execution_node.node_count_min

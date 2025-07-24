@@ -50,6 +50,7 @@ resource "aws_flow_log" "flowlog" {
   log_destination = aws_cloudwatch_log_group.flowlogs[0].arn
   traffic_type    = "ALL"
   vpc_id          = local.vpc_id
+  tags            = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "flowlogs" {
@@ -63,6 +64,7 @@ resource "aws_cloudwatch_log_group" "flowlogs" {
 resource "aws_iam_role" "flowlogs_role" {
   count              = local.create_vpc ? 1 : 0
   name               = "${local.infrastructurename}-flowlogs-role"
+  description        = "AWS IAM service role for VPC flow logs."
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -78,6 +80,7 @@ resource "aws_iam_role" "flowlogs_role" {
   ]
 }
 EOF
+  tags               = var.tags
 }
 
 resource "aws_iam_policy" "flowlogs_policy" {
@@ -100,6 +103,7 @@ resource "aws_iam_policy" "flowlogs_policy" {
   ]
 }
 EOF
+  tags   = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "flowlogs_attachment" {

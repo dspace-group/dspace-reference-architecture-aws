@@ -1,13 +1,13 @@
 module "ivs_instance" {
-  source            = "./modules/ivs_aws_instance"
-  for_each          = var.ivsInstances
-  k8s_namespace     = each.value.k8s_namespace
-  eks_cluster_id    = var.infrastructurename
-  instancename      = each.key
-  tags              = var.tags
-  dataBucketName    = each.value.dataBucketName
-  rawDataBucketName = each.value.rawDataBucketName
-  nodeRoleNames     = local.ivs_node_groups_roles
+  source          = "./modules/ivs_aws_instance"
+  for_each        = var.ivsInstances
+  k8s_namespace   = each.value.k8s_namespace
+  eks_cluster_id  = var.infrastructurename
+  instancename    = each.key
+  tags            = var.tags
+  data_bucket     = each.value.data_bucket
+  raw_data_bucket = each.value.raw_data_bucket
+  nodeRoleNames   = local.ivs_node_groups_roles
   opensearch = merge(each.value.opensearch, {
     domain_name        = "${var.infrastructurename}-${each.key}"
     subnet_ids         = local.private_subnets
@@ -23,5 +23,6 @@ module "ivs_instance" {
   goofys_user_agent_sdk_and_go_version = each.value.goofys_user_agent_sdk_and_go_version
   eks_oidc_issuer                      = replace(module.eks.eks_oidc_issuer_url, "https://", "")
   eks_oidc_provider_arn                = module.eks.eks_oidc_provider_arn
+  log_bucket                           = aws_s3_bucket.bucket_logs.id
   depends_on                           = [module.k8s_eks_addons]
 }

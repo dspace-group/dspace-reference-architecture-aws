@@ -4,7 +4,7 @@ output "account_id" {
 }
 
 output "backup_vaults" {
-  description = "Backups vaults from all SIMPHERA and IVS instances."
+  description = "Backups vaults from all dSPACE cloud products managed by terraform."
   value = flatten([
     flatten([for name, instance in module.simphera_instance : instance.backup_vaults]),
     flatten([for name, instance in module.ivs_instance : instance.backup_vaults])
@@ -39,4 +39,8 @@ output "opensearch_domain_endpoints" {
 output "ivs_buckets_service_accounts" {
   description = "List of K8s service account names with access to the IVS buckets"
   value       = [for name, instance in module.ivs_instance : instance.ivs_buckets_service_account]
+}
+
+output "ivs_node_groups_roles" {
+  value = merge(local.ivs_node_groups_roles, var.windows_execution_node.enable ? { winexecnode : module.eks.node_groups[0]["winexecnodes"].nodegroup_role_id } : {})
 }

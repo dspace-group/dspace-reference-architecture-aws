@@ -1,5 +1,5 @@
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   description = "The tags to be added to all resources."
   default     = {}
 }
@@ -38,6 +38,12 @@ variable "linuxExecutionNodeSize" {
   type        = list(string)
   description = "The machine size of the Linux nodes for the job execution, user must check the availability of the instance types for the region. The list is ordered by priority where the first instance type gets the highest priority. Instance types must fulfill the following requirements: 64 GB RAM, 16 vCPUs, at least 110 IPs, at least 2 availability zones."
   default     = ["m6a.4xlarge", "m5a.4xlarge", "m5.4xlarge", "m6i.4xlarge", "m4.4xlarge", "m7i.4xlarge", "m7a.4xlarge"]
+}
+
+variable "linuxExecutionNodeCapacityType" {
+  type        = string
+  description = "The capacity type of the Linux nodes to be used. Defaults to 'ON_DEMAND' and can be changed to 'SPOT'. Be ware that using spot instances can result in abrupt termination of simulation/validation jobs and corresponding 'error' results."
+  default     = "ON_DEMAND"
 }
 
 variable "linuxExecutionNodeCountMin" {
@@ -155,27 +161,55 @@ variable "vpcCidr" {
 }
 
 variable "private_subnet_ids" {
-  type        = list(any)
+  type        = list(string)
   description = "List of IDs for the private subnets."
   default     = []
+  validation {
+    condition     = alltrue([for id in var.private_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
+  }
 }
 
 variable "vpcPrivateSubnets" {
-  type        = list(any)
+  type        = list(string)
   description = "List of CIDRs for the private subnets."
   default     = ["10.1.0.0/22", "10.1.4.0/22", "10.1.8.0/22"]
+  validation {
+    condition = alltrue([
+    for cidr in var.vpcPrivateSubnets : can(regex("^((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/(3[0-2]|[12]?\\d)$", cidr) != null)])
+    error_message = "Each subnet CIDR must be a valid IPv4 CIDR block like '10.0.0.0/24'."
+  }
 }
 
 variable "public_subnet_ids" {
-  type        = list(any)
+  type        = list(string)
   description = "List of IDs for the public subnets."
   default     = []
+  validation {
+    condition     = alltrue([for id in var.public_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
+  }
 }
 
 variable "vpcPublicSubnets" {
-  type        = list(any)
+  type        = list(string)
   description = "List of CIDRs for the public subnets."
   default     = ["10.1.12.0/22", "10.1.16.0/22", "10.1.20.0/22"]
+  validation {
+    condition = alltrue([
+    for cidr in var.vpcPublicSubnets : can(regex("^((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/(3[0-2]|[12]?\\d)$", cidr) != null)])
+    error_message = "Each subnet CIDR must be a valid IPv4 CIDR block like '10.0.0.0/24'."
+  }
+}
+
+variable "eks_api_subnet_ids" {
+  type        = list(string)
+  description = "List of IDs for the EKS API subnets"
+  default     = []
+  validation {
+    condition     = alltrue([for id in var.eks_api_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
+  }
 }
 
 variable "ecr_pullthrough_cache_rule_config" {
@@ -304,9 +338,15 @@ variable "simphera_monitoring_namespace" {
 
 variable "ivsInstances" {
   type = map(object({
-    k8s_namespace                        = string
-    dataBucketName                       = string
-    rawDataBucketName                    = string
+    k8s_namespace = string
+    data_bucket = object({
+      name   = string
+      create = optional(bool, true)
+    })
+    raw_data_bucket = object({
+      name   = string
+      create = optional(bool, true)
+    })
     goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })
     opensearch = optional(object({
       enable                  = optional(bool, false)
@@ -327,9 +367,13 @@ variable "ivsInstances" {
   description = "A list containing the individual IVS instances, such as 'staging' and 'production'. 'opensearch' object is used for enabling AWS OpenSearch Domain creation.'opensearch.master_user_secret_name' is an AWS secret containing key 'master_user' and 'master_password'. 'opensearch.instance_type' must have option for ebs storage, check available type at https://aws.amazon.com/opensearch-service/pricing/"
   default = {
     "production" = {
-      k8s_namespace     = "ivs"
-      dataBucketName    = "demo-ivs"
-      rawDataBucketName = "demo-ivs-rawdata"
+      k8s_namespace = "ivs"
+      data_bucket = {
+        name = "demo-ivs"
+      }
+      raw_data_bucket = {
+        name = "demo-ivs-rawdata"
+      }
       opensearch = {
         enable = false
       }
@@ -496,6 +540,7 @@ variable "windows_execution_node" {
   type = object({
     enable         = bool
     node_size      = list(string)
+    capacity_type  = string
     disk_size      = number
     node_count_min = number
     node_count_max = number
@@ -504,6 +549,7 @@ variable "windows_execution_node" {
   default = {
     enable         = false
     node_size      = ["m6a.4xlarge", "m5a.4xlarge", "m5.4xlarge", "m6i.4xlarge", "m4.4xlarge", "m7i.4xlarge", "m7a.4xlarge"]
+    capacity_type  = "ON_DEMAND"
     disk_size      = 200
     node_count_min = 0
     node_count_max = 2

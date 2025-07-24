@@ -1,9 +1,16 @@
+## v0.6.0
+
+- Added option to use SPOT instances for execution nodes.
+- Implement optional creation of IVS buckets
+- Added support for usage of different subnet list for EKS API
+
 ## v0.5.0
 
 - Implemented deployment of an OpenSearch Domain for usage in IVS
 - Update default version for helm chart of `ingress-nginx` to `4.12.1` (controller version `1.12.1`)
 - Increase required terraform version to 1.9.0
 - Added optional creation of Windows based node group `winexecnode`
+- Added IVS related ingress rules to license server
 
 ## v0.4.0
 

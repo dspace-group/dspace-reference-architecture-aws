@@ -156,7 +156,14 @@ resource "aws_s3_bucket" "license_server_bucket" {
 resource "aws_s3_bucket_policy" "license_server_bucket_ssl" {
   count  = var.licenseServer ? 1 : 0
   bucket = aws_s3_bucket.license_server_bucket[0].id
-  policy = templatefile("${path.module}/templates/bucket_policy.json", { bucket = aws_s3_bucket.license_server_bucket[0].id })
+  policy = templatefile("${path.module}/templates/s3_ssl_policy.json", { bucket = aws_s3_bucket.license_server_bucket[0].id })
+}
+
+resource "aws_s3_bucket_logging" "license_server_bucket_logging" {
+  count         = var.licenseServer ? 1 : 0
+  bucket        = aws_s3_bucket.license_server_bucket[0].id
+  target_bucket = aws_s3_bucket.bucket_logs.id
+  target_prefix = "logs/bucket/${aws_s3_bucket.license_server_bucket[0].id}/"
 }
 
 resource "aws_iam_instance_profile" "license_server_profile" {
@@ -173,16 +180,36 @@ module "security_group_license_server" {
   description = "License server security group"
   vpc_id      = local.vpc_id
   tags        = var.tags
-  ingress_with_source_security_group_id = [
-    {
-      type                     = "ingress"
-      from_port                = 22350
-      to_port                  = 22350
-      protocol                 = "tcp"
-      description              = "Inbound TCP on port 22350 from kubernetes nodes security group"
-      source_security_group_id = module.eks.cluster_primary_security_group_id
-    },
-  ]
+  ingress_with_source_security_group_id = concat(
+    local.create_simphera_resources ? [
+      {
+        type                     = "ingress"
+        from_port                = 22350
+        to_port                  = 22350
+        protocol                 = "tcp"
+        description              = "Inbound TCP on port 22350 from kubernetes nodes security group"
+        source_security_group_id = module.eks.cluster_primary_security_group_id
+      },
+    ] : [],
+    local.create_ivs_resources ? [
+      {
+        type                     = "ingress"
+        from_port                = 5053
+        to_port                  = 5053
+        protocol                 = "tcp"
+        description              = "Allow ingoing RTMaps license request (rlm)"
+        source_security_group_id = module.eks.cluster_primary_security_group_id
+      },
+      {
+        type                     = "ingress"
+        from_port                = 60403
+        to_port                  = 60403
+        protocol                 = "tcp"
+        description              = "Allow ingoing RTMaps license request (IVS intempora)"
+        source_security_group_id = module.eks.cluster_primary_security_group_id
+      }
+    ] : []
+  )
   egress_with_cidr_blocks = [
     {
       from_port   = 0

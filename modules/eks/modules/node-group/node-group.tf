@@ -4,7 +4,7 @@ resource "aws_eks_node_group" "node_group" {
   node_role_arn          = aws_iam_role.node_group.arn
   subnet_ids             = var.subnet_ids
   ami_type               = var.custom_ami_id != "" ? null : var.ami_type
-  capacity_type          = "ON_DEMAND"
+  capacity_type          = var.capacity_type
   instance_types         = var.instance_types
   version                = var.custom_ami_id != "" ? null : var.node_group_context.cluster_version
   scaling_config {
@@ -60,6 +60,16 @@ resource "aws_autoscaling_group_tag" "ephemeral_storage" {
   tag {
     key                 = "k8s.io/cluster-autoscaler/node-template/resources/ephemeral-storage"
     value               = "${var.volume_size}G"
+    propagate_at_launch = true
+  }
+}
+
+resource "aws_autoscaling_group_tag" "tags" {
+  for_each               = var.tags
+  autoscaling_group_name = aws_eks_node_group.node_group.resources[0].autoscaling_groups[0].name
+  tag {
+    key                 = each.key
+    value               = each.value
     propagate_at_launch = true
   }
 }

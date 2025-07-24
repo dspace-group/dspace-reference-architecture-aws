@@ -27,19 +27,25 @@ variable "instancename" {
 }
 
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   description = "The tags to be added to all resources."
   default     = {}
 }
 
-variable "dataBucketName" {
-  type        = string
-  description = "The name of the data bucket."
+variable "data_bucket" {
+  description = "Object containing name of the bucket. If flag `create` is set to `false` it is expected that bucket already exist."
+  type = object({
+    name   = string
+    create = optional(bool, true)
+  })
 }
 
-variable "rawDataBucketName" {
-  type        = string
-  description = "The name of the raw data bucket."
+variable "raw_data_bucket" {
+  description = "Object containing name of the bucket. If flag `create` is set to `false` it is expected that bucket already exist."
+  type = object({
+    name   = string
+    create = optional(bool, true)
+  })
 }
 
 variable "nodeRoleNames" {
@@ -101,3 +107,9 @@ variable "goofys_user_agent_sdk_and_go_version" {
   type        = map(string)
   description = "Goofys user agent sdk and go version."
 }
+
+variable "log_bucket" {
+  type        = string
+  description = "Name of the S3 bucket where S3 server access logs are stored"
+}
+
