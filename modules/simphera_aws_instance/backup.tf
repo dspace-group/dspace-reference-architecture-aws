@@ -1,6 +1,7 @@
 resource "aws_backup_vault" "backup-vault" {
   count = var.enable_backup_service ? 1 : 0
   name  = local.backup_vault_name
+  tags  = var.tags
 }
 
 resource "aws_backup_plan" "backup-plan" {
@@ -45,6 +46,7 @@ resource "aws_iam_role" "backup_iam_role" {
   ]
 }
 POLICY
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "backup_rds_policy" {
