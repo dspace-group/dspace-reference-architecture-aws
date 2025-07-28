@@ -2,7 +2,7 @@ import YAML from 'yaml'
 import { execSync } from "child_process"
 import * as fs from 'fs';
 
-const clusterid = ""
+const clusterid = "vr-simphera"
 
 
 const builtin_roles = [
@@ -112,7 +112,7 @@ for (let category of structure) {
 
 }
 
-const resources = execute(`aws resourcegroupstaggingapi get-resources --tag-filters Key=clusterid,Values=${clusterid}`)
+const resources = execute(`aws resourcegroupstaggingapi get-resources --tag-filters Key=Cluster,Values=${clusterid}`)
 for (let resource of resources.ResourceTagMappingList) {
     let original_arn = resource.ResourceARN
     let indexed_arn = index_value(original_arn)
@@ -320,7 +320,7 @@ for (let role of roles.Roles) {
 
         if (role.Role.Tags && role.Role.Tags) {
 
-            let match = role.Role.Tags.find((element: any) => element.Key == "clusterid" && element.Value == clusterid)
+            let match = role.Role.Tags.find((element: any) => element.Key == "Cluster" && element.Value == clusterid)
 
             let description = role.Role.Description || ""
             description = description.replace("\n", "")
