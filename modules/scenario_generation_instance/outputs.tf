@@ -1,6 +1,6 @@
 output "backup_vaults" {
   description = "Backups vaults created for the Scenario Generation instance."
-  value       = [aws_backup_vault.backup_vault[*].name]
+  value       = [aws_backup_vault.scenario_generation_backup_vault[*].name]
 }
 
 output "database_identifiers" {
@@ -15,7 +15,7 @@ output "database_endpoints" {
 
 output "opensearch_domain_endpoint" {
   description = "OpenSearch Domain endpoint"
-  value       = try(aws_opensearch_domain.opensearch[0].endpoint, null)
+  value       = try(aws_opensearch_domain.scenario_generation_opensearch[0].endpoint, null)
 }
 
 output "opensearch_service_account" {

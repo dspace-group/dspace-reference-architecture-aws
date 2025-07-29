@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "opensearch_access" {
+data "aws_iam_policy_document" "scenario_generation_opensearch_access" {
   count = var.opensearch.enable ? 1 : 0
   statement {
     effect = "Allow"

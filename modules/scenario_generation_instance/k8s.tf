@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "k8s_namespace" {
+resource "kubernetes_namespace" "scenario_generation" {
   metadata {
     name = var.k8s_namespace
   }

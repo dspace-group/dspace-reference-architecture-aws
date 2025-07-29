@@ -1,4 +1,4 @@
-resource "aws_iam_role" "opensearch_iam_role" {
+resource "aws_iam_role" "scenario_generation_opensearch" {
   count       = var.opensearch.enable ? 1 : 0
   name        = "${local.instancename}-opensearch-role"
   description = "IAM role for the OpenSearch service account"
@@ -22,19 +22,19 @@ resource "aws_iam_role" "opensearch_iam_role" {
   })
 }
 
-resource "kubernetes_service_account" "opensearch_service_account" {
+resource "kubernetes_service_account" "scenario_generation_opensearch" {
   count = var.opensearch.enable ? 1 : 0
   metadata {
     name      = local.opensearch_serviceaccount
-    namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
+    namespace = kubernetes_namespace.scenario_generation.metadata[0].name
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.opensearch_iam_role[0].arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.scenario_generation_opensearch[0].arn
     }
   }
   automount_service_account_token = false
 }
 
-resource "aws_opensearch_domain" "opensearch" {
+resource "aws_opensearch_domain" "scenario_generation_opensearch" {
   count          = var.opensearch.enable ? 1 : 0
   domain_name    = var.opensearch.domain_name
   engine_version = var.opensearch.engine_version
@@ -42,7 +42,7 @@ resource "aws_opensearch_domain" "opensearch" {
     enabled                        = true
     internal_user_database_enabled = false
     master_user_options {
-      master_user_arn = aws_iam_role.opensearch_iam_role[0].arn
+      master_user_arn = aws_iam_role.scenario_generation_opensearch[0].arn
     }
   }
   node_to_node_encryption {
@@ -77,6 +77,6 @@ resource "aws_opensearch_domain" "opensearch" {
     subnet_ids         = slice(var.opensearch.subnet_ids, 0, var.opensearch.instance_count < 3 ? var.opensearch.instance_count : 3)
     security_group_ids = var.opensearch.security_group_ids
   }
-  access_policies = data.aws_iam_policy_document.opensearch_access[0].json
+  access_policies = data.aws_iam_policy_document.scenario_generation_opensearch_access[0].json
   tags            = var.tags
 }
