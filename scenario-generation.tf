@@ -1,5 +1,6 @@
 module "scenario_generation_instance" {
   source                               = "./modules/scenario_generation_instance"
+  count                                = var.scenarioGenerationInstances.enable ? 1 : 0
   for_each                             = var.scenarioGenerationInstances.instances
   infrastructurename                   = local.infrastructurename
   tags                                 = var.tags
