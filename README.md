@@ -299,22 +299,27 @@ Resources that contain data, i.e. the databases, S3 storage, and the recovery po
 Before the backup vault can be deleted, all the continuous recovery points for S3 storage and the databases need to be deleted, for example by using the following Powershell snippet:
 
 ```powershell
-$vaults = terraform output backup_vaults | ConvertFrom-Json
-$profile = "<profile_name>"
-foreach ($vault in $vaults){
-  Write-Host "Deleting $vault"
-  $recoverypoints = aws backup list-recovery-points-by-backup-vault --profile $profile --backup-vault-name $vault | ConvertFrom-Json
-  foreach ($rp in $recoverypoints.RecoveryPoints){
-    aws backup delete-recovery-point --profile $profile --backup-vault-name $vault --recovery-point-arn $rp.RecoveryPointArn
-  }
-  foreach ($rp in $recoverypoints.RecoveryPoints){
-    Do
-    {
-      Start-Sleep -Seconds 10
-      aws backup describe-recovery-point --profile $profile --backup-vault-name $vault --recovery-point-arn $rp.RecoveryPointArn | ConvertFrom-Json
-    } while( $LASTEXITCODE -eq 0)
-  }
-  aws backup delete-backup-vault --profile $profile --backup-vault-name $vault
+$vaults = terraform output -json backup_vaults | ConvertFrom-Json
+$aws_profile = "<profile_name>"
+
+foreach ($product in $vaults.PSObject.Properties) {
+    foreach ($instance in $product.Value.PSObject.Properties) {
+        foreach ($vault in $instance.Value){
+            Write-Host "Deleting AWS Backup Vault:`n- Vault: '$vault'`n- Instance   : '$($instance.Name)'`n- Product    : '$($product.Name)'`n"
+            $recoverypoints = aws backup list-recovery-points-by-backup-vault --profile $aws_profile --backup-vault-name $vault | ConvertFrom-Json
+            foreach ($rp in $recoverypoints.RecoveryPoints){
+                aws backup delete-recovery-point --profile $aws_profile --backup-vault-name $vault --recovery-point-arn $rp.RecoveryPointArn
+            }
+            foreach ($rp in $recoverypoints.RecoveryPoints){
+                Do
+                {
+                Start-Sleep -Seconds 10
+                aws backup describe-recovery-point --profile $aws_profile --backup-vault-name $vault --recovery-point-arn $rp.RecoveryPointArn | ConvertFrom-Json
+                } while( $LASTEXITCODE -eq 0)
+            }
+            aws backup delete-backup-vault --profile $aws_profile --backup-vault-name $vault
+        }
+    }
 }
 ```
 
@@ -323,11 +328,15 @@ foreach ($vault in $vaults){
 Before the databases can be deleted, you need to remove their delete protection:
 
 ```powershell
-$databases = terraform output database_identifiers | ConvertFrom-Json
-foreach ($db in $databases){
-  Write-Host "Deleting database $db"
-  aws rds modify-db-instance --profile $profile --db-instance-identifier $db --no-deletion-protection
-  aws rds delete-db-instance --profile $profile --db-instance-identifier $db --skip-final-snapshot
+$databases = terraform output -json database_identifiers | ConvertFrom-Json
+foreach ($product in $databases.PSObject.Properties) {
+    foreach ($instances in $product.Value.PSObject.Properties) {
+        foreach ($db in $instances.Value){
+            Write-Host "`nDeleting AWS RDS database instance:`n- DB Identifier : '$db'`n- Instance   : '$($instance.Name)'`n- Product    : '$($product.Name)'`n"
+            aws rds modify-db-instance --profile $profile --db-instance-identifier $db --no-deletion-protection
+            aws rds delete-db-instance --profile $profile --db-instance-identifier $db --skip-final-snapshot
+        }
+    }
 }
 ```
 
@@ -339,7 +348,7 @@ To delete the S3 buckets that contains both versioned and non-versioned objects,
 $aws_profile = "<profile_name>"
 $buckets = terraform output s3_buckets | ConvertFrom-Json
 foreach ($bucket in $buckets) {
-    Write-Output "Deleting bucket: $bucket" 
+    Write-Output "Deleting bucket: $bucket"
     $deleteObjDict = @{}
     $deleteObj = New-Object System.Collections.ArrayList
     aws s3api list-object-versions --bucket $bucket --profile $aws_profile --query '[Versions[*].{ Key:Key , VersionId:VersionId} , DeleteMarkers[*].{ Key:Key , VersionId:VersionId}]' --output json `
@@ -348,8 +357,10 @@ foreach ($bucket in $buckets) {
     for ($i = 0; $i -lt $n; $i++) {
         $deleteObjDict["Objects"] = $deleteObj[(0 + $i * 100)..(100 * ($i + 1))]
         $deleteObjDict["Objects"] = $deleteObjDict["Objects"] | Where-Object { $_ -ne $null }
-        $deleteStuff = $deleteObjDict | ConvertTo-Json
-        aws s3api delete-objects --bucket $bucket --profile $aws_profile --delete $deleteStuff | Out-Null
+        if ($deleteObjDict["Objects"].Count -gt 0) {
+            $deleteStuff = $deleteObjDict | ConvertTo-Json
+            aws s3api delete-objects --bucket $bucket --profile $aws_profile --delete $deleteStuff | Out-Null
+        }
     }
     aws s3 rb s3://$bucket --force --profile $aws_profile
     Write-Output "$bucket bucket deleted"
