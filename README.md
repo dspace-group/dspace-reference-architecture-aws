@@ -299,9 +299,8 @@ Resources that contain data, i.e. the databases, S3 storage, and the recovery po
 Before the backup vault can be deleted, all the continuous recovery points for S3 storage and the databases need to be deleted, for example by using the following Powershell snippet:
 
 ```powershell
-$vaults = terraform output -json backup_vaults | ConvertFrom-Json
 $aws_profile = "<profile_name>"
-
+$vaults = terraform output -json backup_vaults | ConvertFrom-Json
 foreach ($product in $vaults.PSObject.Properties) {
     foreach ($instance in $product.Value.PSObject.Properties) {
         foreach ($vault in $instance.Value){
@@ -328,13 +327,14 @@ foreach ($product in $vaults.PSObject.Properties) {
 Before the databases can be deleted, you need to remove their delete protection:
 
 ```powershell
+$aws_profile = "<profile_name>"
 $databases = terraform output -json database_identifiers | ConvertFrom-Json
 foreach ($product in $databases.PSObject.Properties) {
     foreach ($instances in $product.Value.PSObject.Properties) {
         foreach ($db in $instances.Value){
             Write-Host "`nDeleting AWS RDS database instance:`n- DB Identifier : '$db'`n- Instance   : '$($instance.Name)'`n- Product    : '$($product.Name)'`n"
-            aws rds modify-db-instance --profile $profile --db-instance-identifier $db --no-deletion-protection
-            aws rds delete-db-instance --profile $profile --db-instance-identifier $db --skip-final-snapshot
+            aws rds modify-db-instance --profile $aws_profile --db-instance-identifier $db --no-deletion-protection
+            aws rds delete-db-instance --profile $aws_profile --db-instance-identifier $db --skip-final-snapshot
         }
     }
 }
