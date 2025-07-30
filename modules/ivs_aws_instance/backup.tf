@@ -1,6 +1,7 @@
 resource "aws_iam_role" "backup_iam_role" {
   count              = var.backup_service_enable ? 1 : 0
   name               = "${local.instance_identifier}-backup-role"
+  description        = "Role for enabling backup job execution in AWS"
   assume_role_policy = <<POLICY
   {
     "Version": "2012-10-17",

@@ -32,6 +32,7 @@ resource "aws_backup_selection" "backup-selection-rds-s3" {
 resource "aws_iam_role" "backup_iam_role" {
   count              = var.enable_backup_service ? 1 : 0
   name               = "${var.name}-backup-role"
+  description        = "Role for enabling backup job execution in AWS"
   assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",
