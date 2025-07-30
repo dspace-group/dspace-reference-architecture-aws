@@ -134,3 +134,9 @@ variable "opensearch" {
   })
   description = "Input variables for configuring an AWS's OpenSearch domain"
 }
+
+variable "bedrock_region" {
+  default     = "eu-central-1"
+  description = "The AWS region for the bedrock models"
+  type        = string
+}
