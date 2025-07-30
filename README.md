@@ -299,22 +299,26 @@ Resources that contain data, i.e. the databases, S3 storage, and the recovery po
 Before the backup vault can be deleted, all the continuous recovery points for S3 storage and the databases need to be deleted, for example by using the following Powershell snippet:
 
 ```powershell
-$vaults = terraform output backup_vaults | ConvertFrom-Json
-$profile = "<profile_name>"
-foreach ($vault in $vaults){
-  Write-Host "Deleting $vault"
-  $recoverypoints = aws backup list-recovery-points-by-backup-vault --profile $profile --backup-vault-name $vault | ConvertFrom-Json
-  foreach ($rp in $recoverypoints.RecoveryPoints){
-    aws backup delete-recovery-point --profile $profile --backup-vault-name $vault --recovery-point-arn $rp.RecoveryPointArn
-  }
-  foreach ($rp in $recoverypoints.RecoveryPoints){
-    Do
-    {
-      Start-Sleep -Seconds 10
-      aws backup describe-recovery-point --profile $profile --backup-vault-name $vault --recovery-point-arn $rp.RecoveryPointArn | ConvertFrom-Json
-    } while( $LASTEXITCODE -eq 0)
-  }
-  aws backup delete-backup-vault --profile $profile --backup-vault-name $vault
+$aws_profile = "<profile_name>"
+$vaults = terraform output -json backup_vaults | ConvertFrom-Json
+foreach ($product in $vaults.PSObject.Properties) {
+    foreach ($instance in $product.Value.PSObject.Properties) {
+        foreach ($vault in $instance.Value){
+            Write-Host "Deleting AWS Backup Vault:`n- Vault: '$vault'`n- Instance   : '$($instance.Name)'`n- Product    : '$($product.Name)'`n"
+            $recoverypoints = aws backup list-recovery-points-by-backup-vault --profile $aws_profile --backup-vault-name $vault | ConvertFrom-Json
+            foreach ($rp in $recoverypoints.RecoveryPoints){
+                aws backup delete-recovery-point --profile $aws_profile --backup-vault-name $vault --recovery-point-arn $rp.RecoveryPointArn
+            }
+            foreach ($rp in $recoverypoints.RecoveryPoints){
+                Do
+                {
+                Start-Sleep -Seconds 10
+                aws backup describe-recovery-point --profile $aws_profile --backup-vault-name $vault --recovery-point-arn $rp.RecoveryPointArn | ConvertFrom-Json
+                } while( $LASTEXITCODE -eq 0)
+            }
+            aws backup delete-backup-vault --profile $aws_profile --backup-vault-name $vault
+        }
+    }
 }
 ```
 
@@ -323,11 +327,16 @@ foreach ($vault in $vaults){
 Before the databases can be deleted, you need to remove their delete protection:
 
 ```powershell
-$databases = terraform output database_identifiers | ConvertFrom-Json
-foreach ($db in $databases){
-  Write-Host "Deleting database $db"
-  aws rds modify-db-instance --profile $profile --db-instance-identifier $db --no-deletion-protection
-  aws rds delete-db-instance --profile $profile --db-instance-identifier $db --skip-final-snapshot
+$aws_profile = "<profile_name>"
+$databases = terraform output -json database_identifiers | ConvertFrom-Json
+foreach ($product in $databases.PSObject.Properties) {
+    foreach ($instances in $product.Value.PSObject.Properties) {
+        foreach ($db in $instances.Value){
+            Write-Host "`nDeleting AWS RDS database instance:`n- DB Identifier : '$db'`n- Instance   : '$($instance.Name)'`n- Product    : '$($product.Name)'`n"
+            aws rds modify-db-instance --profile $aws_profile --db-instance-identifier $db --no-deletion-protection
+            aws rds delete-db-instance --profile $aws_profile --db-instance-identifier $db --skip-final-snapshot
+        }
+    }
 }
 ```
 
@@ -339,7 +348,7 @@ To delete the S3 buckets that contains both versioned and non-versioned objects,
 $aws_profile = "<profile_name>"
 $buckets = terraform output s3_buckets | ConvertFrom-Json
 foreach ($bucket in $buckets) {
-    Write-Output "Deleting bucket: $bucket" 
+    Write-Output "Deleting bucket: $bucket"
     $deleteObjDict = @{}
     $deleteObj = New-Object System.Collections.ArrayList
     aws s3api list-object-versions --bucket $bucket --profile $aws_profile --query '[Versions[*].{ Key:Key , VersionId:VersionId} , DeleteMarkers[*].{ Key:Key , VersionId:VersionId}]' --output json `
@@ -348,8 +357,10 @@ foreach ($bucket in $buckets) {
     for ($i = 0; $i -lt $n; $i++) {
         $deleteObjDict["Objects"] = $deleteObj[(0 + $i * 100)..(100 * ($i + 1))]
         $deleteObjDict["Objects"] = $deleteObjDict["Objects"] | Where-Object { $_ -ne $null }
-        $deleteStuff = $deleteObjDict | ConvertTo-Json
-        aws s3api delete-objects --bucket $bucket --profile $aws_profile --delete $deleteStuff | Out-Null
+        if ($deleteObjDict["Objects"].Count -gt 0) {
+            $deleteStuff = $deleteObjDict | ConvertTo-Json
+            aws s3api delete-objects --bucket $bucket --profile $aws_profile --delete $deleteStuff | Out-Null
+        }
     }
     aws s3 rb s3://$bucket --force --profile $aws_profile
     Write-Output "$bucket bucket deleted"
@@ -536,6 +547,7 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | <a name="module_eks"></a> [eks](#module\_eks) | ./modules/eks | n/a |
 | <a name="module_ivs_instance"></a> [ivs\_instance](#module\_ivs\_instance) | ./modules/ivs_aws_instance | n/a |
 | <a name="module_k8s_eks_addons"></a> [k8s\_eks\_addons](#module\_k8s\_eks\_addons) | ./modules/k8s_eks_addons | n/a |
+| <a name="module_scenario_generation_instance"></a> [scenario\_generation\_instance](#module\_scenario\_generation\_instance) | ./modules/scenario_generation_instance | n/a |
 | <a name="module_security_group"></a> [security\_group](#module\_security\_group) | terraform-aws-modules/security-group/aws | ~> 4 |
 | <a name="module_security_group_license_server"></a> [security\_group\_license\_server](#module\_security\_group\_license\_server) | terraform-aws-modules/security-group/aws | ~> 4 |
 | <a name="module_simphera_instance"></a> [simphera\_instance](#module\_simphera\_instance) | ./modules/simphera_aws_instance | n/a |
@@ -651,6 +663,7 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | <a name="input_rtMaps_link"></a> [rtMaps\_link](#input\_rtMaps\_link) | Download link for RTMaps license server. | `string` | `"http://dl.intempora.com/RTMaps4/rtmaps_4.9.0_ubuntu1804_x86_64_release.tar.bz2"` | no |
 | <a name="input_s3_csi_config"></a> [s3\_csi\_config](#input\_s3\_csi\_config) | Input configuration for AWS EKS add-on aws-mountpoint-s3-csi-driver. By setting key 'enable' to 'true', aws-mountpoint-s3-csi-driver add-on is deployed. Key 'configuration\_values' is used to change add-on configuration. Its content should follow add-on configuration schema (see https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/). | <pre>object({<br>    enable = optional(bool, false)<br>    configuration_values = optional(string, <<-YAML<br>node:<br>    tolerateAllTaints: true<br>YAML<br>    )<br>  })</pre> | <pre>{<br>  "enable": false<br>}</pre> | no |
 | <a name="input_scan_schedule"></a> [scan\_schedule](#input\_scan\_schedule) | 6-field Cron expression describing the scan maintenance schedule. Must not overlap with variable install\_schedule. | `string` | `"cron(0 0 * * ? *)"` | no |
+| <a name="input_scenarioGenerationInstances"></a> [scenarioGenerationInstances](#input\_scenarioGenerationInstances) | A list containing the individual Scenario Generation instances, such as 'staging' and 'production'. | <pre>object({<br>    enable = optional(bool, false)<br>    instances = map(object({<br>      name                                 = string<br>      postgresqlApplyImmediately           = bool<br>      postgresqlVersion                    = string<br>      postgresqlStorage                    = number<br>      postgresqlMaxStorage                 = number<br>      db_instance_type_scenario_generation = string<br>      k8s_namespace                        = string<br>      secretname                           = string<br>      enable_backup_service                = bool<br>      backup_retention                     = number<br>      enable_deletion_protection           = bool<br>      opensearch = optional(object({<br>        enable         = optional(bool, true)<br>        engine_version = optional(string, "OpenSearch_2.17")<br>        instance_type  = optional(string, "m7g.medium.search")<br>        instance_count = optional(number, 1)<br>        volume_size    = optional(number, 100)<br>        }),<br>        {}<br>      )<br>    }))<br>  })</pre> | <pre>{<br>  "enable": false,<br>  "instances": {<br>    "production": {<br>      "backup_retention": 35,<br>      "db_instance_type_scenario_generation": "db.t4g.large",<br>      "enable_backup_service": true,<br>      "enable_deletion_protection": true,<br>      "k8s_namespace": "scenario-generation",<br>      "name": "production",<br>      "opensearch": {<br>        "enable": true<br>      },<br>      "postgresqlApplyImmediately": false,<br>      "postgresqlMaxStorage": 100,<br>      "postgresqlStorage": 20,<br>      "postgresqlVersion": "16",<br>      "secretname": "aws-scenario-generation-dev-production"<br>    }<br>  }<br>}</pre> | no |
 | <a name="input_simpheraInstances"></a> [simpheraInstances](#input\_simpheraInstances) | A list containing the individual SIMPHERA instances, such as 'staging' and 'production'. | <pre>map(object({<br>    name                         = string<br>    postgresqlApplyImmediately   = bool<br>    postgresqlVersion            = string<br>    postgresqlStorage            = number<br>    postgresqlMaxStorage         = number<br>    db_instance_type_simphera    = string<br>    enable_keycloak              = bool<br>    postgresqlStorageKeycloak    = number<br>    postgresqlMaxStorageKeycloak = number<br>    db_instance_type_keycloak    = string<br>    k8s_namespace                = string<br>    secretname                   = string<br>    enable_backup_service        = bool<br>    backup_retention             = number<br>    enable_deletion_protection   = bool<br><br>  }))</pre> | <pre>{<br>  "production": {<br>    "backup_retention": 35,<br>    "db_instance_type_keycloak": "db.t4g.large",<br>    "db_instance_type_simphera": "db.t4g.large",<br>    "enable_backup_service": true,<br>    "enable_deletion_protection": true,<br>    "enable_keycloak": true,<br>    "k8s_namespace": "simphera",<br>    "name": "production",<br>    "postgresqlApplyImmediately": false,<br>    "postgresqlMaxStorage": 100,<br>    "postgresqlMaxStorageKeycloak": 100,<br>    "postgresqlStorage": 20,<br>    "postgresqlStorageKeycloak": 20,<br>    "postgresqlVersion": "16",<br>    "secretname": "aws-simphera-dev-production"<br>  }<br>}</pre> | no |
 | <a name="input_simphera_monitoring_namespace"></a> [simphera\_monitoring\_namespace](#input\_simphera\_monitoring\_namespace) | Name of the K8s namespace used for deploying SIMPHERA monitoring chart | `string` | `"monitoring"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | The tags to be added to all resources. | `map(any)` | `{}` | no |
@@ -665,13 +678,13 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | Name | Description |
 |------|-------------|
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | The AWS account id used for creating resources. |
-| <a name="output_backup_vaults"></a> [backup\_vaults](#output\_backup\_vaults) | Backups vaults from all dSPACE cloud products managed by terraform. |
-| <a name="output_database_endpoints"></a> [database\_endpoints](#output\_database\_endpoints) | Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances. |
-| <a name="output_database_identifiers"></a> [database\_identifiers](#output\_database\_identifiers) | Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances. |
+| <a name="output_backup_vaults"></a> [backup\_vaults](#output\_backup\_vaults) | Backups vaults managed by terraform. |
+| <a name="output_database_endpoints"></a> [database\_endpoints](#output\_database\_endpoints) | Endpoints of the databases from all instances. |
+| <a name="output_database_identifiers"></a> [database\_identifiers](#output\_database\_identifiers) | Identifiers of the databases from all instances. |
 | <a name="output_eks_cluster_id"></a> [eks\_cluster\_id](#output\_eks\_cluster\_id) | Amazon EKS Cluster Name |
-| <a name="output_ivs_buckets_service_accounts"></a> [ivs\_buckets\_service\_accounts](#output\_ivs\_buckets\_service\_accounts) | List of K8s service account names with access to the IVS buckets |
 | <a name="output_ivs_node_groups_roles"></a> [ivs\_node\_groups\_roles](#output\_ivs\_node\_groups\_roles) | n/a |
-| <a name="output_opensearch_domain_endpoints"></a> [opensearch\_domain\_endpoints](#output\_opensearch\_domain\_endpoints) | List of OpenSearch Domains endpoints of IVS instances |
+| <a name="output_opensearch_domain_endpoints"></a> [opensearch\_domain\_endpoints](#output\_opensearch\_domain\_endpoints) | OpenSearch Domains endpoints of all the instances |
 | <a name="output_pullthrough_cache_prefix"></a> [pullthrough\_cache\_prefix](#output\_pullthrough\_cache\_prefix) | n/a |
 | <a name="output_s3_buckets"></a> [s3\_buckets](#output\_s3\_buckets) | S3 buckets managed by terraform. |
+| <a name="output_service_accounts"></a> [service\_accounts](#output\_service\_accounts) | K8s service account names |
 <!-- END_TF_DOCS -->

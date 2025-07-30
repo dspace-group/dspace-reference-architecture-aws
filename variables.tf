@@ -353,6 +353,57 @@ variable "ivsInstances" {
   }
 }
 
+variable "scenarioGenerationInstances" {
+  type = object({
+    enable = optional(bool, false)
+    instances = map(object({
+      name                                 = string
+      postgresqlApplyImmediately           = bool
+      postgresqlVersion                    = string
+      postgresqlStorage                    = number
+      postgresqlMaxStorage                 = number
+      db_instance_type_scenario_generation = string
+      k8s_namespace                        = string
+      secretname                           = string
+      enable_backup_service                = bool
+      backup_retention                     = number
+      enable_deletion_protection           = bool
+      opensearch = optional(object({
+        enable         = optional(bool, true)
+        engine_version = optional(string, "OpenSearch_2.17")
+        instance_type  = optional(string, "m7g.medium.search")
+        instance_count = optional(number, 1)
+        volume_size    = optional(number, 100)
+        }),
+        {}
+      )
+    }))
+  })
+
+  description = "A list containing the individual Scenario Generation instances, such as 'staging' and 'production'."
+  default = {
+    enable = false
+    instances = {
+      "production" = {
+        name                                 = "production"
+        postgresqlApplyImmediately           = false
+        postgresqlVersion                    = "16"
+        postgresqlStorage                    = 20
+        postgresqlMaxStorage                 = 100
+        db_instance_type_scenario_generation = "db.t4g.large"
+        k8s_namespace                        = "scenario-generation"
+        secretname                           = "aws-scenario-generation-dev-production"
+        enable_backup_service                = true
+        backup_retention                     = 35
+        enable_deletion_protection           = true
+        opensearch = {
+          enable = true
+        }
+      }
+    }
+  }
+}
+
 variable "enable_patching" {
   type        = bool
   description = "Scans license server EC2 instance and EKS nodes for updates. Installs patches on license server automatically. EKS nodes need to be updated manually."

@@ -94,6 +94,27 @@
     "enable": false
   },
   "scan_schedule": "cron(0 0 * * ? *)",
+  "scenarioGenerationInstances": {
+    "enable": false,
+    "instances": {
+      "production": {
+        "backup_retention": 35,
+        "db_instance_type_scenario_generation": "db.t4g.large",
+        "enable_backup_service": true,
+        "enable_deletion_protection": true,
+        "k8s_namespace": "scenario-generation",
+        "name": "production",
+        "opensearch": {
+          "enable": true
+        },
+        "postgresqlApplyImmediately": false,
+        "postgresqlMaxStorage": 100,
+        "postgresqlStorage": 20,
+        "postgresqlVersion": "16",
+        "secretname": "aws-scenario-generation-dev-production"
+      }
+    }
+  },
   "simpheraInstances": {
     "production": {
       "backup_retention": 35,
