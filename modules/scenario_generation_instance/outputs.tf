@@ -1,6 +1,6 @@
 output "backup_vaults" {
   description = "Backups vaults created for the Scenario Generation instance."
-  value       = [aws_backup_vault.scenario_generation_backup_vault[*].name]
+  value       = [aws_backup_vault.scenario_generation[*].name]
 }
 
 output "database_identifiers" {
