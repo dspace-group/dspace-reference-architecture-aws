@@ -377,6 +377,7 @@ variable "scenarioGenerationInstances" {
         }),
         {}
       )
+      bedrock_region = string
     }))
   })
 
@@ -399,6 +400,7 @@ variable "scenarioGenerationInstances" {
         opensearch = {
           enable = true
         }
+        bedrock_region = "eu-central-1"
       }
     }
   }

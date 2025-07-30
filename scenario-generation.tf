@@ -27,6 +27,7 @@ module "scenario_generation_instance" {
     security_group_ids = [module.eks.cluster_primary_security_group_id]
     }
   )
+  bedrock_region = each.value.postgresqlVersion
 
   depends_on = [module.eks]
 }
