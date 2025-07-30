@@ -1,9 +1,9 @@
-resource "aws_backup_vault" "scenario_generation_backup_vault" {
+resource "aws_backup_vault" "scenario_generation" {
   count = var.enable_backup_service ? 1 : 0
   name  = local.backup_vault_name
 }
 
-resource "aws_backup_plan" "scenario_generation_backup_plan" {
+resource "aws_backup_plan" "scenario_generation" {
   count = var.enable_backup_service ? 1 : 0
   name  = "${local.instancename}-backup-plan"
 
@@ -20,7 +20,7 @@ resource "aws_backup_plan" "scenario_generation_backup_plan" {
   tags = var.tags
 }
 
-resource "aws_backup_selection" "scenario_generation_backup_selection" {
+resource "aws_backup_selection" "scenario_generation_rds" {
   count        = var.enable_backup_service ? 1 : 0
   name         = "${local.instancename}-rds"
   iam_role_arn = aws_iam_role.scenario_generation_backup_iam_role[0].arn
@@ -28,7 +28,7 @@ resource "aws_backup_selection" "scenario_generation_backup_selection" {
   resources    = local.backup_resources
 }
 
-resource "aws_iam_role" "scenario_generation_backup_iam_role" {
+resource "aws_iam_role" "scenario_generation_backup_role" {
   count              = var.enable_backup_service ? 1 : 0
   name               = "${var.name}-backup-role"
   assume_role_policy = <<POLICY
