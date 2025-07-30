@@ -1,3 +1,6 @@
+locals {
+  string_tags = join(",", [for key, value in var.tags : "${key}=${value}"])
+}
 resource "kubernetes_namespace_v1" "ingress_nginx" {
   count = var.ingress_nginx_config.enable ? 1 : 0
 
@@ -18,6 +21,7 @@ resource "helm_release" "ingress_nginx" {
   dependency_update = true
   values = [
     templatefile("${path.module}/templates/nginx_values.yaml", {
+      tags                   = local.string_tags
       public_subnets         = join(", ", var.ingress_nginx_config.subnets_ids)
       protocol               = var.aws_load_balancer_controller_config.enable ? "ssl" : "tcp"
       aws_load_balancer_type = var.aws_load_balancer_controller_config.enable ? "external" : "nlb"

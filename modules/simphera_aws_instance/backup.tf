@@ -1,6 +1,7 @@
 resource "aws_backup_vault" "backup-vault" {
   count = var.enable_backup_service ? 1 : 0
   name  = local.backup_vault_name
+  tags  = var.tags
 }
 
 resource "aws_backup_plan" "backup-plan" {
@@ -31,6 +32,7 @@ resource "aws_backup_selection" "backup-selection-rds-s3" {
 resource "aws_iam_role" "backup_iam_role" {
   count              = var.enable_backup_service ? 1 : 0
   name               = "${var.name}-backup-role"
+  description        = "Role for enabling backup job execution in AWS"
   assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -45,6 +47,7 @@ resource "aws_iam_role" "backup_iam_role" {
   ]
 }
 POLICY
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "backup_rds_policy" {

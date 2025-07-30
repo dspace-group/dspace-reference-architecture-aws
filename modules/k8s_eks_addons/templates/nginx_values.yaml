@@ -1,6 +1,7 @@
 controller:
   service:
     annotations:
+      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "${tags}"
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "${protocol}"
       service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '60'
       service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
