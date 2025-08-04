@@ -84,10 +84,8 @@ output "service_accounts" {
       }
     }
     scenario_generation = {
-      opensearch = {
-        for name, instance in module.scenario_generation_instance :
-        name => instance.opensearch_service_account
-      }
+      for name, instance in module.scenario_generation_instance :
+      name => instance.scenario_generation_service_account
     }
   }
 }

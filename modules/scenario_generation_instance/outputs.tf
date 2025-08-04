@@ -5,12 +5,12 @@ output "backup_vaults" {
 
 output "database_identifiers" {
   description = "Identifiers of the Scenario Generation databases created for this Scenario Generation instance."
-  value       = [aws_db_instance.scenario_generation.identifier]
+  value       = [aws_db_instance.scenario_generation.identifier, aws_db_instance.scenario_generation_auth.identifier]
 }
 
 output "database_endpoints" {
   description = "Endpoints of the Scenario Generation databases created for this Scenario Generation instance."
-  value       = [aws_db_instance.scenario_generation.endpoint]
+  value       = [aws_db_instance.scenario_generation.endpoint, aws_db_instance.scenario_generation_auth.endpoint]
 }
 
 output "opensearch_domain_endpoint" {
@@ -18,7 +18,7 @@ output "opensearch_domain_endpoint" {
   value       = try(aws_opensearch_domain.scenario_generation_opensearch[0].endpoint, null)
 }
 
-output "opensearch_service_account" {
+output "scenario_generation_service_account" {
   description = "K8s service account name with access to OpenSearch"
-  value       = local.opensearch_serviceaccount
+  value       = local.opensearch_bedrock_serviceaccount
 }

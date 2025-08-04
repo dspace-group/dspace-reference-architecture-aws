@@ -21,13 +21,12 @@ module "scenario_generation_instance" {
   kms_key_cloudwatch                   = aws_kms_key.kms_key_cloudwatch_log_group.arn
   private_subnets                      = local.private_subnets
   aws_context                          = local.aws_context
+  bedrock_region                       = each.value.bedrock_region
   opensearch = merge(each.value.opensearch, {
     domain_name        = "${var.infrastructurename}-${each.key}"
     subnet_ids         = local.private_subnets
     security_group_ids = [module.eks.cluster_primary_security_group_id]
     }
   )
-  bedrock_region = each.value.postgresqlVersion
-
   depends_on = [module.eks]
 }

@@ -40,6 +40,42 @@ resource "aws_db_instance" "scenario_generation" {
   }
 }
 
+resource "aws_db_instance" "scenario_generation_auth" {
+  apply_immediately                   = var.postgresqlApplyImmediately
+  allocated_storage                   = var.postgresqlStorage
+  max_allocated_storage               = var.postgresqlMaxStorage
+  auto_minor_version_upgrade          = true # [RDS.13] RDS automatic minor version upgrades should be enabled
+  allow_major_version_upgrade         = true
+  engine                              = "postgres"
+  engine_version                      = var.postgresqlVersion
+  instance_class                      = var.db_instance_type_scenario_generation
+  identifier                          = local.db_authmanager_id
+  db_name                             = "authmanager"
+  username                            = local.secret_postgres_username
+  password                            = local.secrets["postgresql_password"]
+  multi_az                            = true # [RDS.5] RDS DB instances should be configured with multiple Availability Zones
+  enabled_cloudwatch_logs_exports     = ["postgresql", "upgrade"]
+  monitoring_interval                 = 60
+  monitoring_role_arn                 = aws_iam_role.scenario_generation_rds_enhanced_monitoring_role.arn # [RDS.9] Database logging should be enabled
+  deletion_protection                 = var.enable_deletion_protection                                    # [RDS.7] RDS clusters should have deletion protection enabled
+  skip_final_snapshot                 = !var.enable_deletion_protection
+  final_snapshot_identifier           = "${local.db_authmanager_id}-final-snapshot"
+  iam_database_authentication_enabled = true # [RDS.10] IAM authentication should be configured for RDS instances
+  copy_tags_to_snapshot               = true
+  storage_encrypted                   = true # [RDS.3] RDS DB instances should have encryption at rest enabled
+  db_subnet_group_name                = aws_db_subnet_group.scenario_generation_database.name
+  vpc_security_group_ids              = [var.postgresql_security_group_id]
+  tags                                = var.tags
+  depends_on = [
+    aws_cloudwatch_log_group.db_authmanager
+  ]
+  timeouts {
+    create = "2h"
+    delete = "2h"
+    update = "2h"
+  }
+}
+
 resource "kubernetes_secret" "scenario_generation_aws_tls_certificate" {
   metadata {
     name      = "customsslrootcertificate"
@@ -85,6 +121,13 @@ resource "aws_iam_role_policy_attachment" "scenario_generation_rds_enhanced_moni
 
 resource "aws_cloudwatch_log_group" "db_scenario_generation" {
   name              = "/aws/rds/instance/${local.db_scenario_generation_id}/postgresql" # CAUTION: the name is predetermined by AWS RDS. Do not change it. Otherwise AWS will create a new log group without retention and encryption.
+  retention_in_days = var.cloudwatch_retention
+  kms_key_id        = var.kms_key_cloudwatch
+  tags              = var.tags
+}
+
+resource "aws_cloudwatch_log_group" "db_authmanager" {
+  name              = "/aws/rds/instance/${local.db_authmanager_id}/postgresql" # CAUTION: the name is predetermined by AWS RDS. Do not change it. Otherwise AWS will create a new log group without retention and encryption.
   retention_in_days = var.cloudwatch_retention
   kms_key_id        = var.kms_key_cloudwatch
   tags              = var.tags

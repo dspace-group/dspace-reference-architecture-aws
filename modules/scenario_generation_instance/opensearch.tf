@@ -1,39 +1,3 @@
-resource "aws_iam_role" "scenario_generation_opensearch" {
-  count       = var.opensearch.enable ? 1 : 0
-  name        = "${local.instancename}-opensearch-role"
-  description = "IAM role for the OpenSearch service account"
-  tags        = var.tags
-  assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Principal" : {
-          "Federated" : var.eks_oidc_provider_arn
-        },
-        "Action" : "sts:AssumeRoleWithWebIdentity",
-        "Condition" : {
-          "StringEquals" : {
-            "${local.eks_oidc_issuer}:sub" : "system:serviceaccount:${var.k8s_namespace}:${local.opensearch_serviceaccount}"
-          }
-        }
-      }
-    ]
-  })
-}
-
-resource "kubernetes_service_account" "scenario_generation_opensearch" {
-  count = var.opensearch.enable ? 1 : 0
-  metadata {
-    name      = local.opensearch_serviceaccount
-    namespace = kubernetes_namespace.scenario_generation.metadata[0].name
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.scenario_generation_opensearch[0].arn
-    }
-  }
-  automount_service_account_token = false
-}
-
 resource "aws_opensearch_domain" "scenario_generation_opensearch" {
   count          = var.opensearch.enable ? 1 : 0
   domain_name    = var.opensearch.domain_name
@@ -42,7 +6,7 @@ resource "aws_opensearch_domain" "scenario_generation_opensearch" {
     enabled                        = true
     internal_user_database_enabled = false
     master_user_options {
-      master_user_arn = aws_iam_role.scenario_generation_opensearch[0].arn
+      master_user_arn = aws_iam_role.scenario_generation_service_account.arn
     }
   }
   node_to_node_encryption {
