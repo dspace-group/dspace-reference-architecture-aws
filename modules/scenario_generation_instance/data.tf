@@ -4,8 +4,11 @@ data "aws_iam_policy_document" "scenario_generation_opensearch_access" {
     effect = "Allow"
 
     principals {
-      type        = "*"
-      identifiers = ["*"]
+      type = "AWS"
+      identifiers = [
+        aws_iam_role.backend_service_account.arn,
+        aws_iam_role.ragcore_service_account.arn
+      ]
     }
 
     actions   = ["es:*"]
