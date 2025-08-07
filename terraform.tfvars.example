@@ -222,6 +222,7 @@ scenarioGenerationInstances = {
   "instances": {
     "production": {
       "backup_retention": 35,
+      "bedrock_region": "eu-central-1",
       "db_instance_type_scenario_generation": "db.t4g.large",
       "enable_backup_service": true,
       "enable_deletion_protection": true,

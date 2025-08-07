@@ -369,14 +369,16 @@ variable "scenarioGenerationInstances" {
       backup_retention                     = number
       enable_deletion_protection           = bool
       opensearch = optional(object({
-        enable         = optional(bool, true)
-        engine_version = optional(string, "OpenSearch_2.17")
-        instance_type  = optional(string, "m7g.medium.search")
-        instance_count = optional(number, 1)
-        volume_size    = optional(number, 100)
+        enable                  = optional(bool, true)
+        engine_version          = optional(string, "OpenSearch_2.17")
+        instance_type           = optional(string, "m7g.medium.search")
+        instance_count          = optional(number, 1)
+        volume_size             = optional(number, 100)
+        master_user_secret_name = optional(string, null)
         }),
         {}
       )
+      bedrock_region = string
     }))
   })
 
@@ -396,6 +398,7 @@ variable "scenarioGenerationInstances" {
         enable_backup_service                = true
         backup_retention                     = 35
         enable_deletion_protection           = true
+        bedrock_region                       = "eu-central-1"
         opensearch = {
           enable = true
         }
