@@ -8,6 +8,13 @@ from models.structure import Category, Service, ResourceType, Instance
 
 
 def execute(cmd: str) -> dict:
+    """! Runs given string command in underlying shell and returns it's output.
+    @param cmd (string) shell command to run
+
+    @return dictionary
+
+    @exception Exception Output of subrocess.stderr
+    """
     process = subprocess.run(cmd, capture_output=True, encoding="utf-8")
     if process.stderr:
         raise Exception(process.stderr)
@@ -16,6 +23,11 @@ def execute(cmd: str) -> dict:
 
 
 def index_value(arn: str):
+    """! Formats given string (ARN) in short format, e.g. "resource_type:subtype", unless resource is "s3".
+    @param arn (string) arn string
+
+    @return string or literal "s3"
+    """
     splits = arn.split(":")
     subtype = splits[5]
     try:
@@ -28,6 +40,11 @@ def index_value(arn: str):
 
 
 def get_security_groups(vpc_id: str) -> list[SecurityGroup]:
+    """! Queries all security groups in given VPC, and returns their object representation.
+    @param vpc_id (string) AWS VPC id
+
+    @return list[models.security_group.SecurityGroup]
+    """
     security_groups = list()
     security_groups_query = execute(f"aws ec2 describe-security-groups --filters Name=vpc-id,Values={vpc_id}")
     for sg in security_groups_query["SecurityGroups"]:
@@ -37,6 +54,11 @@ def get_security_groups(vpc_id: str) -> list[SecurityGroup]:
 
 
 def get_roles_and_policies(cluster_id: str) -> tuple[list[Role], list[Policy]]:
+    """! Queries all AWS roles and policies and returns their object representation.
+    @param cluster_id (string) AWS VPC id
+
+    @return tuple[list[models.iam.Role], list[models.iam.Policy]]
+    """
     roles = execute("aws iam list-roles")
     role_objects: list[Role] = list()
     policies: list[Policy] = list()
@@ -72,6 +94,11 @@ def get_roles_and_policies(cluster_id: str) -> tuple[list[Role], list[Policy]]:
 
 
 def get_roles_buffer(roles: list[Role]) -> str:
+    """! Creates Markdown string from given roles.
+    @param roles (list[models.iam.Role]) List of Role objects.
+
+    @return string
+    """
     buffer_roles = list()
     buffer_roles.append("| Role name | Description | Policies  |")
     buffer_roles.append("| --------- | ----------- | --------- |")
@@ -81,6 +108,11 @@ def get_roles_buffer(roles: list[Role]) -> str:
 
 
 def get_policies_buffer(policies: list[Policy]) -> str:
+    """! Creates Markdown string from given policies.
+    @param policies (list[models.iam.Policy]) List of Role objects.
+
+    @return string
+    """
     buffer_policies = list()
     buffer_policies.append("| Policy name | Description | Managed By |")
     buffer_policies.append("| ----------- | ----------- | ---------- |")
@@ -91,6 +123,11 @@ def get_policies_buffer(policies: list[Policy]) -> str:
 
 
 def get_security_group_buffer(security_groups: list[SecurityGroup]) -> str:
+    """! Creates HTML table from given SecurityGroups.
+    @param security_groups (list[models.security_group.SecurityGroup]) List of SecurityGroup objects.
+
+    @return string
+    """
     header = "<tr><th>Group name</th><th>Group description</th><th>Direction</th><th>Protocol</th><th>Port range</th><th>Rule description</th></tr>"
     buffer = list()
     for group in security_groups:
@@ -99,6 +136,11 @@ def get_security_group_buffer(security_groups: list[SecurityGroup]) -> str:
 
 
 def get_vpc_id(cluster_name: str) -> str:
+    """! Queries AWS vpcs and returns one tagged with "Name" of value "cluster_name".
+    @param cluster_name (string) EKS cluster name.
+
+    @return string
+    """
     vpc_id = execute(
         f'aws ec2 describe-vpcs --filters "Name=tag:Name,Values={cluster_name}-vpc" --query "Vpcs[].VpcId"'
     )[0]
@@ -106,6 +148,12 @@ def get_vpc_id(cluster_name: str) -> str:
 
 
 def get_categories(structure_file_path: str, cluster_name: str) -> list[Category]:
+    """! Queries AWS resources tagged with tag "Cluster" of value "cluster_name", parses "structure.yaml" file and creates list of models.structure.Category objects.
+    @param structure_file_path (string) Path to "structure.yaml" file.
+    @param cluster_name (string) EKS cluster name.
+
+    @return list[models.structure.Category]
+    """
     with open(structure_file_path, "r") as structure_file:
         structure = yaml.safe_load(structure_file)
     arn_index = {}
@@ -149,6 +197,14 @@ def get_categories(structure_file_path: str, cluster_name: str) -> list[Category
 def populate_categories(
     categories: list[Category], security_groups: list[SecurityGroup], roles: list[Role], policies: list[Policy]
 ) -> list[str]:
+    """! Creates list of Markdown strings from given data.
+    @param categories (list[models.structure.Category]) List of Category objects.
+    @param securty_groups (list[models.security_group.SecurityGroup]) List of SecurityGroup objects.
+    @param roles (list[models.iam.Role]) List of Role objects.
+    @param policies (string) List of Policy objects.
+
+    @return list[str]
+    """
     categories_buffer = list()
     for category in categories:
         categories_buffer.append(f"{category.get_title()}\n\n")
