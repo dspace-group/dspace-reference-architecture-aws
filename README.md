@@ -292,7 +292,7 @@ When deploying an Amazon OpenSearch domain for the first time in a new AWS accou
 
 >**<span style="color:red">Error:</span>** creating OpenSearch Domain: ValidationException: Before you can proceed, you must enable a service-linked role to give Amazon OpenSearch Service permissions to access your VPC.
 
-This error occurs because Amazon OpenSearch requires a service-linked IAM role named `AWSServiceRoleForAmazonOpenSearchService` to interact with your VPC. In a new AWS account, this IAM role might not be created in time during the initial Terraform run, causing the domain provisioning to fail.
+This error occurs because Amazon OpenSearch requires a service-linked role named `AWSServiceRoleForAmazonOpenSearchService` to interact with your VPC. In a new AWS account, this role might not be created in time during the initial Terraform run, causing the domain provisioning to fail.
 
 Simply run `terraform apply` again. On the second attempt, the required service-linked role will already be in place, and the OpenSearch domain should be provisioned successfully.
 ### Destroy Infrastructure
