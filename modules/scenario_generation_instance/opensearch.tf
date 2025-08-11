@@ -2,17 +2,6 @@ resource "aws_opensearch_domain" "scenario_generation_opensearch" {
   count          = var.opensearch.enable ? 1 : 0
   domain_name    = var.opensearch.domain_name
   engine_version = var.opensearch.engine_version
-  advanced_security_options {
-    enabled                        = false
-    internal_user_database_enabled = true
-    # master_user_options {
-    #   master_user_arn = aws_iam_role.opensearch_service_account.arn
-    # }
-    master_user_options {
-      master_user_name     = local.opensearch_secret["master_user"]
-      master_user_password = local.opensearch_secret["master_password"]
-    }
-  }
   node_to_node_encryption {
     enabled = true
   }
