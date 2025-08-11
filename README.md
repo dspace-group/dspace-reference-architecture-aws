@@ -288,6 +288,13 @@ Default timeout for node/addon deployment is 20 minutes, so please be patient.  
 always uncomment line `depends_on = [module.eks.node_groups]`.
 It is recommended to use AWS `admin` account, or ask your AWS administrator to assign necessary IAM roles and permissions to your user.
 
+When deploying an Amazon OpenSearch domain for the first time in a new AWS account using Terraform, you may encounter the following error:
+
+>**<span style="color:red">Error:</span>** creating OpenSearch Domain: ValidationException: Before you can proceed, you must enable a service-linked role to give Amazon OpenSearch Service permissions to access your VPC.
+
+This error occurs because Amazon OpenSearch requires a service-linked role to interact with your VPC. In a new AWS account, this role might not be created in time during the initial Terraform run, causing the domain provisioning to fail.
+
+Simply run `terraform apply` again. On the second attempt, the required service-linked role will already be in place, and the OpenSearch domain should be provisioned successfully.
 ### Destroy Infrastructure
 
 Resources that contain data, i.e. the databases, S3 storage, and the recovery points in the backup vault are protected against unintentional deletion.
@@ -339,7 +346,7 @@ To delete the S3 buckets that contains both versioned and non-versioned objects,
 $aws_profile = "<profile_name>"
 $buckets = terraform output s3_buckets | ConvertFrom-Json
 foreach ($bucket in $buckets) {
-    Write-Output "Deleting bucket: $bucket" 
+    Write-Output "Deleting bucket: $bucket"
     $deleteObjDict = @{}
     $deleteObj = New-Object System.Collections.ArrayList
     aws s3api list-object-versions --bucket $bucket --profile $aws_profile --query '[Versions[*].{ Key:Key , VersionId:VersionId} , DeleteMarkers[*].{ Key:Key , VersionId:VersionId}]' --output json `
