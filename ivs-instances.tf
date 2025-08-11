@@ -26,3 +26,16 @@ module "ivs_instance" {
   log_bucket                           = aws_s3_bucket.bucket_logs.id
   depends_on                           = [module.k8s_eks_addons]
 }
+
+resource "aws_iam_service_linked_role" "opensearch" {
+  # count            = 0
+  aws_service_name = "opensearchservice.amazonaws.com"
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
+}
+
+import {
+  to = aws_iam_service_linked_role.opensearch
+  id = "arn:aws:iam::${local.aws_context.caller_identity_account_id}:role/aws-service-role/opensearchservice.amazonaws.com/AWSServiceRoleForAmazonOpenSearchService"
+}
