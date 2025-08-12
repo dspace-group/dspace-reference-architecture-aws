@@ -269,11 +269,17 @@ provider "aws" {
 
 Amazon OpenSearch requires a service-linked role named `AWSServiceRoleForAmazonOpenSearchService` to access resources within your VPC. If you're creating an Amazon OpenSearch domain for the first time in a new AWS account, this role may not yet exist. Before proceeding, check whether this role already exists in your account. If it doesn't, you can manually create it via the AWS Console:
 
-1. Navigate to IAM in the AWS Management Console.
+1. Navigate to IAM in the AWS Console.
 2. Click Create Role.
 3. Select **AWS service** as the trusted entity type.
 4. Choose **Amazon OpenSearch Service** from the list.
 5. Proceed with the default settings and create the role.
+
+You can also create the role via the AWS CLI:
+
+```sh
+aws iam create-service-linked-role  --aws-service-name opensearchservice.amazonaws.com --profile <profile_name>
+```
 
 ### Apply Terraform Configuration
 
