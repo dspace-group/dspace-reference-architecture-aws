@@ -265,6 +265,15 @@ provider "aws" {
 +  profile = "<profile-name>"
 }
 ```
+### Setting Up Service-Linked Role for First-Time OpenSearch Domian Creation in an AWS Account
+
+Amazon OpenSearch requires a service-linked role named `AWSServiceRoleForAmazonOpenSearchService` to access resources within your VPC. If you're creating an Amazon OpenSearch domain for the first time in a new AWS account, this role may not yet exist. Before proceeding, check whether this role already exists in your account. If it doesn't, you can manually create it via the AWS Console:
+
+1. Navigate to IAM in the AWS Management Console.
+2. Click Create Role.
+3. Select **AWS service** as the trusted entity type.
+4. Choose **Amazon OpenSearch Service** from the list.
+5. Proceed with the default settings and create the role.
 
 ### Apply Terraform Configuration
 
@@ -288,11 +297,11 @@ Default timeout for node/addon deployment is 20 minutes, so please be patient.  
 always uncomment line `depends_on = [module.eks.node_groups]`.
 It is recommended to use AWS `admin` account, or ask your AWS administrator to assign necessary IAM roles and permissions to your user.
 
-When deploying an Amazon OpenSearch domain for the first time in a new AWS account using Terraform, you may encounter the following error:
+If the required service-linked role `AWSServiceRoleForAmazonOpenSearchService` is not manually created beforehand, setting up an Amazon OpenSearch domain for the first time in a new AWS account using Terraform may result in the following error:
 
 >**<span style="color:red">Error:</span>** creating OpenSearch Domain: ValidationException: Before you can proceed, you must enable a service-linked role to give Amazon OpenSearch Service permissions to access your VPC.
 
-This error occurs because Amazon OpenSearch requires a service-linked role named `AWSServiceRoleForAmazonOpenSearchService` to interact with your VPC. In a new AWS account, this role might not be created in time during the initial Terraform run, causing the domain provisioning to fail.
+This issue arises because, in a new AWS account, the required service-linked role may not be created in time during the initial Terraform run, causing the domain provisioning to fail.
 
 Simply run `terraform apply` again. On the second attempt, the required service-linked role will already be in place, and the OpenSearch domain should be provisioned successfully.
 ### Destroy Infrastructure
