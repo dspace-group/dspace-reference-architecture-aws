@@ -243,6 +243,16 @@ Open the Plaintext tab and paste the following JSON object and enter your userna
   "master_password": "your_password"
 }
 ```
+### Granting Access to Bedrock Models
+To use AWS Bedrock models, you must first grant access to the desired models via the AWS Console. Follow these steps:
+
+1. Go to the AWS Console and navigate to Bedrock.
+2. Under the "Configure and Learn" section, select "Model access".
+3. Hover over the models listed as "Available for access".
+4. Click "Request model access" for the models you want to use.
+5. Proceed through the prompts to complete the access request.
+
+Once access is granted, you’ll be able to use the selected models in your applications.
 
 ### Adjust Terraform Variables
 
