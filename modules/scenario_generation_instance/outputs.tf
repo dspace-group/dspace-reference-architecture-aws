@@ -18,12 +18,7 @@ output "opensearch_domain_endpoint" {
   value       = try(aws_opensearch_domain.scenario_generation_opensearch[0].endpoint, null)
 }
 
-output "ragcore_service_account" {
-  description = "K8s service account name with access to OpenSearch"
-  value       = local.ragcore_opensearch_bedrock_serviceaccount
-}
-
-output "backend_service_account" {
-  description = "K8s service account name with access to OpenSearch"
-  value       = local.backend_opensearch_bedrock_serviceaccount
+output "scenario_generation_service_account" {
+  description = "K8s service account name with access to OpenSearch and Bedrock"
+  value       = local.opensearch_bedrock_serviceaccount
 }

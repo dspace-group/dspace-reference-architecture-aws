@@ -377,7 +377,6 @@ variable "scenarioGenerationInstances" {
         }),
         {}
       )
-      bedrock_region = string
     }))
   })
 
@@ -397,7 +396,6 @@ variable "scenarioGenerationInstances" {
         enable_backup_service                = true
         backup_retention                     = 35
         enable_deletion_protection           = true
-        bedrock_region                       = "eu-central-1"
         opensearch = {
           enable = true
         }

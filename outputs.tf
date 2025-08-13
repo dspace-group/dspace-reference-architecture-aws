@@ -84,14 +84,8 @@ output "service_accounts" {
       }
     }
     scenario_generation = {
-      rag_core = {
-        for name, instance in module.scenario_generation_instance :
-        name => instance.ragcore_service_account
-      }
-      backend = {
-        for name, instance in module.scenario_generation_instance :
-        name => instance.backend_service_account
-      }
+      for name, instance in module.scenario_generation_instance :
+      name => instance.scenario_generation_service_account
     }
   }
 }

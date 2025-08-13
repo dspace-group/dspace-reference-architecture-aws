@@ -2,6 +2,13 @@ resource "aws_opensearch_domain" "scenario_generation_opensearch" {
   count          = var.opensearch.enable ? 1 : 0
   domain_name    = var.opensearch.domain_name
   engine_version = var.opensearch.engine_version
+  advanced_security_options {
+    enabled                        = true
+    internal_user_database_enabled = false
+    master_user_options {
+      master_user_arn = aws_iam_role.scenario_generation_opensearch_bedrock.arn
+    }
+  }
   node_to_node_encryption {
     enabled = true
   }
