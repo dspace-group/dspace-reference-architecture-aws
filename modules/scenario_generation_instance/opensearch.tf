@@ -37,25 +37,3 @@ resource "aws_opensearch_domain" "scenario_generation_opensearch" {
   access_policies = data.aws_iam_policy_document.scenario_generation_opensearch_access[0].json
   tags            = var.tags
 }
-
-# resource "aws_iam_policy" "opensearch_access_policy" {
-#   name        = "${local.instancename}-opensearch-access-policy"
-#   description = "Policy for OpenSearch access"
-#   policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [{
-#       Effect   = "Allow",
-#       Action   = ["es:*"],
-#       Resource = ["arn:aws:es:${var.aws_context.region_name}:${var.aws_context.caller_identity_account_id}:domain/${var.opensearch.domain_name}/*"]
-#     }]
-#   })
-# }
-# resource "aws_iam_role_policy_attachment" "ragcore_policy_attachment" {
-#   role       = aws_iam_role.ragcore_service_account.name
-#   policy_arn = aws_iam_policy.opensearch_access_policy.arn
-# }
-
-# resource "aws_iam_role_policy_attachment" "backend_policy_attachment" {
-#   role       = aws_iam_role.backend_service_account.name
-#   policy_arn = aws_iam_policy.opensearch_access_policy.arn
-# }

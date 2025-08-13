@@ -123,15 +123,14 @@ variable "aws_context" {
 
 variable "opensearch" {
   type = object({
-    enable                  = bool
-    subnet_ids              = list(string)
-    domain_name             = string
-    engine_version          = string
-    instance_type           = string
-    instance_count          = number
-    volume_size             = number
-    master_user_secret_name = string
-    security_group_ids      = list(string)
+    enable             = bool
+    subnet_ids         = list(string)
+    domain_name        = string
+    engine_version     = string
+    instance_type      = string
+    instance_count     = number
+    volume_size        = number
+    security_group_ids = list(string)
   })
   description = "Input variables for configuring an AWS's OpenSearch domain"
 }

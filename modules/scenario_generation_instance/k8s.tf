@@ -6,7 +6,7 @@ resource "kubernetes_namespace" "scenario_generation" {
 
 resource "aws_iam_role" "ragcore_service_account" {
   name        = "${local.instancename}-ragcore-sa-role"
-  description = "IAM role for OpenSearch and Bedrock service account got RAG core"
+  description = "IAM role for OpenSearch and Bedrock service account for RAG core"
   tags        = var.tags
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
