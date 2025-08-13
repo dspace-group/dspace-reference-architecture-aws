@@ -27,4 +27,3 @@ output "backend_service_account" {
   description = "K8s service account name with access to OpenSearch"
   value       = local.backend_opensearch_bedrock_serviceaccount
 }
-
