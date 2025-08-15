@@ -64,7 +64,7 @@ Charges may apply for the following AWS resources and services:
 
 ### AWS Regions Supported
 
-dSPACE Cloud Products rely on a set of core AWS services that are included in all AWS Region launches. While Amazon Elastic File System (EFS) is not part of the initial core set, it typically becomes available within 12 months of a new region’s launch. For GPU-based workloads and other node configurations, users must verify the availability of the required EC2 instance types in the selected region.
+dSPACE Cloud Products rely on a set of core AWS services that are included in all AWS Region launches. While Amazon Elastic File System (EFS) is not part of the initial core set, it may not be immediately available in newly launched AWS Regions. For GPU-based workloads and other node configurations, users must verify the availability of the required EC2 instance types in the selected region.
 
 
 ## Usage Instructions
