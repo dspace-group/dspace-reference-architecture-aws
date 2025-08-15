@@ -62,6 +62,10 @@ Charges may apply for the following AWS resources and services:
 | Amazon OpenSearch Service | Database service for storing embedding tags, used by IVS embedding service and Similarity search feature | IVS ||
 | Amazon Elastic Block Store | Block storage volumes used for EC2 volumes or as persistent volumes in Kubernetes cluster | SIMPHERA/IVS | Yes (IVS) |
 
+### AWS Regions Supported
+
+dSPACE Cloud Products rely on a set of core AWS services that are included in all AWS Region launches. While Amazon Elastic File System (EFS) is not part of the initial core set, it may not be immediately available in newly launched AWS Regions. For GPU-based workloads and other node configurations, users must verify the availability of the required EC2 instance types in the selected region.
+
 ## Usage Instructions
 
 To create the AWS resources that are required for operating the dSPACE Cloud Products from your local administration PC, you need to accomplish the following tasks:
