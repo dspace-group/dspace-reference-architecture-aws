@@ -243,7 +243,8 @@ Open the Plaintext tab and paste the following JSON object and enter your userna
   "master_password": "your_password"
 }
 ```
-### Granting Access to Bedrock Models
+### Granting Access to Bedrock Models (Scenario Generation)
+
 To use AWS Bedrock models, you must first grant access to the desired models via the AWS Console. Follow these steps:
 
 1. Go to the AWS Console and navigate to Bedrock.
