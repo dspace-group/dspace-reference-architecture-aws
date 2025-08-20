@@ -355,6 +355,7 @@ variable "ivsInstances" {
 
 variable "scenarioGenerationInstances" {
   type = object({
+    enable = optional(bool, false)
     instances = map(object({
       name                                 = string
       postgresqlApplyImmediately           = bool
@@ -381,6 +382,7 @@ variable "scenarioGenerationInstances" {
 
   description = "A list containing the individual Scenario Generation instances, such as 'staging' and 'production'."
   default = {
+    enable = false
     instances = {
       "production" = {
         name                                 = "production"
