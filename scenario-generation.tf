@@ -1,6 +1,6 @@
 module "scenario_generation_instance" {
   source                               = "./modules/scenario_generation_instance"
-  for_each                             = var.scenarioGenerationInstances.instances
+  for_each                             = var.scenarioGenerationInstances.enable ? var.scenarioGenerationInstances.instances : {}
   infrastructurename                   = local.infrastructurename
   tags                                 = var.tags
   eks_oidc_issuer_url                  = module.eks.eks_oidc_issuer_url
@@ -22,7 +22,7 @@ module "scenario_generation_instance" {
   private_subnets                      = local.private_subnets
   aws_context                          = local.aws_context
   opensearch = merge(each.value.opensearch, {
-    domain_name        = "${var.infrastructurename}-${each.key}"
+    domain_name        = "${var.infrastructurename}-scgen-${each.key}"
     subnet_ids         = local.private_subnets
     security_group_ids = [module.eks.cluster_primary_security_group_id]
     }
