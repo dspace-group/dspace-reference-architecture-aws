@@ -247,7 +247,7 @@ Open the Plaintext tab and paste the following JSON object and enter your userna
 
 When OpenSearch is deployed via the `ivs_aws_instance module`, it uses a master username and password for authentication. However, Scenario Generation cannot use this authentication method because it relies on IRSA (IAM Roles for Service Accounts) for access.
 
-Therefor an additional master user needs to be created that is mapping to the IAM role used by the `opensearch-bedrock-irsa` service account. The IAM role attached to the opensearch-bedrock-irsa service account can be retrieved after the infrastructure is provisioned. This IAM role ARN can be fetched from your cloud console (e.g., AWS Management Console) or by describing the service account using kubectl:
+Therefore, an additional master user mapped to `opensearch-bedrock-irsa` service account associated with the correct IAM role needs to be created. The IAM role attached to the opensearch-bedrock-irsa service account can be retrieved after the infrastructure is provisioned. This IAM role ARN can be fetched from your cloud console (e.g., AWS Management Console) or by describing the service account using kubectl:
 
 ```json
 kubectl get serviceaccount opensearch-bedrock-irsa -n scenario-generation -o jsonpath='{.metadata.annotations.eks\.amazonaws\.com/role-arn}' --kubeconfig <path_to_the_kubeconfig>
