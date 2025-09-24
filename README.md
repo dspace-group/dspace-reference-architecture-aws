@@ -249,13 +249,13 @@ When OpenSearch is deployed via the `ivs_aws_instance module`, it uses a master 
 
 Therefore, an additional master user mapped to `opensearch-bedrock-irsa` service account associated with the correct IAM role needs to be created. The IAM role attached to the `opensearch-bedrock-irsa` service account can be retrieved after the infrastructure is provisioned. This IAM role ARN can be fetched from your cloud console (e.g., AWS Management Console) or by describing the service account using kubectl:
 
-```json
+```powershell
 kubectl get serviceaccount opensearch-bedrock-irsa -n scenario-generation -o jsonpath='{.metadata.annotations.eks\.amazonaws\.com/role-arn}' --kubeconfig <path_to_the_kubeconfig>
 ```
 
 The additional master user can be created using the OpenSearch REST API. To do this, shell into the Scenario Generation RAG core Pod and make the API call as follows:
 
-```json
+```bash
 curl -XPUT -u '<opensearch_master_username>:<opensearch_master_password>' 'https:/<opensearch_domain_endpoint>/_plugins/_security/api/rolesmapping/all_access' \
 -H "Content-Type: application/json" \
 -d '{
