@@ -255,7 +255,7 @@ kubectl get serviceaccount opensearch-bedrock-irsa -n scenario-generation -o jso
 
 The additional master user can be created using the OpenSearch REST API. To do this, shell into the Scenario Generation RAG core Pod and make the API call as follows:
 
-```powershell
+```bash
 curl -XPUT -u '<opensearch_master_username>:<opensearch_master_password>' 'https:/<opensearch_domain_endpoint>/_plugins/_security/api/rolesmapping/all_access' \
 -H "Content-Type: application/json" \
 -d '{
