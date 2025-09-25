@@ -3,6 +3,7 @@ variable "region" {
   description = "The AWS region to be used."
   default     = "eu-central-1"
 }
+
 variable "infrastructurename" {
   type        = string
   description = "The name of the infrastructure. e.g. simphera-infra"
