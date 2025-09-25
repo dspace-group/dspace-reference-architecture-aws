@@ -8,7 +8,7 @@ module "ivs_instance" {
   cloudwatch_retention                 = var.cloudwatch_retention
   database_secretname                  = each.value.database_secretname
   data_bucket                          = each.value.data_bucket
-  db_instance_type_ivs                 = each.value.db_instance_type_ivs_authentication
+  db_instance_type_ivs                 = each.value.db_instance_type_ivs
   eks_cluster_id                       = var.infrastructurename
   eks_oidc_issuer                      = replace(module.eks.eks_oidc_issuer_url, "https://", "")
   eks_oidc_provider_arn                = module.eks.eks_oidc_provider_arn
