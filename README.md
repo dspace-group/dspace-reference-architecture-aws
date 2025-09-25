@@ -202,7 +202,7 @@ Your account ARN (Amazon Resource Number) is in the output of `aws sts get-calle
 You have to provide the name of the certain secrets in your Terraform variables.
 To create required secrets, follow these instructions.
 
-#### PostgreSQL (SIMPHERA)
+#### PostgreSQL (SIMPHERA/IVS)
 
 Username and password for the PostgreSQL databases are stored in AWS Secrets Manager.
 Before you let Terraform create AWS resources, you need to manually create a Secrets Manager secret that stores the password.
