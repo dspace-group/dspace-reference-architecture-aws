@@ -1,6 +1,7 @@
 variable "k8s_namespace" {
   type = string
 }
+
 variable "eks_cluster_id" {
   type = string
 }
@@ -96,7 +97,6 @@ variable "backup_schedule" {
   description = "Cron string that schedules backup occurance"
 }
 
-
 variable "enable_deletion_protection" {
   type        = bool
   description = "Enable deletion protection for databases and content of s3 buckets."
@@ -164,4 +164,9 @@ variable "enableIVSAuthentication" {
   type        = bool
   description = "A switch to enable/disable deployment of IVS Authentication DB"
   default     = false
+}
+
+variable "database_secretname" {
+  description = "Secrets manager secret"
+  type        = string
 }

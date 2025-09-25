@@ -107,7 +107,6 @@ variable "enable_deletion_protection" {
   default     = true
 }
 
-
 variable "secretname" {
   description = "Secrets manager secret"
   type        = string

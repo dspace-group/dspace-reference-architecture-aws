@@ -6,6 +6,7 @@ module "ivs_instance" {
   backup_schedule                      = each.value.backup_schedule
   backup_service_enable                = each.value.backup_service_enable
   cloudwatch_retention                 = var.cloudwatch_retention
+  database_secretname                  = each.value.database_secretname
   data_bucket                          = each.value.data_bucket
   db_instance_type_ivs                 = each.value.db_instance_type_ivs_authentication
   eks_cluster_id                       = var.infrastructurename
