@@ -26,12 +26,12 @@ module "ivs_instance" {
     security_group_ids = [module.eks.cluster_primary_security_group_id]
     }
   )
-  postgresql_security_group_id         = module.security_group.security_group_id
-  postgresqlApplyImmediately           = each.value.postgresqlApplyImmediately
-  postgresqlVersion                    = each.value.postgresqlVersion
-  private_subnets                      = local.private_subnets
-  raw_data_bucket                      = each.value.raw_data_bucket
-  region                               = local.region
-  tags                                 = var.tags
-  depends_on                           = [module.k8s_eks_addons]
+  postgresql_security_group_id = module.security_group.security_group_id
+  postgresqlApplyImmediately   = each.value.postgresqlApplyImmediately
+  postgresqlVersion            = each.value.postgresqlVersion
+  private_subnets              = local.private_subnets
+  raw_data_bucket              = each.value.raw_data_bucket
+  region                       = local.region
+  tags                         = var.tags
+  depends_on                   = [module.k8s_eks_addons]
 }

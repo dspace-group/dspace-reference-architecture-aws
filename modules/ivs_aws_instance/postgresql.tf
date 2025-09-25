@@ -23,7 +23,7 @@ resource "aws_db_instance" "ivs_authentication" {
   enabled_cloudwatch_logs_exports     = ["postgresql", "upgrade"]
   monitoring_interval                 = 60
   monitoring_role_arn                 = aws_iam_role.rds_enhanced_monitoring_role_ivs.arn # [RDS.9] Database logging should be enabled
-  deletion_protection                 = var.enable_deletion_protection                # [RDS.7] RDS clusters should have deletion protection enabled
+  deletion_protection                 = var.enable_deletion_protection                    # [RDS.7] RDS clusters should have deletion protection enabled
   skip_final_snapshot                 = !var.enable_deletion_protection
   final_snapshot_identifier           = "${local.db_ivs_id}-final-snapshot"
   iam_database_authentication_enabled = true # [RDS.10] IAM authentication should be configured for RDS instances

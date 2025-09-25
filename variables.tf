@@ -338,19 +338,19 @@ variable "simphera_monitoring_namespace" {
 
 variable "ivsInstances" {
   type = map(object({
-    backup_retention           = optional(number, 7)
-    backup_schedule            = optional(string, "cron(0 1 * * ? *)")
-    backup_service_enable      = optional(bool, false)
+    backup_retention      = optional(number, 7)
+    backup_schedule       = optional(string, "cron(0 1 * * ? *)")
+    backup_service_enable = optional(bool, false)
     data_bucket = object({
       name   = string
       create = optional(bool, true)
     })
-    db_instance_type_ivs       = optional(string, "db.t4g.large")
-    enable_deletion_protection = optional(bool, true)
-    enable_ivs_authentication  = optional(bool, false)
+    db_instance_type_ivs                 = optional(string, "db.t4g.large")
+    enable_deletion_protection           = optional(bool, true)
+    enable_ivs_authentication            = optional(bool, false)
     goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })
-    ivs_release_name           = optional(string, "ivs")
-    k8s_namespace = string
+    ivs_release_name                     = optional(string, "ivs")
+    k8s_namespace                        = string
     opensearch = optional(object({
       enable                  = optional(bool, false)
       engine_version          = optional(string, "OpenSearch_2.17")
