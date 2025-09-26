@@ -16,7 +16,7 @@ resource "aws_db_instance" "ivs_authentication" {
   engine_version                      = var.postgresqlVersion
   instance_class                      = var.db_instance_type_ivs
   identifier                          = local.db_ivs_id
-  db_name                             = "ivs-authentication"
+  db_name                             = "ivsauthentication"
   username                            = local.secret_postgres_username
   password                            = local.database_secretname["postgresql_password"]
   multi_az                            = true # [RDS.5] RDS DB instances should be configured with multiple Availability Zones
