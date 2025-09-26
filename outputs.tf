@@ -11,9 +11,14 @@ output "backup_vaults" {
   ])
 }
 
-output "database_identifiers" {
+output "simphera_database_identifiers" {
   description = "Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances."
-  value       = flatten([for name, instance in module.simphera_instance : instance.database_identifiers])
+  value       = flatten([for name, instance in module.simphera_instance : instance.simphera_database_identifiers])
+}
+
+output "ivs_database_identifiers" {
+  description = "Identifiers of the IVS databases from all IVS instances."
+  value       = flatten([for name, instance in module.ivs_instance : instance.ivs_database_identifiers])
 }
 
 output "database_endpoints" {
