@@ -3,6 +3,7 @@ variable "region" {
   description = "The AWS region to be used."
   default     = "eu-central-1"
 }
+
 variable "infrastructurename" {
   type        = string
   description = "The name of the infrastructure. e.g. simphera-infra"
@@ -105,7 +106,6 @@ variable "enable_deletion_protection" {
   description = "Enable deletion protection for databases and content of s3 buckets."
   default     = true
 }
-
 
 variable "secretname" {
   description = "Secrets manager secret"
