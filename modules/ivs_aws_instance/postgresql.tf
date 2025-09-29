@@ -8,7 +8,7 @@ resource "aws_db_subnet_group" "database" {
 resource "aws_db_instance" "ivs_authentication" {
   count                               = var.enableIVSAuthentication ? 1 : 0
   apply_immediately                   = var.postgresqlApplyImmediately
-  allocated_storage                   = 20
+  allocated_storage                   = 2
   max_allocated_storage               = 30
   auto_minor_version_upgrade          = true # [RDS.13] RDS automatic minor version upgrades should be enabled
   allow_major_version_upgrade         = true

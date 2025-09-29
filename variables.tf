@@ -345,7 +345,7 @@ variable "ivsInstances" {
       name   = string
       create = optional(bool, true)
     })
-    db_instance_type_ivs                 = optional(string, "db.t4g.large")
+    db_instance_type_ivs                 = optional(string, "db.t4g.small")
     enable_deletion_protection           = optional(bool, true)
     enable_ivs_authentication            = optional(bool, false)
     goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })
