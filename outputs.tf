@@ -4,21 +4,45 @@ output "account_id" {
 }
 
 output "backup_vaults" {
-  description = "Backups vaults from all dSPACE cloud products managed by terraform."
-  value = flatten([
-    flatten([for name, instance in module.simphera_instance : instance.backup_vaults]),
-    flatten([for name, instance in module.ivs_instance : instance.backup_vaults])
-  ])
+  description = "Backups vaults managed by terraform."
+  value = {
+    simphera = {
+      for name, instance in module.simphera_instance :
+      name => flatten(instance.backup_vaults)
+    }
+    ivs = {
+      for name, instance in module.ivs_instance :
+      name => flatten(instance.backup_vaults)
+    }
+  }
 }
 
 output "database_identifiers" {
-  description = "Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances."
-  value       = flatten([for name, instance in module.simphera_instance : instance.database_identifiers])
+  description = "Identifiers of the databases from all instances."
+  value = {
+    simphera = {
+      for name, instance in module.simphera_instance :
+      name => flatten(instance.database_identifiers)
+    }
+    ivs = {
+      for name, instance in module.ivs_instance :
+      name => flatten(instance.database_identifiers)
+    }
+  }
 }
 
 output "database_endpoints" {
-  description = "Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances."
-  value       = flatten([for name, instance in module.simphera_instance : instance.database_endpoints])
+  description = "Endpoints of the databases from all instances."
+  value = {
+    simphera = {
+      for name, instance in module.simphera_instance :
+      name => flatten(instance.database_endpoints)
+    }
+    ivs = {
+      for name, instance in module.ivs_instance :
+      name => flatten(instance.database_endpoints)
+    }
+  }
 }
 
 output "s3_buckets" {

@@ -338,44 +338,49 @@ variable "simphera_monitoring_namespace" {
 
 variable "ivsInstances" {
   type = map(object({
-    k8s_namespace = string
+    backup_retention      = optional(number, 7)
+    backup_schedule       = optional(string, "cron(0 1 * * ? *)")
+    backup_service_enable = optional(bool, false)
     data_bucket = object({
       name   = string
       create = optional(bool, true)
     })
+    db_instance_type_ivs                 = optional(string, "db.t4g.small")
+    enable_deletion_protection           = optional(bool, true)
+    enable_ivs_authentication            = optional(bool, true)
+    goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })
+    ivs_release_name                     = optional(string, "ivs")
+    k8s_namespace                        = string
+    opensearch = optional(object({
+      enable                  = optional(bool, false)
+      engine_version          = optional(string, "OpenSearch_2.17")
+      instance_count          = optional(number, 1)
+      instance_type           = optional(string, "m7g.medium.search")
+      master_user_secret_name = optional(string, null)
+      volume_size             = optional(number, 100)
+      }),
+      {}
+    )
+    postgresqlApplyImmediately = optional(bool, false)
+    postgresqlVersion          = optional(string, "16")
     raw_data_bucket = object({
       name   = string
       create = optional(bool, true)
     })
-    goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })
-    opensearch = optional(object({
-      enable                  = optional(bool, false)
-      engine_version          = optional(string, "OpenSearch_2.17")
-      instance_type           = optional(string, "m7g.medium.search")
-      instance_count          = optional(number, 1)
-      volume_size             = optional(number, 100)
-      master_user_secret_name = optional(string, null)
-      }),
-      {}
-    )
-    ivs_release_name           = optional(string, "ivs")
-    backup_service_enable      = optional(bool, false)
-    backup_retention           = optional(number, 7)
-    backup_schedule            = optional(string, "cron(0 1 * * ? *)")
-    enable_deletion_protection = optional(bool, true)
+    database_secretname = optional(string, "aws-ivs-auth")
   }))
   description = "A list containing the individual IVS instances, such as 'staging' and 'production'. 'opensearch' object is used for enabling AWS OpenSearch Domain creation.'opensearch.master_user_secret_name' is an AWS secret containing key 'master_user' and 'master_password'. 'opensearch.instance_type' must have option for ebs storage, check available type at https://aws.amazon.com/opensearch-service/pricing/"
   default = {
     "production" = {
-      k8s_namespace = "ivs"
       data_bucket = {
         name = "demo-ivs"
       }
-      raw_data_bucket = {
-        name = "demo-ivs-rawdata"
-      }
+      k8s_namespace = "ivs"
       opensearch = {
         enable = false
+      }
+      raw_data_bucket = {
+        name = "demo-ivs-rawdata"
       }
     }
   }
