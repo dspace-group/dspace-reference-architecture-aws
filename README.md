@@ -701,14 +701,13 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | Name | Description |
 |------|-------------|
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | The AWS account id used for creating resources. |
-| <a name="output_backup_vaults"></a> [backup\_vaults](#output\_backup\_vaults) | Backups vaults from all dSPACE cloud products managed by terraform. |
-| <a name="output_database_endpoints"></a> [database\_endpoints](#output\_database\_endpoints) | Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances. |
+| <a name="output_backup_vaults"></a> [backup\_vaults](#output\_backup\_vaults) | Backups vaults managed by terraform. |
+| <a name="output_database_endpoints"></a> [database\_endpoints](#output\_database\_endpoints) | Endpoints of the databases from all instances. |
+| <a name="output_database_identifiers"></a> [database\_identifiers](#output\_database\_identifiers) | Identifiers of the databases from all instances. |
 | <a name="output_eks_cluster_id"></a> [eks\_cluster\_id](#output\_eks\_cluster\_id) | Amazon EKS Cluster Name |
 | <a name="output_ivs_buckets_service_accounts"></a> [ivs\_buckets\_service\_accounts](#output\_ivs\_buckets\_service\_accounts) | List of K8s service account names with access to the IVS buckets |
-| <a name="output_ivs_database_identifiers"></a> [ivs\_database\_identifiers](#output\_ivs\_database\_identifiers) | Identifiers of the IVS databases from all IVS instances. |
 | <a name="output_ivs_node_groups_roles"></a> [ivs\_node\_groups\_roles](#output\_ivs\_node\_groups\_roles) | n/a |
 | <a name="output_opensearch_domain_endpoints"></a> [opensearch\_domain\_endpoints](#output\_opensearch\_domain\_endpoints) | List of OpenSearch Domains endpoints of IVS instances |
 | <a name="output_pullthrough_cache_prefix"></a> [pullthrough\_cache\_prefix](#output\_pullthrough\_cache\_prefix) | n/a |
 | <a name="output_s3_buckets"></a> [s3\_buckets](#output\_s3\_buckets) | S3 buckets managed by terraform. |
-| <a name="output_simphera_database_identifiers"></a> [simphera\_database\_identifiers](#output\_simphera\_database\_identifiers) | Identifiers of the SIMPHERA and Keycloak databases from all SIMPHERA instances. |
 <!-- END_TF_DOCS -->
