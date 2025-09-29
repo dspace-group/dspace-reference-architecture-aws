@@ -8,9 +8,14 @@ output "backup_vaults" {
   value       = [aws_backup_vault.backup_vault[*].name]
 }
 
-output "ivs_database_identifiers" {
+output "database_identifiers" {
   description = "Identifiers of the IVS database created for this IVS instance."
   value       = [var.enableIVSAuthentication ? aws_db_instance.ivs_authentication[0].identifier : ""]
+}
+
+output "database_endpoints" {
+  description = "Endpoints of the IVS database created for this IVS instance."
+  value       = [var.enableIVSAuthentication ? aws_db_instance.ivs_authentication[0].endpoint : ""]
 }
 
 output "ivs_buckets_service_account" {
