@@ -32,6 +32,10 @@ output "database_identifiers" {
       for name, instance in module.scenario_generation_instance :
       name => flatten(instance.database_identifiers)
     }
+    ivs = {
+      for name, instance in module.ivs_instance :
+      name => flatten(instance.database_identifiers)
+    }
   }
 }
 
@@ -44,6 +48,10 @@ output "database_endpoints" {
     }
     scenario_generation = {
       for name, instance in module.scenario_generation_instance :
+      name => flatten(instance.database_endpoints)
+    }
+    ivs = {
+      for name, instance in module.ivs_instance :
       name => flatten(instance.database_endpoints)
     }
   }

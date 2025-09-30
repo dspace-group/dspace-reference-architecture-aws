@@ -3,6 +3,7 @@ module "eks" {
   cluster_version                        = var.kubernetesVersion
   cluster_name                           = var.infrastructurename
   subnet_ids                             = local.private_subnets
+  eks_api_subnet_ids                     = var.eks_api_subnet_ids
   node_groups                            = local.node_pools
   map_accounts                           = var.map_accounts
   map_users                              = var.map_users

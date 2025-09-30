@@ -4,7 +4,7 @@
   },
   "cloudwatch_retention": 7,
   "cluster_autoscaler_config": {},
-  "codemeter": "https://www.wibu.com/support/user/user-software/file/download/13346.html?tx_wibudownloads_downloadlist%5BdirectDownload%5D=directDownload&tx_wibudownloads_downloadlist%5BuseAwsS3%5D=0&cHash=8dba7ab094dec6267346f04fce2a2bcd",
+  "codemeter": "https://www.wibu.com/support/user/user-software/file/download/15803.html?tx_wibudownloads_downloadlist%5BdirectDownload%5D=directDownload&tx_wibudownloads_downloadlist%5BuseAwsS3%5D=0&cHash=8dba7ab094dec6267346f04fce2a2bcd",
   "coredns_config": {
     "enable": true
   },
@@ -15,6 +15,7 @@
   "efs_csi_config": {
     "enable": true
   },
+  "eks_api_subnet_ids": [],
   "enable_patching": false,
   "execution_node_pool": {
     "enable": true

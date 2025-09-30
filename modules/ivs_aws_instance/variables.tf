@@ -1,6 +1,7 @@
 variable "k8s_namespace" {
   type = string
 }
+
 variable "eks_cluster_id" {
   type = string
 }
@@ -27,7 +28,7 @@ variable "instancename" {
 }
 
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   description = "The tags to be added to all resources."
   default     = {}
 }
@@ -96,7 +97,6 @@ variable "backup_schedule" {
   description = "Cron string that schedules backup occurance"
 }
 
-
 variable "enable_deletion_protection" {
   type        = bool
   description = "Enable deletion protection for databases and content of s3 buckets."
@@ -113,3 +113,60 @@ variable "log_bucket" {
   description = "Name of the S3 bucket where S3 server access logs are stored"
 }
 
+variable "private_subnets" {
+  type        = list(string)
+  description = "List of CIDRs for the private subnets."
+  default     = ["10.1.0.0/22", "10.1.4.0/22", "10.1.8.0/22"]
+}
+
+variable "postgresqlApplyImmediately" {
+  type        = bool
+  description = "Apply PostgreSQL changes immediately (true) or during next maintenance window (false)"
+  default     = false
+}
+
+variable "postgresqlVersion" {
+  type        = string
+  description = "PostgreSQL Server version to deploy"
+  default     = "16"
+}
+
+variable "db_instance_type_ivs" {
+  type        = string
+  description = "PostgreSQL database instance type for IVS authentication data"
+  default     = "db.t4g.large"
+}
+
+variable "cloudwatch_retention" {
+  default     = 7
+  description = "Cloudwatch retention period for the PostgreSQL logs."
+  type        = number
+}
+
+variable "kms_key_cloudwatch" {
+  type        = string
+  description = "ARN of KMS encryption key used to encrypt CloudWatch log groups."
+  default     = ""
+}
+
+variable "postgresql_security_group_id" {
+  type        = string
+  description = "The ID of the security group"
+}
+
+variable "region" {
+  type        = string
+  description = "The AWS region to be used."
+  default     = "eu-central-1"
+}
+
+variable "enableIVSAuthentication" {
+  type        = bool
+  description = "A switch to enable/disable deployment of IVS Authentication DB"
+  default     = false
+}
+
+variable "database_secretname" {
+  description = "Secrets manager secret"
+  type        = string
+}
