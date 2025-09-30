@@ -3,6 +3,7 @@ variable "region" {
   description = "The AWS region to be used."
   default     = "eu-central-1"
 }
+
 variable "infrastructurename" {
   type        = string
   description = "The name of the infrastructure. e.g. simphera-infra"
@@ -14,7 +15,7 @@ variable "postgresql_security_group_id" {
 }
 
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   description = "The tags to be added to all resources."
   default     = {}
 }
@@ -106,7 +107,6 @@ variable "enable_deletion_protection" {
   default     = true
 }
 
-
 variable "secretname" {
   description = "Secrets manager secret"
   type        = string
@@ -148,7 +148,7 @@ variable "log_bucket" {
 }
 
 variable "private_subnets" {
-  type        = list(any)
+  type        = list(string)
   description = "List of CIDRs for the private subnets."
   default     = ["10.1.0.0/22", "10.1.4.0/22", "10.1.8.0/22"]
 }

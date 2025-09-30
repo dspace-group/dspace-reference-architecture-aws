@@ -5,7 +5,6 @@ resource "aws_db_subnet_group" "database" {
 }
 
 resource "aws_db_instance" "simphera" {
-
   apply_immediately                   = var.postgresqlApplyImmediately
   allocated_storage                   = var.postgresqlStorage
   max_allocated_storage               = var.postgresqlMaxStorage
@@ -39,11 +38,9 @@ resource "aws_db_instance" "simphera" {
     delete = "2h"
     update = "2h"
   }
-
 }
 
 resource "aws_db_instance" "keycloak" {
-
   count                               = var.enableKeycloak ? 1 : 0
   apply_immediately                   = var.postgresqlApplyImmediately
   allocated_storage                   = var.postgresqlStorageKeycloak
@@ -83,6 +80,7 @@ resource "aws_db_instance" "keycloak" {
 data "http" "aws_tls_certificate" {
   url = "https://truststore.pki.rds.amazonaws.com/${var.region}/${var.region}-bundle.pem"
 }
+
 resource "kubernetes_secret" "aws_tls_certificate" {
   metadata {
     name      = "customsslrootcertificate"
@@ -93,7 +91,6 @@ resource "kubernetes_secret" "aws_tls_certificate" {
   }
   type = "Opaque"
 }
-
 
 resource "aws_iam_role" "rds_enhanced_monitoring_role" {
   name        = "${var.name}-rds-enhanced-monitoring"
@@ -119,7 +116,6 @@ resource "aws_iam_role" "rds_enhanced_monitoring_role" {
   )
 
   tags = var.tags
-
 }
 
 # [RDS.6] Enhanced monitoring should be configured for RDS DB instances and clusters
@@ -127,7 +123,6 @@ resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring_policy" {
   role       = aws_iam_role.rds_enhanced_monitoring_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }
-
 
 resource "aws_cloudwatch_log_group" "db_simphera" {
   name              = "/aws/rds/instance/${local.db_simphera_id}/postgresql" # CAUTION: the name is predetermined by AWS RDS. Do not change it. Otherwise AWS will create a new log group without retention and encryption.
