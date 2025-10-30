@@ -1,4 +1,4 @@
-data "aws_ami" "al2gpu_ami" {
+data "aws_ami" "gpu_ami" {
   owners      = ["amazon"]
   most_recent = true
   filter {
@@ -102,7 +102,7 @@ locals {
       subnet_ids        = local.private_subnets
       max_size          = var.gpuNodeCountMax
       min_size          = var.gpuNodeCountMin
-      custom_ami_id     = data.aws_ami.al2gpu_ami.image_id
+      custom_ami_id     = data.aws_ami.gpu_ami.image_id
       block_device_name = "/dev/sda1"
       volume_size       = var.gpuNodeDiskSize
       k8s_labels = {
@@ -125,7 +125,7 @@ locals {
       subnet_ids        = local.private_subnets
       max_size          = var.ivsGpuNodeCountMax
       min_size          = var.ivsGpuNodeCountMin
-      custom_ami_id     = data.aws_ami.al2gpu_ami.image_id
+      custom_ami_id     = data.aws_ami.gpu_ami.image_id
       block_device_name = "/dev/sda1"
       volume_size       = var.ivsGpuNodeDiskSize
       k8s_labels = {
