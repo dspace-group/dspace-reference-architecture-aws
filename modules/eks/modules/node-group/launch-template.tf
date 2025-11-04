@@ -10,6 +10,16 @@ resource "aws_launch_template" "node_group" {
   api-server = "${var.node_group_context.cluster_endpoint}"
   cluster-certificate = "${var.node_group_context.cluster_ca_base64}"
   node-labels = ["role=worker"]
+  [settings.host-containers.admin]
+  enabled = true
+  # Mount extra EBS volume
+  [settings.bootstrap-containers]
+  format-and-mount = """
+  #!/bin/bash
+  mkfs.ext4 /dev/nvme1n1
+  mkdir -p /local
+  mount /dev/nvme1n1 /local
+  """
   EOF
     ) :
     base64encode(
