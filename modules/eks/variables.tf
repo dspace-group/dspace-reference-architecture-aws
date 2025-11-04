@@ -106,8 +106,8 @@ variable "node_groups" {
     min_size        = number
     custom_ami_id   = optional(string, "")
     #ami_type        = optional(string, "AL2_x86_64")
-    ami_type = optional(string, "AL2023_x86_64_STANDARD")
-    #ami_type         = optional(string, "BOTTLEROCKET_x86_64")
+    #ami_type = optional(string, "AL2023_x86_64_STANDARD")
+    ami_type          = optional(string, "BOTTLEROCKET_x86_64")
     block_device_name = optional(string, "/dev/xvda")
     volume_size       = number
     k8s_labels        = optional(map(string), {})
