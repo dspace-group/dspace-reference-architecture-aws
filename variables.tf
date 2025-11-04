@@ -145,7 +145,7 @@ variable "codemeter" {
 variable "kubernetesVersion" {
   type        = string
   description = "The kubernetes version of the EKS cluster."
-  default     = "1.32"
+  default     = "1.34"
 }
 
 variable "vpcId" {
