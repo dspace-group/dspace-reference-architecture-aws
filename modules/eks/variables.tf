@@ -108,7 +108,7 @@ variable "node_groups" {
     #ami_type        = optional(string, "AL2_x86_64")
     #ami_type = optional(string, "AL2023_x86_64_STANDARD")
     ami_type          = optional(string, "BOTTLEROCKET_x86_64")
-    block_device_name = optional(string, "/dev/xvda")
+    block_device_name = optional(string, "/dev/xvdb")
     volume_size       = number
     k8s_labels        = optional(map(string), {})
     k8s_taints = optional(list(object({

@@ -10,16 +10,6 @@ resource "aws_launch_template" "node_group" {
   api-server = "${var.node_group_context.cluster_endpoint}"
   cluster-certificate = "${var.node_group_context.cluster_ca_base64}"
   node-labels = ["role=worker"]
-  storage = "/mnt/container-storage"
-  [settings]
-  container-storage = "/mnt/container-storage"
-  [bootstrap-containers.format-and-mount]
-  source = "public.ecr.aws/docker/library/busybox:latest"
-  essential = true
-  command = [
-    "sh", "-c",
-    "DEV=$(lsblk -o NAME,SIZE,TYPE -dsn | awk '/disk/ && $2 > 50 {print $1; exit}') && mkfs.ext4 /dev/$DEV && mkdir -p /mnt/container-storage && mount /dev/$DEV /mnt/container-storage"
-  ]
   EOF
     ) :
     base64encode(
