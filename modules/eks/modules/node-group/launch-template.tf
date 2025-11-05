@@ -17,8 +17,8 @@ resource "aws_launch_template" "node_group" {
   source = "public.ecr.aws/docker/library/busybox:latest"
   essential = true
   command = [
-      "sh", "-c",
-      "mkfs.ext4 /dev/xvda && mkdir -p /mnt/container-storage && mount /dev/xvda /mnt/container-storage"
+    "sh", "-c",
+    "DEV=$(lsblk -o NAME,SIZE,TYPE -dsn | awk '/disk/ && $2 > 50 {print $1; exit}') && mkfs.ext4 /dev/$DEV && mkdir -p /mnt/container-storage && mount /dev/$DEV /mnt/container-storage"
   ]
   EOF
     ) :
