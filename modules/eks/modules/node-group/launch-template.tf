@@ -10,16 +10,16 @@ resource "aws_launch_template" "node_group" {
   api-server = "${var.node_group_context.cluster_endpoint}"
   cluster-certificate = "${var.node_group_context.cluster_ca_base64}"
   node-labels = ["role=worker"]
-  [settings.host-containers.admin]
-  enabled = true
-  # Mount extra EBS volume
-  [settings.bootstrap-containers]
-  format-and-mount = """
-  #!/bin/bash
-  mkfs.ext4 /dev/nvme1n1
-  mkdir -p /local
-  mount /dev/nvme1n1 /local
-  """
+  storage = "/mnt/container-storage"
+  [settings]
+  container-storage = "/mnt/container-storage"
+  [bootstrap-containers.format-and-mount]
+  source = "public.ecr.aws/docker/library/busybox:latest"
+  essential = true
+  command = [
+      "sh", "-c",
+      "mkfs.ext4 /dev/xvda && mkdir -p /mnt/container-storage && mount /dev/xvda /mnt/container-storage"
+  ]
   EOF
     ) :
     base64encode(
