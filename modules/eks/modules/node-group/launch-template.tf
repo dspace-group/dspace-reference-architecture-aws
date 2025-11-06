@@ -6,7 +6,7 @@ resource "aws_launch_template" "node_group" {
     strcontains(var.ami_type, "WINDOWS") ? null :
     strcontains(var.ami_type, "BOTTLEROCKET") ? (
       strcontains(var.node_group_name, "gpu") ? base64encode(
-        templatefile("${path.module}/templates/userdata-amazonlinux2023eks.tpl", {
+        templatefile("${path.module}/templates/userdata.tpl", {
           eks_cluster_id         = var.node_group_context.eks_cluster_id
           cluster_ca_base64      = var.node_group_context.cluster_ca_base64
           cluster_endpoint       = var.node_group_context.cluster_endpoint
