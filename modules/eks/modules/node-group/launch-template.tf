@@ -3,7 +3,6 @@ resource "aws_launch_template" "node_group" {
   description            = "Launch Template for EKS Managed Node Groups"
   update_default_version = true
   user_data = (
-    strcontains(var.ami_type, "WINDOWS") ? null :
     strcontains(var.ami_type, "BOTTLEROCKET") ? base64encode(<<EOF
   [settings.kubernetes]
   cluster-name = "${var.node_group_context.eks_cluster_id}"
@@ -12,6 +11,7 @@ resource "aws_launch_template" "node_group" {
   node-labels = ["role=worker"]
   EOF
     ) :
+    strcontains(var.ami_type, "WINDOWS") ? null :
     base64encode(
       templatefile("${path.module}/templates/userdata-amazonlinux2023eks.tpl", {
         eks_cluster_id         = var.node_group_context.eks_cluster_id
