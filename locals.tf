@@ -109,7 +109,7 @@ locals {
       max_size          = var.gpuNodeCountMax
       min_size          = var.gpuNodeCountMin
       custom_ami_id     = data.aws_ssm_parameter.bottlerocket_nvidia_ami.value
-      block_device_name = "/dev/sda1"
+      block_device_name = "/dev/xvdb"
       volume_size       = var.gpuNodeDiskSize
       k8s_labels = {
         "purpose"    = "gpu",
