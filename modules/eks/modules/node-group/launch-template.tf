@@ -10,10 +10,9 @@ cluster-name = "${var.node_group_context.eks_cluster_id}"
 api-server = "${var.node_group_context.cluster_endpoint}"
 cluster-certificate = "${var.node_group_context.cluster_ca_base64}"
 node-labels = ["role=worker"]
-test
 EOF
     ) :
-    strcontains(var.ami_type, "CUSTOM") ? base64encode(
+    strcontains(var.node_group_name, "gpu") ? base64encode(
       templatefile("${path.module}/templates/userdata-amazonlinux2023eks.tpl", {
         eks_cluster_id         = var.node_group_context.eks_cluster_id
         cluster_ca_base64      = var.node_group_context.cluster_ca_base64
