@@ -12,7 +12,7 @@ cluster-certificate = "${var.node_group_context.cluster_ca_base64}"
 node-labels = ["role=worker"]
 EOF
     ) :
-    length(var.custom_ami_id) > 0 ? base64encode(
+    strcontains(var.ami_type, "CUSTOM") ? base64encode(
       templatefile("${path.module}/templates/userdata-amazonlinux2023eks.tpl", {
         eks_cluster_id         = var.node_group_context.eks_cluster_id
         cluster_ca_base64      = var.node_group_context.cluster_ca_base64
