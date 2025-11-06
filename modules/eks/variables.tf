@@ -98,15 +98,13 @@ variable "aws_context" {
 
 variable "node_groups" {
   type = map(object({
-    node_group_name = string
-    instance_types  = list(string)
-    capacity_type   = optional(string, "ON_DEMAND")
-    subnet_ids      = list(string)
-    max_size        = number
-    min_size        = number
-    custom_ami_id   = optional(string, "")
-    #ami_type        = optional(string, "AL2_x86_64")
-    #ami_type = optional(string, "AL2023_x86_64_STANDARD")
+    node_group_name   = string
+    instance_types    = list(string)
+    capacity_type     = optional(string, "ON_DEMAND")
+    subnet_ids        = list(string)
+    max_size          = number
+    min_size          = number
+    custom_ami_id     = optional(string, "")
     ami_type          = optional(string, "BOTTLEROCKET_x86_64")
     block_device_name = optional(string, "/dev/xvdb")
     volume_size       = number
