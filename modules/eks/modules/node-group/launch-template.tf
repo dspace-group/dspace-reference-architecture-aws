@@ -3,7 +3,6 @@ resource "aws_launch_template" "node_group" {
   description            = "Launch Template for EKS Managed Node Groups"
   update_default_version = true
   user_data = (
-    length(trimspace(var.custom_ami_id)) > 0 ? null :
     strcontains(var.ami_type, "WINDOWS") ? null :
     strcontains(var.ami_type, "BOTTLEROCKET") ? base64encode(<<EOF
 [settings.kubernetes]
@@ -12,6 +11,21 @@ api-server = "${var.node_group_context.cluster_endpoint}"
 cluster-certificate = "${var.node_group_context.cluster_ca_base64}"
 node-labels = ["role=worker"]
 EOF
+    ) :
+    length(var.custom_ami_id) > 0 ? base64encode(
+      templatefile("${path.module}/templates/userdata-amazonlinux2023eks.tpl", {
+        eks_cluster_id         = var.node_group_context.eks_cluster_id
+        cluster_ca_base64      = var.node_group_context.cluster_ca_base64
+        cluster_endpoint       = var.node_group_context.cluster_endpoint
+        custom_ami_id          = var.custom_ami_id
+        pre_userdata           = ""
+        bootstrap_extra_args   = ""
+        post_userdata          = ""
+        kubelet_extra_args     = ""
+        service_ipv6_cidr      = ""
+        service_ipv4_cidr      = ""
+        format_mount_nvme_disk = false
+      })
     ) : null
   )
   block_device_mappings {
