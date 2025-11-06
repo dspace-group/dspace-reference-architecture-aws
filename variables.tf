@@ -420,7 +420,7 @@ variable "cluster_autoscaler_config" {
   type = object({
     enable          = optional(bool, true)
     helm_repository = optional(string, "https://kubernetes.github.io/autoscaler")
-    helm_version    = optional(string, "9.52.1")
+    helm_version    = optional(string, "9.37.0")
     chart_values = optional(string, <<-YAML
 
     YAML
