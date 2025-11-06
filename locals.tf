@@ -108,7 +108,7 @@ locals {
       subnet_ids        = local.private_subnets
       max_size          = var.gpuNodeCountMax
       min_size          = var.gpuNodeCountMin
-      custom_ami_id     = data.ws_ssm_parameter.bottlerocket_nvidia_ami.value
+      custom_ami_id     = data.aws_ssm_parameter.bottlerocket_nvidia_ami.value
       block_device_name = "/dev/sda1"
       volume_size       = var.gpuNodeDiskSize
       k8s_labels = {
@@ -131,7 +131,7 @@ locals {
       subnet_ids        = local.private_subnets
       max_size          = var.ivsGpuNodeCountMax
       min_size          = var.ivsGpuNodeCountMin
-      custom_ami_id     = data.ws_ssm_parameter.bottlerocket_nvidia_ami.value
+      custom_ami_id     = data.aws_ssm_parameter.bottlerocket_nvidia_ami.value
       block_device_name = "/dev/sda1"
       volume_size       = var.ivsGpuNodeDiskSize
       k8s_labels = {
