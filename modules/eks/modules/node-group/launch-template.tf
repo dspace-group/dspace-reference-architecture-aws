@@ -5,12 +5,12 @@ resource "aws_launch_template" "node_group" {
   user_data = (
     strcontains(var.ami_type, "WINDOWS") ? null :
     strcontains(var.ami_type, "BOTTLEROCKET") ? base64encode(<<EOF
-  [settings.kubernetes]
-  cluster-name = "${var.node_group_context.eks_cluster_id}"
-  api-server = "${var.node_group_context.cluster_endpoint}"
-  cluster-certificate = "${var.node_group_context.cluster_ca_base64}"
-  node-labels = ["role=worker"]
-  EOF
+[settings.kubernetes]
+cluster-name = "${var.node_group_context.eks_cluster_id}"
+api-server = "${var.node_group_context.cluster_endpoint}"
+cluster-certificate = "${var.node_group_context.cluster_ca_base64}"
+node-labels = ["role=worker"]
+EOF
     ) : null
   )
   block_device_mappings {
