@@ -33,9 +33,9 @@ resource "aws_eks_node_group" "node_group" {
   }
   labels = var.k8s_labels
   timeouts {
-    create = "60m"
+    create = "30m"
     update = "2h"
-    delete = "60m"
+    delete = "30m"
   }
   tags = local.common_tags
   depends_on = [
