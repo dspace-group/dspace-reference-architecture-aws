@@ -2,21 +2,32 @@ resource "aws_launch_template" "node_group" {
   name                   = "${var.node_group_context.eks_cluster_id}-${var.node_group_name}"
   description            = "Launch Template for EKS Managed Node Groups"
   update_default_version = true
-  user_data = strcontains(var.ami_type, "WINDOWS") ? null : base64encode(
-    templatefile("${path.module}/templates/userdata-amazonlinux2eks.tpl", {
-      eks_cluster_id         = var.node_group_context.eks_cluster_id
-      cluster_ca_base64      = var.node_group_context.cluster_ca_base64
-      cluster_endpoint       = var.node_group_context.cluster_endpoint
-      custom_ami_id          = var.custom_ami_id
-      pre_userdata           = ""
-      bootstrap_extra_args   = ""
-      post_userdata          = ""
-      kubelet_extra_args     = ""
-      service_ipv6_cidr      = ""
-      service_ipv4_cidr      = ""
-      format_mount_nvme_disk = false
-      }
-  ))
+  user_data = (
+    strcontains(var.node_group_name, "gpu") ? base64encode(
+      templatefile("${path.module}/templates/userdata.tpl", {
+        eks_cluster_id         = var.node_group_context.eks_cluster_id
+        cluster_ca_base64      = var.node_group_context.cluster_ca_base64
+        cluster_endpoint       = var.node_group_context.cluster_endpoint
+        custom_ami_id          = var.custom_ami_id
+        pre_userdata           = ""
+        bootstrap_extra_args   = ""
+        post_userdata          = ""
+        kubelet_extra_args     = ""
+        service_ipv6_cidr      = ""
+        service_ipv4_cidr      = ""
+        format_mount_nvme_disk = false
+      })
+    ) :
+    strcontains(var.ami_type, "WINDOWS") ? null :
+    strcontains(var.ami_type, "BOTTLEROCKET") ? base64encode(<<EOF
+[settings.kubernetes]
+cluster-name = "${var.node_group_context.eks_cluster_id}"
+api-server = "${var.node_group_context.cluster_endpoint}"
+cluster-certificate = "${var.node_group_context.cluster_ca_base64}"
+node-labels = ["role=worker"]
+EOF
+    ) : null
+  )
   block_device_mappings {
     device_name = var.block_device_name
     ebs {

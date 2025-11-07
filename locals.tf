@@ -1,12 +1,12 @@
-data "aws_ami" "al2gpu_ami" {
+data "aws_ami" "gpu_ami" {
   owners      = ["amazon"]
   most_recent = true
   filter {
     name   = "name"
     values = ["*ubuntu-eks/k8s_${var.kubernetesVersion}/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server*"]
+    # from kubernetes version 1.33 use *ubuntu-eks/k8s_${var.kubernetesVersion}/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*
   }
 }
-
 locals {
   create_vpc                                = var.vpcId == null ? true : false
   vpc_id                                    = local.create_vpc ? module.vpc[0].vpc_id : var.vpcId
@@ -102,7 +102,7 @@ locals {
       subnet_ids        = local.private_subnets
       max_size          = var.gpuNodeCountMax
       min_size          = var.gpuNodeCountMin
-      custom_ami_id     = data.aws_ami.al2gpu_ami.image_id
+      custom_ami_id     = data.aws_ami.gpu_ami.image_id
       block_device_name = "/dev/sda1"
       volume_size       = var.gpuNodeDiskSize
       k8s_labels = {
@@ -125,7 +125,7 @@ locals {
       subnet_ids        = local.private_subnets
       max_size          = var.ivsGpuNodeCountMax
       min_size          = var.ivsGpuNodeCountMin
-      custom_ami_id     = data.aws_ami.al2gpu_ami.image_id
+      custom_ami_id     = data.aws_ami.gpu_ami.image_id
       block_device_name = "/dev/sda1"
       volume_size       = var.ivsGpuNodeDiskSize
       k8s_labels = {
