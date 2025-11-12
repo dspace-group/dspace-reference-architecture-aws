@@ -3,7 +3,7 @@ resource "aws_launch_template" "node_group" {
   description            = "Launch Template for EKS Managed Node Groups"
   update_default_version = true
   user_data = (
-    strcontains(var.node_group_name, "gpu") ? base64encode(
+    (strcontains(var.node_group_name, "gpu") || strcontains(var.ami_type, "AL2023_x86_64")) ? base64encode(
       templatefile("${path.module}/templates/userdata.tpl", {
         eks_cluster_id         = var.node_group_context.eks_cluster_id
         cluster_ca_base64      = var.node_group_context.cluster_ca_base64
