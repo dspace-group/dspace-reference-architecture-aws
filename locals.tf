@@ -49,7 +49,7 @@ locals {
       max_size        = var.linuxNodeCountMax
       min_size        = var.linuxNodeCountMin
       volume_size     = var.linuxNodeDiskSize
-      ami_type        = "AL2023_x86_64_STANDARD"
+      ami_type        = var.executionNodeAmiType
     },
     "execnodes" = {
       node_group_name = "execnodes"
@@ -59,7 +59,7 @@ locals {
       max_size        = var.linuxExecutionNodeCountMax
       min_size        = var.linuxExecutionNodeCountMin
       volume_size     = var.linuxExecutionNodeDiskSize
-      ami_type        = "AL2023_x86_64_STANDARD"
+      ami_type        = var.executionNodeAmiType
       k8s_labels = {
         "purpose" = "execution"
         "product" = "ivs"

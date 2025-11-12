@@ -560,3 +560,9 @@ variable "windows_execution_node" {
     node_count_max = 2
   }
 }
+
+variable "executionNodeAmiType" {
+  type        = string
+  description = "Specifies the AMI type to use for the execution and default nodes. Can be 'BOTTLEROCKET_x86_64' or 'AL2023_x86_64_STANDARD'"
+  default     = "AL2023_x86_64_STANDARD"
+}
