@@ -1,4 +1,3 @@
-
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="//"
 
@@ -11,20 +10,22 @@ set -ex
 # User-supplied pre userdata
 ${pre_userdata}
 %{ endif ~}
-
 %{ if format_mount_nvme_disk ~}
 echo "Format and Mount NVMe Disks if available"
 IDX=1
 DEVICES=$(lsblk -o NAME,TYPE -dsn | awk '/disk/ {print $1}')
-for DEV in $DEVICES; do
+
+for DEV in $DEVICES
+do
   mkfs.xfs /dev/$${DEV}
   mkdir -p /local$${IDX}
-  echo "/dev/$${DEV} /local$${IDX} xfs defaults,noatime 1 2" >> /etc/fstab
+
+  echo /dev/$${DEV} /local$${IDX} xfs defaults,noatime 1 2 >> /etc/fstab
+
   IDX=$(($${IDX} + 1))
 done
 mount -a
 %{ endif ~}
-
 %{ if length(service_ipv4_cidr) > 0 ~}
 export SERVICE_IPV4_CIDR=${service_ipv4_cidr}
 %{ endif ~}
