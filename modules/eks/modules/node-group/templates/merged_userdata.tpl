@@ -45,7 +45,7 @@ spec:
     name: "${eks_cluster_id}"
     apiServerEndpoint: "${cluster_endpoint}"
     certificateAuthority: "${cluster_ca_base64}"
-    serviceCIDR: 172.20.0.0/16
+    cidr: 172.20.0.0/16
   kubelet:
     extraArgs: "${kubelet_extra_args}"
 EOF
