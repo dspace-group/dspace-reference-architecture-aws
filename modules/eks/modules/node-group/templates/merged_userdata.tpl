@@ -38,7 +38,7 @@ echo "Bootstrapping Amazon Linux 2023 with nodeadm"
 
 # Write NodeConfig YAML
 cat <<EOF > /etc/nodeadm-config.yaml
-apiVersion: eks.amazonaws.com/v1alpha1
+apiVersion: node.eks.aws/v1alpha1
 kind: NodeConfig
 spec:
   cluster:
