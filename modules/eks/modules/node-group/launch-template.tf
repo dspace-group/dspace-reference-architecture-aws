@@ -3,7 +3,7 @@ resource "aws_launch_template" "node_group" {
   description            = "Launch Template for EKS Managed Node Groups"
   update_default_version = true
   user_data = (
-    (strcontains(var.node_group_name, "gpu") || strcontains(var.ami_type, "AL2023_x86_64")) ? base64encode(
+    strcontains(var.node_group_name, "gpu") ? base64encode(
       templatefile("${path.module}/templates/merged_userdata.tpl", {
         eks_cluster_id         = var.node_group_context.eks_cluster_id
         cluster_ca_base64      = var.node_group_context.cluster_ca_base64
@@ -14,11 +14,12 @@ resource "aws_launch_template" "node_group" {
         post_userdata          = ""
         kubelet_extra_args     = ""
         service_ipv6_cidr      = ""
-        service_ipv4_cidr      = ""
+        service_ipv4_cidr      = "172.20.0.0/16"
         format_mount_nvme_disk = false
         ami_type               = var.ami_type
       })
     ) :
+    strcontains(var.ami_type, "AL2023_x86_64") ? null :
     strcontains(var.ami_type, "WINDOWS") ? null :
     strcontains(var.ami_type, "BOTTLEROCKET") ? base64encode(<<EOF
 [settings.kubernetes]
