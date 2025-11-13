@@ -31,7 +31,7 @@ export SERVICE_IPV4_CIDR=${service_ipv4_cidr}
 %{ endif ~}
 %{ if length(service_ipv6_cidr) > 0 ~}
 export SERVICE_IPV6_CIDR=${service_ipv6_cidr}
-%{ endif ~}
+%{ endif ~}serviceCIDR
 
 %{ if strcontains(ami_type, "AL2023") ~}
 echo "Bootstrapping Amazon Linux 2023 with nodeadm"
@@ -45,6 +45,7 @@ spec:
     name: "${eks_cluster_id}"
     apiServerEndpoint: "${cluster_endpoint}"
     certificateAuthority: "${cluster_ca_base64}"
+    serviceCIDR: "${service_ipv4_cidr}"
   kubelet:
     extraArgs: "${kubelet_extra_args}"
 EOF
