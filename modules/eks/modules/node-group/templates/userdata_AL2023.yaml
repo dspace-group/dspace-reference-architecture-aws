@@ -1,0 +1,35 @@
+#cloud-config
+runcmd:
+  - |
+    #!/bin/bash
+    set -ex
+    # Optional pre-userdata
+    %{ if length(pre_userdata) > 0 ~}
+    ${pre_userdata}
+    %{ endif ~}
+
+    # Format NVMe disks if requested
+    %{ if format_mount_nvme_disk ~}
+    echo "Format and mount NVMe disks"
+    IDX=1
+    DEVICES=$(lsblk -o NAME,TYPE -dsn | awk '/disk/ {print $1}')
+    for DEV in $DEVICES; do
+      mkfs.xfs /dev/$${DEV}
+      mkdir -p /local$${IDX}
+      echo "/dev/$${DEV} /local$${IDX} xfs defaults,noatime 1 2" >> /etc/fstab
+      IDX=$(($${IDX} + 1))
+    done
+    mount -a
+    %{ endif ~}
+
+    # Use nodeadm for AL2023 bootstrap
+    nodeadm join \
+      --cluster-name ${eks_cluster_id} \
+      --apiserver-endpoint ${cluster_endpoint} \
+      --b64-cluster-ca ${cluster_ca_base64} \
+      --kubelet-extra-args "${kubelet_extra_args}" ${bootstrap_extra_args}
+
+    # Optional post-userdata
+    %{ if length(post_userdata) > 0 ~}
+    ${post_userdata}
+    %{ endif ~}
