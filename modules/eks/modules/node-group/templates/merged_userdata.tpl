@@ -36,17 +36,21 @@ export SERVICE_IPV6_CIDR=${service_ipv6_cidr}
 %{ if strcontains(ami_type, "AL2023") ~}
 echo "Bootstrapping Amazon Linux 2023 with nodeadm"
 
-# Write TOML config
-cat <<EOF > /etc/nodeadm-config.toml
-[settings.kubernetes]
-cluster-name = "${eks_cluster_id}"
-api-server = "${cluster_endpoint}"
-cluster-certificate = "${cluster_ca_base64}"
-kubelet-extra-args = "${kubelet_extra_args}"
+# Write NodeConfig YAML
+cat <<EOF > /etc/nodeadm-config.yaml
+apiVersion: eks.amazonaws.com/v1alpha1
+kind: NodeConfig
+spec:
+  cluster:
+    name: "${eks_cluster_id}"
+    apiServerEndpoint: "${cluster_endpoint}"
+    certificateAuthority: "${cluster_ca_base64}"
+  kubelet:
+    extraArgs: "${kubelet_extra_args}"
 EOF
 
 # Run nodeadm with file source
-nodeadm init --config-source file:///etc/nodeadm-config.toml
+nodeadm init --config-source file:///etc/nodeadm-config.yaml
 
 %{ else ~}
 echo "Bootstrapping AL2 or Ubuntu with bootstrap.sh"
