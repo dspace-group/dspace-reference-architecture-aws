@@ -51,7 +51,7 @@ spec:
 EOF
 
 # Run nodeadm with file source
-nodeadm init --config-source file:///etc/nodeadm-config.yaml
+nodeadm init --config-source file:///etc/nodeadm-config.yaml --config-cache /var/lib/nodeadm/config-cache.yaml
 
 %{ else ~}
 echo "Bootstrapping AL2 or Ubuntu with bootstrap.sh"
