@@ -52,7 +52,7 @@ enable_patching = false
 
 # Specifies the AMI type to use for the execution and default nodes.
 # Can be 'BOTTLEROCKET_x86_64' or 'AL2023_x86_64_STANDARD'.
-executionNodeAmiType = "AL2023_x86_64_STANDARD"
+linuxNodeAmiType = "AL2023_x86_64_STANDARD"
 
 # The maximum number of nodes for gpu job execution
 gpuNodeCountMax = 12

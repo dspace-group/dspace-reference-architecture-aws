@@ -561,8 +561,13 @@ variable "windows_execution_node" {
   }
 }
 
-variable "executionNodeAmiType" {
+variable "linuxNodeAmiType" {
   type        = string
-  description = "Specifies the AMI type to use for the execution and default nodes. Can be 'BOTTLEROCKET_x86_64' or 'AL2023_x86_64_STANDARD'"
+  description = "Specifies the AMI type to use for the linux execution and default nodes. Can be 'BOTTLEROCKET_x86_64' or 'AL2023_x86_64_STANDARD'"
   default     = "AL2023_x86_64_STANDARD"
+
+  validation {
+    condition     = contains(["AL2023_x86_64_STANDARD", "BOTTLEROCKET_x86_64"], var.linuxNodeAmiType)
+    error_message = "AMI type must be either AL2023_x86_64_STANDARD or BOTTLEROCKET_x86_64"
+  }
 }
