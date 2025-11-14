@@ -50,10 +50,6 @@ eks_api_subnet_ids = []
 # EKS nodes need to be updated manually.
 enable_patching = false
 
-# Specifies the AMI type to use for the execution and default nodes.
-# Can be 'BOTTLEROCKET_x86_64' or 'AL2023_x86_64_STANDARD'.
-linuxNodeAmiType = "AL2023_x86_64_STANDARD"
-
 # The maximum number of nodes for gpu job execution
 gpuNodeCountMax = 12
 
@@ -163,6 +159,10 @@ linuxExecutionNodeSize = [
   "m7i.4xlarge",
   "m7a.4xlarge"
 ]
+
+# Specifies the AMI type to use for the linux execution and default nodes.
+# Can be 'BOTTLEROCKET_x86_64' or 'AL2023_x86_64_STANDARD'.
+linuxNodeAmiType = "AL2023_x86_64_STANDARD"
 
 # The maximum number of Linux nodes for the regular services
 linuxNodeCountMax = 12
