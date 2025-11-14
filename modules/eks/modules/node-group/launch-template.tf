@@ -18,7 +18,7 @@ resource "aws_launch_template" "node_group" {
         format_mount_nvme_disk = false
       })
     ) :
-    strcontains(var.ami_type, "AL2023_x86_64") ? null :
+    #strcontains(var.ami_type, "AL2023_x86_64") ? null :
     strcontains(var.ami_type, "WINDOWS") ? null :
     strcontains(var.ami_type, "BOTTLEROCKET") ? base64encode(<<EOF
 [settings.kubernetes]
