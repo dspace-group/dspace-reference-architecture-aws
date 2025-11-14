@@ -17,7 +17,6 @@
   },
   "eks_api_subnet_ids": [],
   "enable_patching": false,
-  "linuxNodeAmiType": "AL2023_x86_64_STANDARD",
   "gpuNodeCountMax": 12,
   "gpuNodeCountMin": 0,
   "gpuNodeDiskSize": 100,
@@ -70,6 +69,7 @@
     "m7i.4xlarge",
     "m7a.4xlarge"
   ],
+  "linuxNodeAmiType": "AL2023_x86_64_STANDARD",
   "linuxNodeCountMax": 12,
   "linuxNodeCountMin": 1,
   "linuxNodeDiskSize": 200,
