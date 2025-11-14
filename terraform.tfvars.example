@@ -160,6 +160,10 @@ linuxExecutionNodeSize = [
   "m7a.4xlarge"
 ]
 
+# Specifies the AMI type to use for the linux execution and default nodes.
+# Can be 'BOTTLEROCKET_x86_64' or 'AL2023_x86_64_STANDARD'.
+linuxNodeAmiType = "AL2023_x86_64_STANDARD"
+
 # The maximum number of Linux nodes for the regular services
 linuxNodeCountMax = 12
 
