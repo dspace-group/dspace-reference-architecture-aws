@@ -163,6 +163,5 @@ locals {
     partition                  = data.aws_partition.current.partition
     region_name                = data.aws_region.current.name
     iam_issuer_arn             = data.aws_iam_session_context.current.issuer_arn
-    ipv4_cidr                  = var.vpcCidr
   }
 }
