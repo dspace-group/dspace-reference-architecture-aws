@@ -19,7 +19,8 @@ resource "aws_eks_cluster" "eks" {
 
   encryption_config {
     provider {
-      key_arn = aws_kms_key.cluster.arn
+      #key_arn = aws_kms_key.cluster.arn
+      key_arn = "arn:aws:kms:${var.aws_context.region_name}:${var.aws_context.aws_caller_identity.current.account_id}:alias/aws/eks"
     }
     resources = ["secrets"]
 
