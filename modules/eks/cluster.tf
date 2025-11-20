@@ -18,10 +18,11 @@ resource "aws_eks_cluster" "eks" {
   }
 
   encryption_config {
-    provider {
-      key_arn = var.aws_managed_kms ? null : aws_kms_key.cluster[0].arn
-      #key_arn = aws_kms_key.cluster.arn
-      #key_arn = "arn:aws:kms:${var.aws_context.region_name}:${var.aws_context.caller_identity_account_id}:alias/aws/eks"
+    dynamic "provider" {
+      for_each = var.aws_managed_kms ? [] : [1]
+      content {
+        key_arn = aws_kms_key.cluster[0].arn
+      }
     }
     resources = ["secrets"]
 
