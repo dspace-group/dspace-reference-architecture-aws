@@ -12,7 +12,7 @@ module "eks" {
   cloudwatch_log_group_retention_in_days = var.cloudwatch_retention
   aws_context                            = local.aws_context
   tags                                   = var.tags
-  use_aws_managed_kms                    = var.use_aws_managed_kms
+  aws_managed_kms                        = var.aws_managed_kms
 
   depends_on = [module.vpc]
 }

@@ -561,7 +561,7 @@ variable "windows_execution_node" {
   }
 }
 
-variable "use_aws_managed_kms" {
+variable "aws_managed_kms" {
   type    = bool
   default = false
 }
