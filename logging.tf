@@ -20,13 +20,10 @@ resource "aws_s3_bucket_policy" "log_bucket_policy" {
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_logs_encryption" {
   bucket = aws_s3_bucket.bucket_logs.bucket
 
-  dynamic "rule" {
-    for_each = var.aws_managed_kms ? [] : [1]
-    content {
-      apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = aws_kms_key.s3_logs_key[0].arn
-      }
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = var.aws_managed_kms ? null : aws_kms_key.s3_logs_key[0].arn
     }
   }
 }

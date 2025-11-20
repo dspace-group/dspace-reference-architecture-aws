@@ -12,7 +12,7 @@ module "simphera_instance" {
   enableKeycloak               = each.value.enable_keycloak
   infrastructurename           = local.infrastructurename
   k8s_namespace                = each.value.k8s_namespace
-  kms_key_cloudwatch           = aws_kms_key.kms_key_cloudwatch_log_group.arn
+  kms_key_cloudwatch           = var.aws_managed_kms ? null : aws_kms_key.kms_key_cloudwatch_log_group[0].arn
   log_bucket                   = aws_s3_bucket.bucket_logs.id
   name                         = each.value.name
   postgresql_security_group_id = module.security_group.security_group_id

@@ -18,7 +18,7 @@ module "ivs_instance" {
   instancename                         = each.key
   ivs_release_name                     = each.value.ivs_release_name
   k8s_namespace                        = each.value.k8s_namespace
-  kms_key_cloudwatch                   = aws_kms_key.kms_key_cloudwatch_log_group.arn
+  kms_key_cloudwatch                   = var.aws_managed_kms ? null : aws_kms_key.kms_key_cloudwatch_log_group[0].arn
   log_bucket                           = aws_s3_bucket.bucket_logs.id
   nodeRoleNames                        = local.ivs_node_groups_roles
   opensearch = merge(each.value.opensearch, {

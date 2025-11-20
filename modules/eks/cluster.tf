@@ -21,7 +21,6 @@ resource "aws_eks_cluster" "eks" {
     for_each = var.aws_managed_kms ? [] : [1]
     content {
       resources = ["secrets"]
-
       provider {
         key_arn = aws_kms_key.cluster[0].arn
       }
