@@ -20,15 +20,19 @@ resource "aws_s3_bucket_policy" "log_bucket_policy" {
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_logs_encryption" {
   bucket = aws_s3_bucket.bucket_logs.bucket
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm     = "aws:kms"
-      kms_master_key_id = aws_kms_key.s3_logs_key.arn
+  dynamic "rule" {
+    for_each = var.aws_managed_kms ? [] : [1]
+    content {
+      apply_server_side_encryption_by_default {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.s3_logs_key[0].arn
+      }
     }
   }
 }
 
 resource "aws_kms_key" "s3_logs_key" {
+  count               = var.aws_managed_kms ? 0 : 1
   description         = "KMS key for encrypting S3 access logs"
   enable_key_rotation = true
   tags                = var.tags
@@ -71,6 +75,7 @@ resource "aws_kms_key" "s3_logs_key" {
 
 
 resource "aws_kms_key" "kms_key_cloudwatch_log_group" {
+  count               = var.aws_managed_kms ? 0 : 1
   description         = "KMS key used to encrypt Kubernetes, VPC Flow, Amazon RDS for PostgreSQL and SSM Patch manager log groups within infrastructure ${var.infrastructurename}"
   enable_key_rotation = true
   tags                = var.tags
