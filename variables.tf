@@ -560,3 +560,8 @@ variable "windows_execution_node" {
     node_count_max = 2
   }
 }
+
+variable "use_aws_managed_kms" {
+  type    = bool
+  default = false
+}
