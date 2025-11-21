@@ -1,3 +1,10 @@
+## v0.8.0
+
+- Updated autoscaler chart
+- Added permission for autoscaling
+- Changed device name for larger volume
+- Added option to select AmazonLinux 2023 or Bottlerocket AMI type for default and execution nodes groups
+
 ## v0.7.0
 
 - Added IVS authentication postgresql database
