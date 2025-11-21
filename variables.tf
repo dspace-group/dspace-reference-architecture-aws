@@ -572,5 +572,7 @@ variable "linuxNodeAmiType" {
 }
 
 variable "aws_managed_kms" {
-  type    = bool
-  default = false
+  type        = bool
+  description = "Flag for using AWS managed KMS keys."
+  default     = false
+}
