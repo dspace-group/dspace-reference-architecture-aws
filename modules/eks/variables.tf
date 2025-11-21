@@ -116,3 +116,9 @@ variable "node_groups" {
     })), [])
   }))
 }
+
+variable "aws_managed_kms" {
+  type        = bool
+  description = "Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs."
+  default     = false
+}

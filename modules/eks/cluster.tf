@@ -17,12 +17,14 @@ resource "aws_eks_cluster" "eks" {
     ip_family = "ipv4"
   }
 
-  encryption_config {
-    provider {
-      key_arn = aws_kms_key.cluster.arn
+  dynamic "encryption_config" {
+    for_each = var.aws_managed_kms ? [] : [1]
+    content {
+      resources = ["secrets"]
+      provider {
+        key_arn = aws_kms_key.cluster[0].arn
+      }
     }
-    resources = ["secrets"]
-
   }
   access_config {
     authentication_mode                         = "CONFIG_MAP"

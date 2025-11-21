@@ -120,7 +120,7 @@ resource "aws_cloudwatch_log_group" "ssm_scan_log_group" {
   count             = var.enable_patching ? 1 : 0
   name              = local.patch_manager_cloudwatch_loggroup_scan
   retention_in_days = var.cloudwatch_retention
-  kms_key_id        = aws_kms_key.kms_key_cloudwatch_log_group.arn
+  kms_key_id        = var.aws_managed_kms ? null : aws_kms_key.kms_key_cloudwatch_log_group[0].arn
   tags              = var.tags
 }
 
@@ -128,7 +128,7 @@ resource "aws_cloudwatch_log_group" "ssm_install_log_group" {
   count             = var.enable_patching && var.licenseServer ? 1 : 0
   name              = local.patch_manager_cloudwatch_loggroup_install
   retention_in_days = var.cloudwatch_retention
-  kms_key_id        = aws_kms_key.kms_key_cloudwatch_log_group.arn
+  kms_key_id        = var.aws_managed_kms ? null : aws_kms_key.kms_key_cloudwatch_log_group[0].arn
   tags              = var.tags
 }
 
