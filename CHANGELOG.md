@@ -4,6 +4,7 @@
 - Added permission for autoscaling
 - Changed device name for larger volume
 - Added option to select AmazonLinux 2023 or Bottlerocket AMI type for default and execution nodes groups
+- Added possibility to use AWS managed KMS keys
 
 ## v0.7.0
 
