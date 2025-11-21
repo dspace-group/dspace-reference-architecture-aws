@@ -7,7 +7,7 @@ aws_load_balancer_controller_config = {
   "enable": false
 }
 
-# Flag for using AWS managed KMS keys.
+# Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs.
 aws_managed_kms = false
 
 # Global cloudwatch retention period for the EKS, VPC, SSM, and PostgreSQL logs.
