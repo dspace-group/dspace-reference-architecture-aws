@@ -29,7 +29,7 @@ EOF
     ) : null
   )
   block_device_mappings {
-    device_name = var.block_device_name
+    device_name = strcontains(var.ami_type, "AL2023") ? "/dev/xvda" : var.block_device_name
     ebs {
       delete_on_termination = true
       encrypted             = true
