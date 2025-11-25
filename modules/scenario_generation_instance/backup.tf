@@ -5,7 +5,7 @@ resource "aws_backup_vault" "scenario_generation" {
 
 resource "aws_backup_plan" "scenario_generation" {
   count = var.enable_backup_service ? 1 : 0
-  name  = "${local.instancename}-backup-plan"
+  name  = "${local.instancename}-scengen-backup-plan"
 
   rule {
     rule_name                = "${local.instancename}-backup-rule"
@@ -22,7 +22,7 @@ resource "aws_backup_plan" "scenario_generation" {
 
 resource "aws_backup_selection" "scenario_generation_rds" {
   count        = var.enable_backup_service ? 1 : 0
-  name         = "${local.instancename}-rds"
+  name         = "${local.instancename}-scengen-rds"
   iam_role_arn = aws_iam_role.scenario_generation_backup_role[0].arn
   plan_id      = aws_backup_plan.scenario_generation[0].id
   resources    = local.backup_resources
@@ -30,7 +30,7 @@ resource "aws_backup_selection" "scenario_generation_rds" {
 
 resource "aws_iam_role" "scenario_generation_backup_role" {
   count              = var.enable_backup_service ? 1 : 0
-  name               = "${var.name}-backup-role"
+  name               = "${local.instancename}-scengen-backup-role"
   assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",

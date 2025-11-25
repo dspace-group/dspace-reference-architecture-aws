@@ -5,6 +5,6 @@ locals {
   postgresql_secret                 = jsondecode(data.aws_secretsmanager_secret_version.postgresql_secret.secret_string)
   instancename                      = join("-", [var.infrastructurename, var.name])
   backup_resources                  = [aws_db_instance.scenario_generation.arn]
-  backup_vault_name                 = "${local.instancename}-backup-vault"
-  db_scenario_generation_id         = "${local.instancename}-scenario-generation"
+  backup_vault_name                 = "${local.instancename}-scengen-backup-vault"
+  db_scenario_generation_id         = "${local.instancename}-scengen"
 }
