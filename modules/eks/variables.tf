@@ -19,7 +19,12 @@ variable "cluster_timeouts" {
 }
 
 variable "subnet_ids" {
-  description = "A list of subnet IDs where the nodes/node groups will be provisioned and where the EKS cluster control plane (ENIs) will be provisioned"
+  description = "A list of subnet IDs where the nodes/node groups will be provisioned. If 'eks_api_subnet_ids' is not provided, the EKS cluster control plane (ENIs) will also be provisioned in these subnets"
+  type        = list(string)
+}
+
+variable "eks_api_subnet_ids" {
+  description = "A list of subnet IDs where the EKS cluster control plane (ENIs) will be provisioned"
   type        = list(string)
 }
 

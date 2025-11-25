@@ -1,5 +1,5 @@
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   description = "The tags to be added to all resources."
   default     = {}
 }
@@ -139,7 +139,7 @@ variable "licenseServer" {
 variable "codemeter" {
   type        = string
   description = "Download link for codemeter rpm package."
-  default     = "https://www.wibu.com/support/user/user-software/file/download/13346.html?tx_wibudownloads_downloadlist%5BdirectDownload%5D=directDownload&tx_wibudownloads_downloadlist%5BuseAwsS3%5D=0&cHash=8dba7ab094dec6267346f04fce2a2bcd"
+  default     = "https://www.wibu.com/support/user/user-software/file/download/15803.html?tx_wibudownloads_downloadlist%5BdirectDownload%5D=directDownload&tx_wibudownloads_downloadlist%5BuseAwsS3%5D=0&cHash=8dba7ab094dec6267346f04fce2a2bcd"
 }
 
 variable "kubernetesVersion" {
@@ -161,27 +161,55 @@ variable "vpcCidr" {
 }
 
 variable "private_subnet_ids" {
-  type        = list(any)
+  type        = list(string)
   description = "List of IDs for the private subnets."
   default     = []
+  validation {
+    condition     = alltrue([for id in var.private_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
+  }
 }
 
 variable "vpcPrivateSubnets" {
-  type        = list(any)
+  type        = list(string)
   description = "List of CIDRs for the private subnets."
   default     = ["10.1.0.0/22", "10.1.4.0/22", "10.1.8.0/22"]
+  validation {
+    condition = alltrue([
+    for cidr in var.vpcPrivateSubnets : can(regex("^((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/(3[0-2]|[12]?\\d)$", cidr) != null)])
+    error_message = "Each subnet CIDR must be a valid IPv4 CIDR block like '10.0.0.0/24'."
+  }
 }
 
 variable "public_subnet_ids" {
-  type        = list(any)
+  type        = list(string)
   description = "List of IDs for the public subnets."
   default     = []
+  validation {
+    condition     = alltrue([for id in var.public_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
+  }
 }
 
 variable "vpcPublicSubnets" {
-  type        = list(any)
+  type        = list(string)
   description = "List of CIDRs for the public subnets."
   default     = ["10.1.12.0/22", "10.1.16.0/22", "10.1.20.0/22"]
+  validation {
+    condition = alltrue([
+    for cidr in var.vpcPublicSubnets : can(regex("^((25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]?\\d)/(3[0-2]|[12]?\\d)$", cidr) != null)])
+    error_message = "Each subnet CIDR must be a valid IPv4 CIDR block like '10.0.0.0/24'."
+  }
+}
+
+variable "eks_api_subnet_ids" {
+  type        = list(string)
+  description = "List of IDs for the EKS API subnets"
+  default     = []
+  validation {
+    condition     = alltrue([for id in var.eks_api_subnet_ids : can(regex("^subnet-[0-9a-fA-F]{8,17}$", id))])
+    error_message = "Each subnet ID must start with 'subnet-' followed by 8 to 17 hexadecimal characters."
+  }
 }
 
 variable "ecr_pullthrough_cache_rule_config" {
@@ -310,44 +338,49 @@ variable "simphera_monitoring_namespace" {
 
 variable "ivsInstances" {
   type = map(object({
-    k8s_namespace = string
+    backup_retention      = optional(number, 7)
+    backup_schedule       = optional(string, "cron(0 1 * * ? *)")
+    backup_service_enable = optional(bool, false)
     data_bucket = object({
       name   = string
       create = optional(bool, true)
     })
+    db_instance_type_ivs                 = optional(string, "db.t4g.small")
+    enable_deletion_protection           = optional(bool, true)
+    enable_ivs_authentication            = optional(bool, true)
+    goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })
+    ivs_release_name                     = optional(string, "ivs")
+    k8s_namespace                        = string
+    opensearch = optional(object({
+      enable                  = optional(bool, false)
+      engine_version          = optional(string, "OpenSearch_2.17")
+      instance_count          = optional(number, 1)
+      instance_type           = optional(string, "m7g.medium.search")
+      master_user_secret_name = optional(string, null)
+      volume_size             = optional(number, 100)
+      }),
+      {}
+    )
+    postgresqlApplyImmediately = optional(bool, false)
+    postgresqlVersion          = optional(string, "16")
     raw_data_bucket = object({
       name   = string
       create = optional(bool, true)
     })
-    goofys_user_agent_sdk_and_go_version = optional(map(string), { sdk_version = "1.44.37", go_version = "1.17.7" })
-    opensearch = optional(object({
-      enable                  = optional(bool, false)
-      engine_version          = optional(string, "OpenSearch_2.17")
-      instance_type           = optional(string, "m7g.medium.search")
-      instance_count          = optional(number, 1)
-      volume_size             = optional(number, 100)
-      master_user_secret_name = optional(string, null)
-      }),
-      {}
-    )
-    ivs_release_name           = optional(string, "ivs")
-    backup_service_enable      = optional(bool, false)
-    backup_retention           = optional(number, 7)
-    backup_schedule            = optional(string, "cron(0 1 * * ? *)")
-    enable_deletion_protection = optional(bool, true)
+    database_secretname = optional(string, "aws-ivs-auth")
   }))
   description = "A list containing the individual IVS instances, such as 'staging' and 'production'. 'opensearch' object is used for enabling AWS OpenSearch Domain creation.'opensearch.master_user_secret_name' is an AWS secret containing key 'master_user' and 'master_password'. 'opensearch.instance_type' must have option for ebs storage, check available type at https://aws.amazon.com/opensearch-service/pricing/"
   default = {
     "production" = {
-      k8s_namespace = "ivs"
       data_bucket = {
         name = "demo-ivs"
       }
-      raw_data_bucket = {
-        name = "demo-ivs-rawdata"
-      }
+      k8s_namespace = "ivs"
       opensearch = {
         enable = false
+      }
+      raw_data_bucket = {
+        name = "demo-ivs-rawdata"
       }
     }
   }

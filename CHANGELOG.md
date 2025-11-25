@@ -1,7 +1,12 @@
+## v0.7.0
+
+- Added IVS authentication postgresql database
+
 ## v0.6.0
 
 - Added option to use SPOT instances for execution nodes.
 - Implement optional creation of IVS buckets
+- Added support for usage of different subnet list for EKS API
 
 ## v0.5.0
 
