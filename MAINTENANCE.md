@@ -585,7 +585,7 @@ terraform apply
 
 7. Remove `move.tf` file.
 
-# Migrate Scenario Generation AWS RDS databases to use different subnet group
+# Migrating AWS RDS Databases to a New Subnet Group for Scenario Generation
 
 This procedure explains how to migrate AWS RDS databases, deployed with reference architecture for Scenario Generation, from using subnet group with a different name. This only applies to already existing deployments, new deployments are not affected.
 
