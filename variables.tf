@@ -8,6 +8,10 @@ variable "infrastructurename" {
   type        = string
   description = "The name of the infrastructure. e.g. simphera-infra"
   default     = "simphera"
+  validation {
+    condition     = length(var.infrastructurename) <= 10
+    error_message = "The infrastructure name must be at most 10 characters."
+  }
 }
 
 variable "linuxNodeSize" {

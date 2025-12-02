@@ -1,5 +1,5 @@
 resource "aws_db_subnet_group" "scenario_generation_database" {
-  name       = "${local.instancename}-vpc"
+  name       = "${local.instancename}-scengen-vpc"
   subnet_ids = var.private_subnets
   tags       = var.tags
 }
@@ -52,7 +52,7 @@ resource "kubernetes_secret" "scenario_generation_aws_tls_certificate" {
 }
 
 resource "aws_iam_role" "scenario_generation_rds_enhanced_monitoring_role" {
-  name        = "${var.name}-rds-enhanced-monitoring"
+  name        = "${var.name}-scengen-rds-enhanced-monitoring"
   description = "AWS IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs."
   assume_role_policy = jsonencode(
     {

@@ -584,3 +584,18 @@ terraform apply
 ```
 
 7. Remove `move.tf` file.
+
+# Migrating AWS RDS Databases to a New Subnet Group for Scenario Generation
+
+This procedure explains how to migrate AWS RDS databases, deployed with reference architecture for Scenario Generation, from using subnet group with a different name. This only applies to already existing deployments, new deployments are not affected.
+
+## Steps
+
+1. Check your existing deployment and make sure everything works etc.
+2. Delete the Scenario Genration database instance, making sure that final snapshot is created. When deleting the databases via the AWS Management Console, the option to create a final snapshot is selected by default.
+3. Create a new Subnet Group in AWS Aurora and RDS under the Subnet Groups Section. Name this subnet group <infrastructure name>-<instance name>-scengen-vpc, Eg: genai-production-scengen-vpc. Add all the VPC private subnets to this group.
+4. Restore DB from the snapshot taken, selecting same configuration options as the original DB (names, VPCs, security groups etc.)
+5. Remove old DB subnet group from Terraform state, eg.: terraform state rm 'module.scenario_generation_instance["production"].aws_db_subnet_group.scenario_generation_database'
+6. Import new DB subnet group into Terraform state, eg.: terraform import 'module.scenario_generation_instance["production"].aws_db_subnet_group.scenario_generation_database' <infrastructure name>-<instance name>-scengen-vpc
+7. Re-run Terraform to refresh the state and apply any small configuration changes in-place, which were missed in previous steps - use "terraform apply" command
+8. Check Scenario Generation deployment and make sure all pods are running fine, endpoints are reachable etc.
