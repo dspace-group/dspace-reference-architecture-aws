@@ -131,18 +131,18 @@ resource "aws_iam_role" "executoragentlinux_irsa" {
 
 resource "aws_iam_role_policy_attachment" "minio" {
   count      = var.enable_minio ? 1 : 0
-  role       = aws_iam_role.minio_irsa.name
+  role       = aws_iam_role.minio_irsa[0].name
   policy_arn = aws_iam_policy.bucket_access.arn
 }
 
 resource "aws_iam_role_policy_attachment" "simphera" {
   count      = var.enable_minio ? 0 : 1
-  role       = aws_iam_role.simphera_irsa.name
+  role       = aws_iam_role.simphera_irsa[0].name
   policy_arn = aws_iam_policy.bucket_access.arn
 }
 
 resource "aws_iam_role_policy_attachment" "executoragentlinux" {
   count      = var.enable_minio ? 0 : 1
-  role       = aws_iam_role.executoragentlinux_irsa.name
+  role       = aws_iam_role.executoragentlinux_irsa[0].name
   policy_arn = aws_iam_policy.bucket_access.arn
 }

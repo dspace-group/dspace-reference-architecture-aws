@@ -11,7 +11,7 @@ resource "kubernetes_service_account" "minio" {
     name      = local.minio_serviceaccount
     namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.minio_irsa.arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.minio_irsa[0].arn
     }
   }
   automount_service_account_token = false
@@ -23,7 +23,7 @@ resource "kubernetes_service_account" "simphera" {
     name      = "simphera-irsa"
     namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.simphera_irsa.arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.simphera_irsa[0].arn
     }
   }
   automount_service_account_token = false
@@ -35,7 +35,7 @@ resource "kubernetes_service_account" "executoragentlinux" {
     name      = "executoragentlinux-irsa"
     namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.executoragentlinux_irsa.arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.executoragentlinux_irsa[0].arn
     }
   }
   automount_service_account_token = false
