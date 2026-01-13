@@ -26,7 +26,6 @@ resource "kubernetes_service_account" "simphera" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.simphera_irsa[0].arn
     }
   }
-  automount_service_account_token = false
 }
 
 resource "kubernetes_service_account" "executoragentlinux" {
@@ -38,5 +37,4 @@ resource "kubernetes_service_account" "executoragentlinux" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.executoragentlinux_irsa[0].arn
     }
   }
-  automount_service_account_token = false
 }
