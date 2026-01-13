@@ -54,6 +54,7 @@ resource "aws_iam_policy" "bucket_access" {
 }
 
 resource "aws_iam_role" "minio_irsa" {
+  count       = var.enable_minio ? 1 : 0
   name        = "${local.instancename}-minio-role"
   description = "IAM role for the MinIO service account"
   assume_role_policy = jsonencode({
@@ -77,6 +78,7 @@ resource "aws_iam_role" "minio_irsa" {
 }
 
 resource "aws_iam_role" "simphera_irsa" {
+  count       = var.enable_minio ? 0 : 1
   name        = "${var.name}-simphera-irsa-role"
   description = "IAM role for the simphera-irsa service account"
   # Terraform's "jsonencode" function converts a
@@ -102,6 +104,7 @@ resource "aws_iam_role" "simphera_irsa" {
 }
 
 resource "aws_iam_role" "executoragentlinux_irsa" {
+  count       = var.enable_minio ? 0 : 1
   name        = "${var.name}-executoragentlinux-irsa-role"
   description = "IAM role for the executoragentlinux-irsa service account"
   # Terraform's "jsonencode" function converts a
@@ -127,16 +130,19 @@ resource "aws_iam_role" "executoragentlinux_irsa" {
 }
 
 resource "aws_iam_role_policy_attachment" "minio" {
+  count      = var.enable_minio ? 1 : 0
   role       = aws_iam_role.minio_irsa.name
   policy_arn = aws_iam_policy.bucket_access.arn
 }
 
 resource "aws_iam_role_policy_attachment" "simphera" {
+  count      = var.enable_minio ? 0 : 1
   role       = aws_iam_role.simphera_irsa.name
   policy_arn = aws_iam_policy.bucket_access.arn
 }
 
 resource "aws_iam_role_policy_attachment" "executoragentlinux" {
+  count      = var.enable_minio ? 0 : 1
   role       = aws_iam_role.executoragentlinux_irsa.name
   policy_arn = aws_iam_policy.bucket_access.arn
 }

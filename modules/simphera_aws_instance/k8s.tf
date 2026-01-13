@@ -6,6 +6,7 @@ resource "kubernetes_namespace" "k8s_namespace" {
 }
 
 resource "kubernetes_service_account" "minio" {
+  count = var.enable_minio ? 1 : 0
   metadata {
     name      = local.minio_serviceaccount
     namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
@@ -17,6 +18,7 @@ resource "kubernetes_service_account" "minio" {
 }
 
 resource "kubernetes_service_account" "simphera" {
+  count = var.enable_minio ? 0 : 1
   metadata {
     name      = "simphera-irsa"
     namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
@@ -28,6 +30,7 @@ resource "kubernetes_service_account" "simphera" {
 }
 
 resource "kubernetes_service_account" "executoragentlinux" {
+  count = var.enable_minio ? 0 : 1
   metadata {
     name      = "executoragentlinux-irsa"
     namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
