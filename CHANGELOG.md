@@ -1,7 +1,7 @@
 ## v0.9.0
 
 - Implemented optional creation of "minio-irsa" K8s service account
-- Added creatio of 'simphera-irsa' and 'executoragentlinux-irs' K8s service accounts
+- Added creation of 'simphera-irsa' and 'executoragentlinux-irsa' K8s service accounts
 
 ## v0.8.0
 
