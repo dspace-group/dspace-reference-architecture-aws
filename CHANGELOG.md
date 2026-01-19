@@ -1,3 +1,8 @@
+## v0.9.0
+
+- Implemented optional creation of "minio-irsa" K8s service account
+- Added creation of 'simphera-irsa' and 'executoragentlinux-irsa' K8s service accounts
+
 ## v0.8.0
 
 - Updated autoscaler chart

@@ -299,6 +299,7 @@ variable "simpheraInstances" {
     enable_backup_service        = bool
     backup_retention             = number
     enable_deletion_protection   = bool
+    enable_minio                 = bool
 
   }))
   description = "A list containing the individual SIMPHERA instances, such as 'staging' and 'production'."
@@ -319,6 +320,7 @@ variable "simpheraInstances" {
       enable_backup_service        = true
       backup_retention             = 35
       enable_deletion_protection   = true
+      enable_minio                 = true
     }
   }
 }

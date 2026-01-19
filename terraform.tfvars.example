@@ -230,6 +230,7 @@ simpheraInstances = {
     "enable_backup_service": true,
     "enable_deletion_protection": true,
     "enable_keycloak": true,
+    "enable_minio": true,
     "k8s_namespace": "simphera",
     "name": "production",
     "postgresqlApplyImmediately": false,

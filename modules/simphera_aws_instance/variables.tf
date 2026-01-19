@@ -158,3 +158,9 @@ variable "cloudwatch_retention" {
   description = "Cloudwatch retention period for the PostgreSQL logs."
   type        = number
 }
+
+variable "enable_minio" {
+  default     = true
+  description = "Enable creation of Minio related resources."
+  type        = bool
+}
