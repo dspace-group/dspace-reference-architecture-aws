@@ -2,6 +2,7 @@
 
 - Implemented optional creation of "minio-irsa" K8s service account
 - Added creation of 'simphera-irsa' and 'executoragentlinux-irsa' K8s service accounts
+- Update kubernetes version to 1.34
 
 ## v0.8.0
 

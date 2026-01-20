@@ -131,7 +131,7 @@ ivsInstances = {
 }
 
 # The kubernetes version of the EKS cluster.
-kubernetesVersion = "1.32"
+kubernetesVersion = "1.34"
 
 # Specifies whether a license server VM will be created.
 licenseServer = false
