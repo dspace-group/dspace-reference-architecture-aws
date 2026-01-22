@@ -3,8 +3,7 @@ data "aws_ami" "gpu_ami" {
   most_recent = true
   filter {
     name   = "name"
-    values = ["*ubuntu-eks/k8s_${var.kubernetesVersion}/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server*"]
-    # from kubernetes version 1.33 use *ubuntu-eks/k8s_${var.kubernetesVersion}/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*
+    values = ["*ubuntu-eks/k8s_${var.kubernetesVersion}/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"]
   }
 }
 locals {
