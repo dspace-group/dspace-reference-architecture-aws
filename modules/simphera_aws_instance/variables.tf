@@ -164,3 +164,9 @@ variable "enable_minio" {
   description = "Enable creation of Minio related resources."
   type        = bool
 }
+
+variable "simphera_url" {
+  default     = ""
+  description = "Simphera url variable for CORS S3 bucket configuration"
+  type        = string
+}

@@ -296,11 +296,11 @@ variable "simpheraInstances" {
     db_instance_type_keycloak    = string
     k8s_namespace                = string
     secretname                   = string
+    simphera_url                 = string
     enable_backup_service        = bool
     backup_retention             = number
     enable_deletion_protection   = bool
     enable_minio                 = bool
-
   }))
   description = "A list containing the individual SIMPHERA instances, such as 'staging' and 'production'."
   default = {
@@ -317,6 +317,7 @@ variable "simpheraInstances" {
       db_instance_type_simphera    = "db.t4g.large"
       k8s_namespace                = "simphera"
       secretname                   = "aws-simphera-dev-production"
+      simphera_url                  = ""
       enable_backup_service        = true
       backup_retention             = 35
       enable_deletion_protection   = true

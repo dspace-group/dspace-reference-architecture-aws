@@ -5,6 +5,19 @@ resource "aws_s3_bucket" "bucket" {
   force_destroy = var.enable_deletion_protection ? false : true
 }
 
+resource "aws_s3_bucket_cors_configuration" "bucket_cors" {
+  count       = var.simphera_url != "" ? 1 : 0
+  bucket = aws_s3_bucket.bucket.id
+
+  cors_rule {
+    id = "simphera-access"
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = [var.simphera_url]
+    allowed_headers = ["Authorization"]
+    expose_headers  = ["Access-Control-Allow-Origin"]
+  }
+}
+
 resource "aws_s3_bucket_logging" "logging" {
   bucket = aws_s3_bucket.bucket.id
   #[S3.9] S3 bucket server access logging should be enabled
