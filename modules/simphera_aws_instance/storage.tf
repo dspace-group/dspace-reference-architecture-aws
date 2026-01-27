@@ -6,7 +6,7 @@ resource "aws_s3_bucket" "bucket" {
 }
 
 resource "aws_s3_bucket_cors_configuration" "bucket_cors" {
-  count  = var.simphera_url != "" ? 1 : 0
+  count  = var.simphera_url != null ? 1 : 0
   bucket = aws_s3_bucket.bucket.id
 
   cors_rule {
@@ -62,7 +62,7 @@ resource "aws_s3_bucket_policy" "buckets_ssl" {
 resource "aws_iam_policy" "bucket_access" {
   name        = "${local.instancename}-s3-policy"
   description = "Allows access to S3 bucket."
-  policy      = templatefile("${path.module}/templates/bucket_access_policy.json", { bucket = local.instancename })
+  policy      = templatefile("${path.module}/templates/bucket_access_policy.json", { bucket = aws_s3_bucket.bucket.bucket })
   tags        = var.tags
 }
 

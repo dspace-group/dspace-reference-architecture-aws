@@ -166,7 +166,7 @@ variable "enable_minio" {
 }
 
 variable "simphera_url" {
-  default     = ""
+  default     = null
   description = "Simphera url variable for CORS S3 bucket configuration"
   type        = string
 }
