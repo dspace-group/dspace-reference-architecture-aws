@@ -6,11 +6,11 @@ resource "aws_s3_bucket" "bucket" {
 }
 
 resource "aws_s3_bucket_cors_configuration" "bucket_cors" {
-  count       = var.simphera_url != "" ? 1 : 0
+  count  = var.simphera_url != "" ? 1 : 0
   bucket = aws_s3_bucket.bucket.id
 
   cors_rule {
-    id = "simphera-access"
+    id              = "simphera-access"
     allowed_methods = ["GET", "HEAD"]
     allowed_origins = [var.simphera_url]
     allowed_headers = ["Authorization"]
