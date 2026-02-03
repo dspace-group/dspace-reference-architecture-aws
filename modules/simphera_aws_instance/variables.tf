@@ -169,7 +169,7 @@ variable "simphera_url" {
   default     = null
   description = "Simphera url variable for CORS S3 bucket configuration"
   type        = string
-  
+
   validation {
     condition = (
       var.simphera_url == null ||
