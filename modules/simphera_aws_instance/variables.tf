@@ -175,6 +175,6 @@ variable "simphera_url" {
       var.simphera_url == null ||
       can(regex("^(https?):\\/\\/([a-z0-9-]+(.[a-z0-9-]+)+|localhost)(:\\d{2,5})?(\\/\\S*)?$", trim(var.simphera_url)))
     )
-    error_message = "If provided, endpoint_url must be a valid http(s) URL."
+    error_message = "If provided, Simphera URL must be a valid http(s) URL."
   }
 }
