@@ -1,3 +1,7 @@
+## v1.0.0
+
+- Add CORS to s3 bucket for Simphera URL
+
 ## v0.9.0
 
 - Implemented optional creation of "minio-irsa" K8s service account

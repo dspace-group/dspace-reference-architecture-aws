@@ -5,6 +5,19 @@ resource "aws_s3_bucket" "bucket" {
   force_destroy = var.enable_deletion_protection ? false : true
 }
 
+resource "aws_s3_bucket_cors_configuration" "bucket_cors" {
+  count  = var.simphera_url != null ? 1 : 0
+  bucket = aws_s3_bucket.bucket.id
+
+  cors_rule {
+    id              = "simphera-access"
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = [var.simphera_url]
+    allowed_headers = ["Authorization"]
+    expose_headers  = ["Access-Control-Allow-Origin"]
+  }
+}
+
 resource "aws_s3_bucket_logging" "logging" {
   bucket = aws_s3_bucket.bucket.id
   #[S3.9] S3 bucket server access logging should be enabled
@@ -49,7 +62,7 @@ resource "aws_s3_bucket_policy" "buckets_ssl" {
 resource "aws_iam_policy" "bucket_access" {
   name        = "${local.instancename}-s3-policy"
   description = "Allows access to S3 bucket."
-  policy      = templatefile("${path.module}/templates/bucket_access_policy.json", { bucket = local.instancename })
+  policy      = templatefile("${path.module}/templates/bucket_access_policy.json", { bucket = aws_s3_bucket.bucket.bucket })
   tags        = var.tags
 }
 
