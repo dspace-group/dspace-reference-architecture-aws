@@ -173,7 +173,7 @@ variable "simphera_url" {
   validation {
     condition = (
       var.simphera_url == null ||
-      can(regex("^(https?):\\/\\/([a-z0-9-]+(.[a-z0-9-]+)+|localhost)(:\\d{2,5})?(\\/\\S*)?$", trim(var.simphera_url)))
+      can(regex("^(https?://)(www\\.)?[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+(:[0-9]{2,5})?(/[^\\s]*)?$", var.simphera_url))
     )
     error_message = "If provided, Simphera URL must be a valid http(s) URL."
   }
