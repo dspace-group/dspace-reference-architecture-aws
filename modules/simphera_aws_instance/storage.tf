@@ -31,7 +31,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle_configuration
         prefix = rule.value.path
       }
       expiration {
-        days = rule.value.expiration_days
+        days                         = rule.value.expiration_days
         expired_object_delete_marker = true
       }
       noncurrent_version_expiration {
