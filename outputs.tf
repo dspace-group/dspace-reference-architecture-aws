@@ -50,6 +50,11 @@ output "s3_buckets" {
   value       = local.s3_buckets
 }
 
+output "s3_lifecycle_rules" {
+  description = "Lifecycle rules created for Simphera S3 bucket"
+  value = module.simphera_instance.s3_lifecycle_rules
+}
+
 output "eks_cluster_id" {
   description = "Amazon EKS Cluster Name"
   value       = module.eks.eks_cluster_id

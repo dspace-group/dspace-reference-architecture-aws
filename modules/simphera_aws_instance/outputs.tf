@@ -18,3 +18,14 @@ output "s3_buckets" {
   description = "S3 buckets created for this SIMPHERA instance."
   value       = [aws_s3_bucket.bucket.bucket]
 }
+
+output "s3_lifecycle_rules" {
+  value = length(aws_s3_bucket_lifecycle_configuration.bucket_lifecycle_configuration) == 0 ? [] : [
+    for rule in aws_s3_bucket_lifecycle_configuration.bucket_lifecycle_configuration[0].rule : {
+      id              = rule.id
+      path            = rule.filter[0].prefix
+      expiration_days = rule.expiration[0].days
+    }
+  ]
+  description = "Lifecycle rules created for Simphera S3 bucket"
+}

@@ -241,6 +241,7 @@ simpheraInstances = {
     "postgresqlVersion": "16",
     "secretname": "aws-simphera-dev-production",
     "simphera_url": null
+    "s3_lifecycle_rules": null
   }
 }
 

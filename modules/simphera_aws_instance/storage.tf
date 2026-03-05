@@ -18,6 +18,26 @@ resource "aws_s3_bucket_cors_configuration" "bucket_cors" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle_configuration" {
+  count = var.s3_lifecycle_rules != null ? 1 : 0
+  bucket = aws_s3_bucket.bucket.id
+
+  dynamic "rule" {
+    for_each = var.s3_lifecycle_rules
+    content {
+      id = "${element(reverse(split("/", trim(rule.value.path, "/"))),0)}-expiration"
+      status = "Enabled"
+      filter {
+        prefix = rule.value.path
+      }
+      expiration {
+        days = rule.value.expiration_days
+      }
+    }
+    
+  }
+}
+
 resource "aws_s3_bucket_logging" "logging" {
   bucket = aws_s3_bucket.bucket.id
   #[S3.9] S3 bucket server access logging should be enabled
