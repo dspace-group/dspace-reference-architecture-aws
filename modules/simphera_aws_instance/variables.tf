@@ -181,7 +181,7 @@ variable "simphera_url" {
 
 variable "s3_lifecycle_rules" {
   type = list(object({
-    path = string
+    path            = string
     expiration_days = number
   }))
   default = null
