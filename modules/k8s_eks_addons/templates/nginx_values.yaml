@@ -8,6 +8,7 @@ controller:
       service.beta.kubernetes.io/aws-load-balancer-target-node-labels: kubernetes.io/os=linux
       service.beta.kubernetes.io/aws-load-balancer-subnets: "${public_subnets}"
       service.beta.kubernetes.io/aws-load-balancer-type: "${aws_load_balancer_type}"
+      service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: preserve_client_ip.enabled=${preserve_client_ip}
       ${aws_load_target-type}
   metrics:
     enabled: true

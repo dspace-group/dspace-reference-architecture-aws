@@ -26,6 +26,7 @@ resource "helm_release" "ingress_nginx" {
       protocol               = var.aws_load_balancer_controller_config.enable ? "ssl" : "tcp"
       aws_load_balancer_type = var.aws_load_balancer_controller_config.enable ? "external" : "nlb"
       aws_load_target-type   = var.aws_load_balancer_controller_config.enable ? "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip" : ""
+      preserve_client_ip     = "true"
     }),
     var.ingress_nginx_config.chart_values
   ]
