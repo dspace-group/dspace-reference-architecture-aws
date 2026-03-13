@@ -1,6 +1,7 @@
-## v1.0.0
+## v0.10.0
 
 - Add CORS to s3 bucket for Simphera URL
+- Add lifecycle policy for Simphera S3 bucket
 
 ## v0.9.0
 
