@@ -27,6 +27,7 @@ module "simphera_instance" {
   secretname                   = each.value.secretname
   simphera_url                 = each.value.simphera_url
   enable_minio                 = each.value.enable_minio
+  s3_lifecycle_rules           = each.value.s3_lifecycle_rules
   tags                         = var.tags
   depends_on                   = [module.eks, kubernetes_storage_class_v1.efs]
 }

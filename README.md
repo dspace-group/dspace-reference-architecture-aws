@@ -274,6 +274,28 @@ provider "aws" {
 }
 ```
 
+#### Set Simphera S3 bucket lifecycle policy
+
+If there is a need to continuously clean up some parts of Simphera S3 bucket, like some cached folders, it can be done by setting `s3_lifecycle_rules` list in terraform.tfvars file.
+This list consists of multiple dictionaries with 3 keys for each rule you want to set for Simphera S3 bucket:
+
+- Key id represents the name of the rule.
+- Key path provides a path inside the S3 bucket to which the rule is applied.
+- Key expiration_days is the number of days after all files will be deleted for a specific path.
+
+```
+"s3_lifecycle_rules": [{
+      id: "Id_of_first_rule",
+      path: "path/to/first/folder",
+      expiration_days: 10
+    },
+    {
+      id: "Id_of_second_rule",
+      path: "path/to/second/folder",
+      expiration_days: 5
+    }]
+```
+
 ### Setting Up Service-Linked Role for First-Time OpenSearch Domian Creation in an AWS Account
 
 Amazon OpenSearch requires a service-linked role named `AWSServiceRoleForAmazonOpenSearchService` to access resources within your VPC. If you're creating an Amazon OpenSearch domain for the first time in a new AWS account, this role may not yet exist. Before proceeding, check whether this role already exists in your account. If it doesn't, you can manually create it via the AWS Console:
@@ -689,7 +711,7 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | <a name="input_rtMaps_link"></a> [rtMaps\_link](#input\_rtMaps\_link) | Download link for RTMaps license server. | `string` | `"http://dl.intempora.com/RTMaps4/rtmaps_4.9.0_ubuntu1804_x86_64_release.tar.bz2"` | no |
 | <a name="input_s3_csi_config"></a> [s3\_csi\_config](#input\_s3\_csi\_config) | Input configuration for AWS EKS add-on aws-mountpoint-s3-csi-driver. By setting key 'enable' to 'true', aws-mountpoint-s3-csi-driver add-on is deployed. Key 'configuration\_values' is used to change add-on configuration. Its content should follow add-on configuration schema (see https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/). | <pre>object({<br>    enable = optional(bool, false)<br>    configuration_values = optional(string, <<-YAML<br>node:<br>    tolerateAllTaints: true<br>YAML<br>    )<br>  })</pre> | <pre>{<br>  "enable": false<br>}</pre> | no |
 | <a name="input_scan_schedule"></a> [scan\_schedule](#input\_scan\_schedule) | 6-field Cron expression describing the scan maintenance schedule. Must not overlap with variable install\_schedule. | `string` | `"cron(0 0 * * ? *)"` | no |
-| <a name="input_simpheraInstances"></a> [simpheraInstances](#input\_simpheraInstances) | A list containing the individual SIMPHERA instances, such as 'staging' and 'production'. | <pre>map(object({<br>    name                         = string<br>    postgresqlApplyImmediately   = bool<br>    postgresqlVersion            = string<br>    postgresqlStorage            = number<br>    postgresqlMaxStorage         = number<br>    db_instance_type_simphera    = string<br>    enable_keycloak              = bool<br>    postgresqlStorageKeycloak    = number<br>    postgresqlMaxStorageKeycloak = number<br>    db_instance_type_keycloak    = string<br>    k8s_namespace                = string<br>    secretname                   = string<br>    simphera_url                 = string<br>    enable_backup_service        = bool<br>    backup_retention             = number<br>    enable_deletion_protection   = bool<br>    enable_minio                 = bool<br>  }))</pre> | <pre>{<br>  "production": {<br>    "backup_retention": 35,<br>    "db_instance_type_keycloak": "db.t4g.large",<br>    "db_instance_type_simphera": "db.t4g.large",<br>    "enable_backup_service": true,<br>    "enable_deletion_protection": true,<br>    "enable_keycloak": true,<br>    "enable_minio": true,<br>    "k8s_namespace": "simphera",<br>    "name": "production",<br>    "postgresqlApplyImmediately": false,<br>    "postgresqlMaxStorage": 100,<br>    "postgresqlMaxStorageKeycloak": 100,<br>    "postgresqlStorage": 20,<br>    "postgresqlStorageKeycloak": 20,<br>    "postgresqlVersion": "16",<br>    "secretname": "aws-simphera-dev-production",<br>    "simphera_url": null<br>  }<br>}</pre> | no |
+| <a name="input_simpheraInstances"></a> [simpheraInstances](#input\_simpheraInstances) | A list containing the individual SIMPHERA instances, such as 'staging' and 'production'. | <pre>map(object({<br>    name                         = string<br>    postgresqlApplyImmediately   = bool<br>    postgresqlVersion            = string<br>    postgresqlStorage            = number<br>    postgresqlMaxStorage         = number<br>    db_instance_type_simphera    = string<br>    enable_keycloak              = bool<br>    postgresqlStorageKeycloak    = number<br>    postgresqlMaxStorageKeycloak = number<br>    db_instance_type_keycloak    = string<br>    k8s_namespace                = string<br>    secretname                   = string<br>    simphera_url                 = string<br>    enable_backup_service        = bool<br>    backup_retention             = number<br>    enable_deletion_protection   = bool<br>    enable_minio                 = bool<br>    s3_lifecycle_rules = list(object({<br>      id              = string<br>      path            = string<br>      expiration_days = number<br>    }))<br>  }))</pre> | <pre>{<br>  "production": {<br>    "backup_retention": 35,<br>    "db_instance_type_keycloak": "db.t4g.large",<br>    "db_instance_type_simphera": "db.t4g.large",<br>    "enable_backup_service": true,<br>    "enable_deletion_protection": true,<br>    "enable_keycloak": true,<br>    "enable_minio": true,<br>    "k8s_namespace": "simphera",<br>    "name": "production",<br>    "postgresqlApplyImmediately": false,<br>    "postgresqlMaxStorage": 100,<br>    "postgresqlMaxStorageKeycloak": 100,<br>    "postgresqlStorage": 20,<br>    "postgresqlStorageKeycloak": 20,<br>    "postgresqlVersion": "16",<br>    "s3_lifecycle_rules": null,<br>    "secretname": "aws-simphera-dev-production",<br>    "simphera_url": null<br>  }<br>}</pre> | no |
 | <a name="input_simphera_monitoring_namespace"></a> [simphera\_monitoring\_namespace](#input\_simphera\_monitoring\_namespace) | Name of the K8s namespace used for deploying SIMPHERA monitoring chart | `string` | `"monitoring"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | The tags to be added to all resources. | `map(string)` | `{}` | no |
 | <a name="input_vpcCidr"></a> [vpcCidr](#input\_vpcCidr) | The CIDR for the virtual private cluster. | `string` | `"10.1.0.0/18"` | no |
@@ -712,4 +734,5 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | <a name="output_opensearch_domain_endpoints"></a> [opensearch\_domain\_endpoints](#output\_opensearch\_domain\_endpoints) | List of OpenSearch Domains endpoints of IVS instances |
 | <a name="output_pullthrough_cache_prefix"></a> [pullthrough\_cache\_prefix](#output\_pullthrough\_cache\_prefix) | n/a |
 | <a name="output_s3_buckets"></a> [s3\_buckets](#output\_s3\_buckets) | S3 buckets managed by terraform. |
+| <a name="output_s3_lifecycle_rules"></a> [s3\_lifecycle\_rules](#output\_s3\_lifecycle\_rules) | Lifecycle rules created for Simphera S3 bucket |
 <!-- END_TF_DOCS -->

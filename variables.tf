@@ -301,6 +301,11 @@ variable "simpheraInstances" {
     backup_retention             = number
     enable_deletion_protection   = bool
     enable_minio                 = bool
+    s3_lifecycle_rules = list(object({
+      id              = string
+      path            = string
+      expiration_days = number
+    }))
   }))
   description = "A list containing the individual SIMPHERA instances, such as 'staging' and 'production'."
   default = {
@@ -322,6 +327,7 @@ variable "simpheraInstances" {
       backup_retention             = 35
       enable_deletion_protection   = true
       enable_minio                 = true
+      s3_lifecycle_rules           = null
     }
   }
 }

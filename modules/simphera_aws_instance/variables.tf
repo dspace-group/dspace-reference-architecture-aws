@@ -178,3 +178,12 @@ variable "simphera_url" {
     error_message = "If provided, Simphera URL must be a valid http(s) URL."
   }
 }
+
+variable "s3_lifecycle_rules" {
+  type = list(object({
+    id              = string
+    path            = string
+    expiration_days = number
+  }))
+  default = null
+}
