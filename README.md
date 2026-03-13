@@ -78,15 +78,15 @@ To create the AWS resources that are required for operating the dSPACE Cloud Pro
 - for SIMPHERA deployment use [deploy_simphera_policy.json](./templates/least_permissions/deploy_simphera_policy.json)
 - for IVS deployment use [deploy_ivs_policy.json](./templates/least_permissions/deploy_ivs_policy.json)
 
-1. create security credentials for that IAM user
-2. request service quota increase for gpu instances if needed
-3. create non-public S3 bucket for Terraform state
-4. create IAM policy that gives the IAM user access to the S3 bucket
-5. clone this repository onto your local administration PC
-6. create Secrets manager secrets
-7. adjust Terraform variables to match your usage (SIMPHERA/IVS/all)
-8. apply Terraform configuration
-9. connect to the Kubernetes cluster
+4. create security credentials for that IAM user
+5. request service quota increase for gpu instances if needed
+6. create non-public S3 bucket for Terraform state
+7. create IAM policy that gives the IAM user access to the S3 bucket
+8. clone this repository onto your local administration PC
+9. create Secrets manager secrets
+10. adjust Terraform variables to match your usage (SIMPHERA/IVS/all)
+11. apply Terraform configuration
+12. connect to the Kubernetes cluster
 
 ### Install Terraform
 
