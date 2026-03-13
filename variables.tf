@@ -302,6 +302,7 @@ variable "simpheraInstances" {
     enable_deletion_protection   = bool
     enable_minio                 = bool
     s3_lifecycle_rules = list(object({
+      id              = string
       path            = string
       expiration_days = number
     }))

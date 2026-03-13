@@ -25,7 +25,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle_configuration
   dynamic "rule" {
     for_each = var.s3_lifecycle_rules
     content {
-      id     = "${element(reverse(split("/", trim(rule.value.path, "/"))), 0)}-expiration"
+      id     = rule.value.id
       status = "Enabled"
       filter {
         prefix = rule.value.path

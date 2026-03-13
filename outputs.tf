@@ -52,7 +52,7 @@ output "s3_buckets" {
 
 output "s3_lifecycle_rules" {
   description = "Lifecycle rules created for Simphera S3 bucket"
-  value       = module.simphera_instance.s3_lifecycle_rules
+  value       = [for name, instance in module.simphera_instance : instance.s3_lifecycle_rules]
 }
 
 output "eks_cluster_id" {
