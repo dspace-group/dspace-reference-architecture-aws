@@ -12,10 +12,10 @@ data "aws_eks_addon_version" "cloudwatch_observability" {
 }
 
 resource "aws_eks_addon" "cloudwatch_observability" {
-  count         = var.cluster_autoscaler_config.enable ? 1 : 0
-  cluster_name  = var.addon_context.eks_cluster_id
-  addon_name    = "amazon-cloudwatch-observability"
-  addon_version = data.aws_eks_addon_version.cloudwatch_observability[0].version
+  count                       = var.cluster_autoscaler_config.enable ? 1 : 0
+  cluster_name                = var.addon_context.eks_cluster_id
+  addon_name                  = "amazon-cloudwatch-observability"
+  addon_version               = data.aws_eks_addon_version.cloudwatch_observability[0].version
   service_account_role_arn    = aws_iam_role.cloudwatch_observability_role[0].arn
   preserve                    = false
   resolve_conflicts_on_create = "OVERWRITE"
