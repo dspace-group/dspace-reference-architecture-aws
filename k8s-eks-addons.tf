@@ -2,6 +2,7 @@ module "k8s_eks_addons" {
   source = "./modules/k8s_eks_addons"
 
   ingress_nginx_config                = merge(var.ingress_nginx_config, { subnets_ids = local.public_subnets })
+  cloudwatch_observability_config     = var.cloudwatch_observability_config
   cluster_autoscaler_config           = var.cluster_autoscaler_config
   coredns_config                      = var.coredns_config
   efs_csi_config                      = var.efs_csi_config
