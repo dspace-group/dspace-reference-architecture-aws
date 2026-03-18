@@ -53,7 +53,7 @@ resource "aws_iam_role" "cloudwatch_observability_role" {
   tags = var.tags
 }
 
-resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "cloudwatch_observability_policy_attachment" {
   count      = var.cluster_autoscaler_config.enable ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   role       = aws_iam_role.cloudwatch_observability_role[0].name
