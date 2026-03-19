@@ -21,7 +21,10 @@ resource "aws_eks_addon" "cloudwatch_observability" {
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"
   tags                        = var.tags
-  configuration_values        = file("${path.module}/templates/cloudwatch_observability_values.yaml")
+  configuration_values        = templatefile("${path.module}/templates/cloudwatch_observability_values.json", {
+    region       = var.addon_context.aws_context.region_name,
+    cluster_name = var.addon_context.eks_cluster_id
+    })
 }
 
 resource "aws_iam_role" "cloudwatch_observability_role" {
