@@ -1,12 +1,11 @@
 locals {
-  aws_cloudwatch_observability_addon_name = "amazon-cloudwatch-observability"
   # This service account is automatically created by the add-on.
   aws_cloudwatch_observability_service_account = "cloudwatch-observability-sa"
 }
 
 data "aws_eks_addon_version" "cloudwatch_observability" {
   count              = var.cloudwatch_observability_config.enable ? 1 : 0
-  addon_name         = local.aws_cloudwatch_observability_addon_name
+  addon_name         = "amazon-cloudwatch-observability"
   kubernetes_version = var.addon_context.eks_cluster_version
 }
 
