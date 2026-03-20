@@ -430,7 +430,7 @@ variable "cloudwatch_observability_config" {
     enable           = bool
     retention_period = number
   })
-  description = "Input configuration for AWS EKS add-on amazon-cloudwatch-observability. By setting key 'enable' to 'true', coredns add-on is deployed. Key 'configuration_values' is used to change add-on configuration. Its content should follow add-on configuration schema (see https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/)."
+  description = "Input configuration for AWS EKS add-on amazon-cloudwatch-observability. By setting key 'enable' to 'true', amazon-cloudwatch-observability add-on is deployed."
   default = {
     enable           = false
     retention_period = 30

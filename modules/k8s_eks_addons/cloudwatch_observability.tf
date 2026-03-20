@@ -1,18 +1,17 @@
 locals {
   aws_cloudwatch_observability_addon_name = "amazon-cloudwatch-observability"
-  aws_cloudwatch_observability_namespace  = "kube-system"
   # This service account is automatically created by the add-on.
-  aws_cloudwatch_observability_service_account = "cloudwatch_observability-sa"
+  aws_cloudwatch_observability_service_account = "cloudwatch-observability-sa"
 }
 
 data "aws_eks_addon_version" "cloudwatch_observability" {
-  count              = var.cluster_autoscaler_config.enable ? 1 : 0
+  count              = var.cloudwatch_observability_config.enable ? 1 : 0
   addon_name         = local.aws_cloudwatch_observability_addon_name
   kubernetes_version = var.addon_context.eks_cluster_version
 }
 
 resource "aws_eks_addon" "cloudwatch_observability" {
-  count                       = var.cluster_autoscaler_config.enable ? 1 : 0
+  count                       = var.cloudwatch_observability_config.enable ? 1 : 0
   cluster_name                = var.addon_context.eks_cluster_id
   addon_name                  = "amazon-cloudwatch-observability"
   addon_version               = data.aws_eks_addon_version.cloudwatch_observability[0].version
@@ -28,7 +27,7 @@ resource "aws_eks_addon" "cloudwatch_observability" {
 }
 
 resource "aws_iam_role" "cloudwatch_observability_role" {
-  count       = var.cluster_autoscaler_config.enable ? 1 : 0
+  count       = var.cloudwatch_observability_config.enable ? 1 : 0
   name        = format("%s-%s-%s", var.addon_context.eks_cluster_id, trimsuffix(local.aws_cloudwatch_observability_service_account, "-sa"), "irsa")
   description = "AWS IAM Role for the Kubernetes service account ${local.aws_cloudwatch_observability_service_account}."
 
@@ -43,7 +42,6 @@ resource "aws_iam_role" "cloudwatch_observability_role" {
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {
           "StringLike" : {
-            "${var.addon_context.eks_oidc_issuer_url}:sub" : "system:serviceaccount:${local.aws_cloudwatch_observability_namespace}:${local.aws_cloudwatch_observability_service_account}",
             "${var.addon_context.eks_oidc_issuer_url}:aud" : "sts.amazonaws.com"
           }
         }
@@ -57,7 +55,7 @@ resource "aws_iam_role" "cloudwatch_observability_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "cloudwatch_observability_policy_attachment" {
-  count      = var.cluster_autoscaler_config.enable ? 1 : 0
+  count      = var.cloudwatch_observability_config.enable ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   role       = aws_iam_role.cloudwatch_observability_role[0].name
 }
