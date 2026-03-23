@@ -1,6 +1,12 @@
 locals {
   # This service account is automatically created by the add-on.
   aws_cloudwatch_observability_service_account = "cloudwatch-observability-sa"
+  aws_cloudwatch_log_group_names = var.cloudwatch_observability_config.enable ? [
+    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/application",
+    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/dataplane",
+    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/host",
+    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/performance"
+  ] : []
 }
 
 data "aws_eks_addon_version" "cloudwatch_observability" {
@@ -23,6 +29,7 @@ resource "aws_eks_addon" "cloudwatch_observability" {
     region       = var.addon_context.aws_context.region_name,
     cluster_name = var.addon_context.eks_cluster_id
   })
+  depends_on = [aws_cloudwatch_log_group.cloudwatch_log_groups]
 }
 
 resource "aws_iam_role" "cloudwatch_observability_role" {
@@ -57,4 +64,12 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_observability_policy_attac
   count      = var.cloudwatch_observability_config.enable ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   role       = aws_iam_role.cloudwatch_observability_role[0].name
+}
+
+resource "aws_cloudwatch_log_group" "cloudwatch_log_groups" {
+  for_each          = toset(local.aws_cloudwatch_log_group_names)
+  name              = each.value
+  retention_in_days = var.cloudwatch_observability_config.retention_period
+  log_group_class   = "STANDARD"
+  tags              = var.tags
 }
