@@ -425,6 +425,18 @@ variable "cloudwatch_retention" {
   default     = 7
 }
 
+variable "cloudwatch_observability_config" {
+  type = object({
+    enable           = bool
+    retention_period = number
+  })
+  description = "Input configuration for AWS EKS add-on amazon-cloudwatch-observability. By setting key 'enable' to 'true', amazon-cloudwatch-observability add-on is deployed."
+  default = {
+    enable           = false
+    retention_period = 30
+  }
+}
+
 variable "cluster_autoscaler_config" {
   type = object({
     enable          = optional(bool, true)

@@ -2,6 +2,7 @@
 
 - Add CORS to s3 bucket for Simphera URL
 - Add lifecycle policy for Simphera S3 bucket
+- Add amazon-cloudwatch-observability addon
 
 ## v0.9.0
 

@@ -10,6 +10,13 @@ aws_load_balancer_controller_config = {
 # Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs.
 aws_managed_kms = false
 
+# Input configuration for AWS EKS add-on amazon-cloudwatch-observability.
+# By setting key 'enable' to 'true', amazon-cloudwatch-observability add-on is deployed.
+cloudwatch_observability_config = {
+  "enable": false,
+  "retention_period": 30
+}
+
 # Global cloudwatch retention period for the EKS, VPC, SSM, and PostgreSQL logs.
 cloudwatch_retention = 7
 
