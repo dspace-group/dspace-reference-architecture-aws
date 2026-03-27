@@ -1,0 +1,240 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# Jobs"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 1,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Total Jobs",
+        "view": "singleValue",
+        "region": "${region}",
+        "metrics": [
+          [
+            {
+              "expression": "SUM(SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName} MetricName=\"jobscheduler_job_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60))",
+              "id": "total_jobs",
+              "label": "Total Jobs",
+              "period": 60
+            }
+          ]
+        ],
+        "sparkline": true
+      }
+    },
+    {
+      "type": "log",
+      "x": 6,
+      "y": 1,
+      "width": 18,
+      "height": 6,
+      "properties": {
+        "title": "Job States",
+        "region": "${region}",
+        "view": "timeSeries",
+        "query": "SOURCE '/aws/containerinsights/${cluster_name}/prometheus' | fields @timestamp, jobscheduler_job_count_total, state\n| filter ispresent(jobscheduler_job_count_total) and ispresent(state)\n| stats max(jobscheduler_job_count_total) by bin(1m), state"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 7,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# Agents"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 8,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Total Agents",
+        "view": "singleValue",
+        "region": "${region}",
+        "metrics": [
+          [
+            {
+              "expression": "SUM(SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName} MetricName=\"jobscheduler_executor_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60))",
+              "id": "total_agents",
+              "label": "Total Agents",
+              "period": 60,
+              "region": "${region}"
+            }
+          ]
+        ],
+        "period": 300,
+        "sparkline": true
+      }
+    },
+    {
+      "type": "log",
+      "x": 6,
+      "y": 8,
+      "width": 18,
+      "height": 6,
+      "properties": {
+        "title": "Agent States",
+        "region": "${region}",
+        "view": "timeSeries",
+        "query": "SOURCE '/aws/containerinsights/${cluster_name}/prometheus' | fields @timestamp, jobscheduler_executor_count_total, state\n| filter ispresent(jobscheduler_executor_count_total) and ispresent(state)\n| stats max(jobscheduler_executor_count_total) by bin(1m), state"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 14,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# Agent Pool Capacity"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 15,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "title": "Min Agent Count (by agentpool)",
+        "view": "bar",
+        "region": "${region}",
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_min_agent_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60)",
+              "id": "min_agents",
+              "label": "${PROP('Dim.agentpool')}",
+              "period": 60
+            }
+          ]
+        ],
+        "setPeriodToTimeRange": true,
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 15,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "title": "Max Agent Count (by agentpool)",
+        "view": "bar",
+        "region": "${region}",
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_max_agent_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60)",
+              "id": "max_agents",
+              "label": "${PROP('Dim.agentpool')}",
+              "period": 60
+            }
+          ]
+        ],
+        "setPeriodToTimeRange": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 15,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_running_agent_count_total\" AND Namespace=\"simphera\"', 'Minimum', 60)",
+              "id": "running_agents",
+              "label": "${PROP('Dim.agentpool')}",
+              "period": 60,
+              "region": "${region}",
+              "stat": "Minimum"
+            }
+          ]
+        ],
+        "title": "Running Agent Count (by agentpool)",
+        "view": "bar",
+        "region": "${region}",
+        "setPeriodToTimeRange": true,
+        "period": 60,
+        "stat": "Minimum"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 21,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# jobscheduler"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 22,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Agent Events Queue",
+        "region": "${region}",
+        "view": "timeSeries",
+        "query": "SOURCE '/aws/containerinsights/${cluster_name}/prometheus' | fields @timestamp, jobscheduler_agent_events_total, event_name\n| filter ispresent(jobscheduler_agent_events_total)\n| stats sum(jobscheduler_agent_events_total) by bin(1m), event_name"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 22,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Jobs Assigned to Agents Count",
+        "view": "singleValue",
+        "region": "${region}",
+        "metrics": [
+          [
+            {
+              "expression": "SUM(SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName} MetricName=\"jobscheduler_matches_total\" AND Namespace=\"simphera\"', 'Sum', 60))",
+              "id": "matches",
+              "label": "Matches",
+              "period": 60
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "type": "log",
+      "x": 18,
+      "y": 22,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "jobscheduler Avg Method Duration",
+        "region": "${region}",
+        "view": "timeSeries",
+        "query": "SOURCE '/aws/containerinsights/${cluster_name}/prometheus' | fields @timestamp, simphera_service_method_duration_seconds_sum, simphera_service_method_duration_seconds_count, method, PodName\n| filter ispresent(simphera_service_method_duration_seconds_sum) and PodName like /jobschedulerservice/\n| stats sum(simphera_service_method_duration_seconds_sum) / sum(simphera_service_method_duration_seconds_count) as avg_duration by bin(1m), method"
+      }
+    }
+  ]
+}

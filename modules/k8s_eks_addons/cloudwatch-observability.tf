@@ -5,7 +5,8 @@ locals {
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/application",
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/dataplane",
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/host",
-    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/performance"
+    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/performance",
+    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/prometheus"
   ] : []
 }
 
