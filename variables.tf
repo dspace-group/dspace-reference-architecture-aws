@@ -597,3 +597,11 @@ variable "aws_managed_kms" {
   description = "Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs."
   default     = false
 }
+
+variable "vpc_cni_addon_configuration" {
+  description = "A YAML string of the configuration values to be applied to the AWS VPC CNI addon. For a list of valid configuration values run `aws eks describe-addon-configuration` for the vpc-cni, as described here: https://docs.aws.amazon.com/cli/latest/reference/eks/describe-addon-versions.html)"
+  type        = string
+  default     = <<-YAML
+    enableNetworkPolicy: "true"
+    YAML
+}
