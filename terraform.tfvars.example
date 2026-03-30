@@ -283,6 +283,10 @@ vpcPublicSubnets = [
   "10.1.20.0/22"
 ]
 
+# A YAML string of the configuration values to be applied to the AWS VPC CNI addon.
+# For a list of valid configuration values run `aws eks describe-addon-configuration` for the vpc-cni, as described here: https://docs.aws.amazon.com/cli/latest/reference/eks/describe-addon-versions.html).
+vpc_cni_addon_configuration = "enableNetworkPolicy: \"true\"\n"
+
 # Configuration for Windows node group.
 # 'node_size' stands for the machine size of the nodes for the job execution, user must check the availability of the instance types for the region.
 # The list is ordered by priority where the first instance type gets the highest priority.
