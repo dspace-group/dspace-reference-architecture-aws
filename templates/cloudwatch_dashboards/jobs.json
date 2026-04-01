@@ -119,7 +119,7 @@
             {
               "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_min_agent_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60)",
               "id": "min_agents",
-              "label": "${PROP('Dim.agentpool')}",
+              "label": "$${PROP('Dim.agentpool')}",
               "period": 60
             }
           ]
@@ -143,7 +143,7 @@
             {
               "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_max_agent_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60)",
               "id": "max_agents",
-              "label": "${PROP('Dim.agentpool')}",
+              "label": "$${PROP('Dim.agentpool')}",
               "period": 60
             }
           ]
@@ -163,7 +163,7 @@
             {
               "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_running_agent_count_total\" AND Namespace=\"simphera\"', 'Minimum', 60)",
               "id": "running_agents",
-              "label": "${PROP('Dim.agentpool')}",
+              "label": "$${PROP('Dim.agentpool')}",
               "period": 60,
               "region": "${region}",
               "stat": "Minimum"

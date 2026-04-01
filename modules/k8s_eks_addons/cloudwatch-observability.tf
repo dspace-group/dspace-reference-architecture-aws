@@ -5,8 +5,7 @@ locals {
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/application",
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/dataplane",
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/host",
-    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/performance",
-    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/prometheus"
+    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/performance"
   ] : []
 }
 
@@ -68,7 +67,10 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_observability_policy_attac
 }
 
 resource "aws_cloudwatch_log_group" "cloudwatch_log_groups" {
-  for_each          = toset(local.aws_cloudwatch_log_group_names)
+  for_each = {
+    for id, name in local.aws_cloudwatch_log_group_names :
+    id => name
+  }
   name              = each.value
   retention_in_days = var.cloudwatch_observability_config.retention_period
   log_group_class   = "STANDARD"

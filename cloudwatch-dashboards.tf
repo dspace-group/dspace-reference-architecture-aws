@@ -7,7 +7,10 @@ locals {
 }
 
 resource "aws_cloudwatch_dashboard" "cloudwatch_dashboard" {
-  for_each       = toset(local.dashboards)
+  for_each = {
+    for id, name in local.dashboards :
+    id => name
+  }
   dashboard_name = each.value
   dashboard_body = templatefile("${path.module}/templates/cloudwatch_dashboards/${each.value}.json", {
     region       = local.region,
