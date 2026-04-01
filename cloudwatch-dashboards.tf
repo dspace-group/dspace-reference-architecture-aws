@@ -1,8 +1,6 @@
 locals {
   dashboards = var.cloudwatch_observability_config.enable ? [
-    "jobs",
-    "license_usage",
-    "quicksearch_logs"
+    "jobs"
   ] : []
 }
 
