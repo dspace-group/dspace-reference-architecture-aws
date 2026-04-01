@@ -69,8 +69,8 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_observability_policy_attac
 
 resource "aws_cloudwatch_log_group" "cloudwatch_log_groups" {
   for_each = {
-    for id, name in local.aws_cloudwatch_log_group_names :
-    id => name
+    for name in local.aws_cloudwatch_log_group_names :
+    name => name
   }
   name              = each.value
   retention_in_days = var.cloudwatch_observability_config.retention_period
