@@ -258,6 +258,11 @@ simphera_monitoring_namespace = "monitoring"
 # The tags to be added to all resources.
 tags = {}
 
+# Input configuration for Traefik ingress controller. Deployed in front of ingress-nginx when using chaining mode.
+traefik_config = {
+  "enable": false
+}
+
 # The CIDR for the virtual private cluster.
 vpcCidr = "10.1.0.0/18"
 

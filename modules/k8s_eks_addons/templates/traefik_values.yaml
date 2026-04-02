@@ -1,0 +1,138 @@
+# see https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+instanceLabelOverride: "traefik-ingress"
+
+
+additionalArguments:
+  - "--entryPoints.websecure.transport.respondingTimeouts.readTimeout=300s"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 330Mi
+  limits:
+    memory: 507Mi
+
+ingressClass:
+  enabled: true
+  isDefaultClass: false
+  name: traefik
+
+providers:
+  kubernetesIngress:
+    enabled: true
+    ingressClass: traefik
+    publishedService:
+      enabled: true
+      pathOverride: "traefik-ingress/traefik-ingress"
+  kubernetesCRD:
+    enabled: true
+    allowExternalNameServices: true
+    allowCrossNamespace: true
+
+logs:
+  access:
+    enabled: true
+    format: json
+    fields:
+      defaultMode: keep
+      headers:
+        defaultMode: keep
+  general:
+    format: json
+
+service:
+  enabled: true
+  type: LoadBalancer
+  spec:
+    externalTrafficPolicy: Local
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "${tags}"
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "${public_subnets}"
+    service.beta.kubernetes.io/aws-load-balancer-type: "${aws_load_balancer_type}"
+    ${aws_load_target-type}
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "${protocol}"
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "60"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-target-node-labels: kubernetes.io/os=linux
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - 'traefik'
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                  - 'traefik-ingress'
+          topologyKey: kubernetes.io/hostname
+
+metrics:
+  prometheus:
+    entryPoint: metrics
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: prometheus
+
+ports:
+  web:
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    http:
+      tls:
+        enabled: true
+
+extraObjects:
+%{ if tls_secret_name != "" }
+  - apiVersion: traefik.io/v1alpha1
+    kind: TLSStore
+    metadata:
+      name: default
+      namespace: ${tls_namespace}
+    spec:
+      defaultCertificate:
+        secretName: ${tls_secret_name}
+%{ endif }
+
+%{ if ingress_nginx_enabled }
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: nginx-fallback-svc
+      namespace: traefik-ingress
+    spec:
+      type: ExternalName
+      externalName: ingress-nginx-controller.nginx.svc.cluster.local
+      ports:
+        - port: 80
+          protocol: TCP
+
+  - apiVersion: traefik.io/v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: fallback-to-nginx
+      namespace: traefik-ingress
+    spec:
+      entryPoints:
+        - web
+        - websecure
+      routes:
+        - match: PathPrefix(`/`)
+          kind: Rule
+          priority: 1
+          services:
+            - name: nginx-fallback-svc
+              port: 80
+              passHostHeader: true
+              scheme: h2c
+%{ endif }

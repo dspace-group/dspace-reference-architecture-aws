@@ -1,3 +1,7 @@
+## v0.11.0
+
+- Added support for Traefik ingress controller in chaining mode
+
 ## v0.10.0
 
 - Add CORS to s3 bucket for Simphera URL
