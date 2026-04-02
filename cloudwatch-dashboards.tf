@@ -6,8 +6,8 @@ locals {
 
 resource "aws_cloudwatch_dashboard" "cloudwatch_dashboard" {
   for_each = {
-    for name in local.dashboards :
-    name => name
+    for id, name in local.dashboards :
+    id => name
   }
   dashboard_name = "${var.infrastructurename}-${each.value}"
   dashboard_body = templatefile("${path.module}/templates/cloudwatch_dashboards/${each.value}.json", {
