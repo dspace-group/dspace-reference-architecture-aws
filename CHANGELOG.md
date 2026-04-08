@@ -1,6 +1,7 @@
 ## v0.11.0
 
 - Added support for Traefik ingress controller in chaining mode
+- Add variable to make vpc-cni configurable
 
 ## v0.10.0
 
