@@ -47,8 +47,6 @@ variable "traefik_config" {
     helm_repository = string
     helm_version    = string
     chart_values    = string
-    tls_secret_name = optional(string, "")
-    tls_namespace   = optional(string, "")
   })
 }
 
