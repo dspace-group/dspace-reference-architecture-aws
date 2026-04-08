@@ -285,11 +285,10 @@ YAML
 variable "traefik_config" {
   type = object({
     enable          = bool
+    chain_mode      = optional(bool, false)
     helm_repository = optional(string, "https://helm.traefik.io/traefik")
     helm_version    = optional(string, "39.0.2")
     chart_values    = optional(string, "")
-    tls_secret_name = optional(string, "")
-    tls_namespace   = optional(string, "")
   })
   description = "Input configuration for Traefik ingress controller. Deployed in front of ingress-nginx when using chaining mode."
   default = {
