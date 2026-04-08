@@ -1,5 +1,6 @@
 ## v0.11.0
 
+- Add Cloudwatch dashboards configurations
 - Added support for Traefik ingress controller in chaining mode
 - Add variable to make vpc-cni configurable
 
