@@ -1,3 +1,9 @@
+## v0.11.1
+
+- Removed TLSStore resource from ref.arch
+- Added seperate chain_mode boolean to deploy Traefik and Nginx in chain mode
+
+
 ## v0.11.0
 
 - Added support for Traefik ingress controller in chaining mode
