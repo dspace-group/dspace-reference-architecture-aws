@@ -1,6 +1,7 @@
 ## v0.11.0
 
 - Add Cloudwatch dashboards configurations
+- Added support for Traefik ingress controller in chaining mode
 
 ## v0.10.0
 

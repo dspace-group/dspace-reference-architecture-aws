@@ -40,6 +40,18 @@ variable "cloudwatch_observability_config" {
   description = "Input configuration for AWS EKS add-on amazon-cloudwatch-observability. By setting key 'enable' to 'true', coredns add-on is deployed. Key 'configuration_values' is used to change add-on configuration. Its content should follow add-on configuration schema (see https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/)."
 }
 
+variable "traefik_config" {
+  description = "Traefik configuration"
+  type = object({
+    enable          = bool
+    helm_repository = string
+    helm_version    = string
+    chart_values    = string
+    tls_secret_name = optional(string, "")
+    tls_namespace   = optional(string, "")
+  })
+}
+
 variable "cluster_autoscaler_config" {
   description = "Cluster Autoscaler configuration."
   type = object({

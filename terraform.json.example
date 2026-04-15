@@ -122,6 +122,9 @@
   },
   "simphera_monitoring_namespace": "monitoring",
   "tags": {},
+  "traefik_config": {
+    "enable": false
+  },
   "vpcCidr": "10.1.0.0/18",
   "vpcId": null,
   "vpcPrivateSubnets": [

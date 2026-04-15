@@ -1,5 +1,14 @@
 controller:
+  publishService:
+    enabled: true
+%{ if traefik_enabled }
+    pathOverride: "traefik-ingress/traefik-ingress"
+%{ endif }
+  config:
+    use-forwarded-headers: "${traefik_enabled ? "true" : "false"}"
   service:
+    type: ${traefik_enabled ? "ClusterIP" : "LoadBalancer"}
+%{ if !traefik_enabled }
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "${tags}"
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "${protocol}"
@@ -9,6 +18,7 @@ controller:
       service.beta.kubernetes.io/aws-load-balancer-subnets: "${public_subnets}"
       service.beta.kubernetes.io/aws-load-balancer-type: "${aws_load_balancer_type}"
       ${aws_load_target-type}
+%{ endif }
   metrics:
     enabled: true
     port: 10254
