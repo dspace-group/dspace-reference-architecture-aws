@@ -1,6 +1,8 @@
 locals {
   dashboards = var.cloudwatch_observability_config.enable ? [
-    "jobs"
+    "jobs",
+    "license_usage",
+    "quicksearch_logs"
   ] : []
 }
 
@@ -11,7 +13,8 @@ resource "aws_cloudwatch_dashboard" "cloudwatch_dashboard" {
   }
   dashboard_name = "${var.infrastructurename}-${each.value}"
   dashboard_body = templatefile("${path.module}/templates/cloudwatch_dashboards/${each.value}.json", {
-    region       = local.region,
-    cluster_name = var.infrastructurename
+    region        = local.region,
+    cluster_name  = var.infrastructurename,
+    k8s_namespace = try(values(var.simpheraInstances)[0].k8s_namespace, "simphera")
   })
 }

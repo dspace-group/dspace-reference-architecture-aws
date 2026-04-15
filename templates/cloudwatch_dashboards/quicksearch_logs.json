@@ -1,0 +1,59 @@
+{
+    "variables": [
+        {
+            "type": "pattern",
+            "pattern": "container_name",
+            "inputType": "select",
+            "id": "Pod_Name",
+            "label": "Pod Name",
+            "visible": true,
+            "inputPopulationType": "search",
+            "search": "SEARCH('{ContainerInsights,ClusterName,Namespace,PodName}  ClusterName=\"${cluster_name}\" Namespace=\"${k8s_namespace}\" MetricName=\"pod_cpu_utilization\"', 'Average', 300)",
+            "populateFrom": "PodName"
+        },
+        {
+            "type": "pattern",
+            "pattern": "keyword",
+            "inputType": "input",
+            "id": "Keyword",
+            "label": "Search",
+            "defaultValue": " ",
+            "visible": true
+        }
+    ],
+    "widgets": [
+        {
+            "type": "text",
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "# Quick Search Logs"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 1,
+            "width": 24,
+            "height": 11,
+            "properties": {
+                "query": "SOURCE \"/aws/containerinsights/${cluster_name}/application\" |  filter kubernetes.namespace_name=\"${k8s_namespace}\" | filter @logStream like /container_name/ | fields jsonParse(@message) as js  | fields js.time as TimeStamp, js.log as LogMessage | filter LogMessage like /(?i)keyword/ | sort TimeStamp desc | display TimeStamp, LogMessage | limit 100",
+                "queryLanguage": "CWLI",
+                "queryBy": "logGroupName",
+                "logGroupPrefixes": {
+                    "accountIds": [],
+                    "logGroupPrefix": [],
+                    "logClass": "STANDARD"
+                },
+                "source": [
+                    "/aws/containerinsights/${cluster_name}/application"
+                ],
+                "region": "eu-central-1",
+                "title": "Logs Panel",
+                "view": "table"
+            }
+        }
+    ]
+}
