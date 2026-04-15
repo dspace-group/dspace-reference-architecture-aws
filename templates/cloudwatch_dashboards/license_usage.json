@@ -20,7 +20,7 @@
                 "metrics": [
                     [
                         {
-                            "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,cluster_name, license} MetricName=\"billing_license_usage_count\" AND Namespace=\"${cluster_name}\"', 'Maximum', 60)",
+                            "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,cluster_name, license} MetricName=\"billing_license_usage_count\" AND Namespace=\"${k8s_namespace}\"', 'Maximum', 60)",
                             "label": "",
                             "id": "e1",
                             "region": "${region}"
@@ -54,7 +54,7 @@
                 "metrics": [
                     [
                         {
-                            "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,cluster_name, license} MetricName=\"billing_license_usage_count\" AND Namespace=\"${cluster_name}\"', 'Maximum', 60)",
+                            "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,cluster_name, license} MetricName=\"billing_license_usage_count\" AND Namespace=\"${k8s_namespace}\"', 'Maximum', 60)",
                             "label": "",
                             "id": "e1",
                             "region": "${region}",
