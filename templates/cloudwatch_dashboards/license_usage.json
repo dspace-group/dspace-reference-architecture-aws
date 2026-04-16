@@ -1,0 +1,76 @@
+{
+    "widgets": [
+        {
+            "type": "text",
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "# License Usage"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 7,
+            "width": 24,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        {
+                            "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,cluster_name, license} MetricName=\"billing_license_usage_count\" AND Namespace=\"${k8s_namespace}\"', 'Maximum', 60)",
+                            "label": "",
+                            "id": "e1",
+                            "region": "${region}"
+                        }
+                    ]
+                ],
+                "sparkline": false,
+                "view": "gauge",
+                "region": "${region}",
+                "stat": "Average",
+                "period": 60,
+                "yAxis": {
+                    "left": {
+                        "min": 0,
+                        "max": 10
+                    }
+                },
+                "title": " Max Used Licenses",
+                "stacked": false,
+                "liveData": true,
+                "setPeriodToTimeRange": true
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 1,
+            "width": 24,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [
+                        {
+                            "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,cluster_name, license} MetricName=\"billing_license_usage_count\" AND Namespace=\"${k8s_namespace}\"', 'Maximum', 60)",
+                            "label": "",
+                            "id": "e1",
+                            "region": "${region}",
+                            "stat": "Maximum"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${region}",
+                "stat": "Maximum",
+                "period": 60,
+                "title": "Number of Licenses in Use",
+                "liveData": false,
+                "sparkline": true
+            }
+        }
+    ]
+}

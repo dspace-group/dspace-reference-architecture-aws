@@ -1,0 +1,1090 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# Jobs"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 1,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Total Jobs",
+        "view": "singleValue",
+        "region": "eu-central-1",
+        "metrics": [
+          [
+            {
+              "expression": "SUM(SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName} MetricName=\"jobscheduler_job_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60))",
+              "id": "total_jobs",
+              "label": "Total Jobs",
+              "period": 60
+            }
+          ]
+        ],
+        "sparkline": true
+      }
+    },
+    {
+      "type": "log",
+      "x": 6,
+      "y": 1,
+      "width": 9,
+      "height": 6,
+      "properties": {
+        "title": "Job States (raw logs)",
+        "region": "eu-central-1",
+        "view": "timeSeries",
+        "query": "SOURCE '/aws/containerinsights/mariog-simphera/prometheus' | fields @timestamp, jobscheduler_job_count_total, state\n| filter ispresent(jobscheduler_job_count_total) and ispresent(state)\n| stats max(jobscheduler_job_count_total) by bin(1m), state"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 7,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Job States (CloudWatch)",
+        "view": "bar",
+        "region": "eu-central-1",
+        "metrics": [
+          [
+            {
+              "expression": "m_pending + m_processing + m_blocked + m_deleting",
+              "id": "total",
+              "label": "TOTAL"
+            }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "PENDING",
+            {
+              "id": "m_pending",
+              "label": "PENDING",
+              "stat": "Sum",
+              "period": 60
+            }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "PROCESSING",
+            {
+              "id": "m_processing",
+              "label": "PROCESSING",
+              "stat": "Sum",
+              "period": 60
+            }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "BLOCKED",
+            {
+              "id": "m_blocked",
+              "label": "BLOCKED",
+              "stat": "Sum",
+              "period": 60
+            }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "DELETING",
+            {
+              "id": "m_deleting",
+              "label": "DELETING",
+              "stat": "Sum",
+              "period": 60
+            }
+          ]
+        ],
+        "legend": {
+          "position": "right"
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 7,
+      "width": 9,
+      "height": 6,
+      "properties": {
+        "title": "Job States (CloudWatch Timeseries)",
+        "region": "eu-central-1",
+        "view": "timeSeries",
+        "stat": "Sum",
+        "period": 60,
+        "metrics": [
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "PENDING",
+            { "id": "m_pending", "label": "PENDING" }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "PROCESSING",
+            { "id": "m_processing", "label": "PROCESSING" }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "DELETING",
+            { "id": "m_deleting", "label": "DELETING" }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "BLOCKED",
+            { "id": "m_blocked", "label": "BLOCKED" }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "ERROR",
+            { "id": "m_error", "label": "ERROR" }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "EXECUTED",
+            { "id": "m_executed", "label": "EXECUTED" }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "ABORTED",
+            { "id": "m_aborted", "label": "ABORTED" }
+          ],
+          [
+            "simphera",
+            "jobscheduler_job_count_total",
+            "state",
+            "ABORTING",
+            { "id": "m_aborting", "label": "ABORTING" }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 15,
+      "y": 1,
+      "width": 9,
+      "height": 12,
+      "properties": {
+        "title": "Total Execution Time",
+        "region": "eu-central-1",
+        "view": "bar",
+        "stat": "Sum",
+        "period": 60,
+        "metrics": [
+          [
+            "simphera",
+            "jobexecutor_method_duration_seconds_sum",
+            "method",
+            "Simulate",
+            { "id": "m_simulate", "label": "Simulate" }
+          ],
+          [
+            "simphera",
+            "jobexecutor_method_duration_seconds_sum",
+            "method",
+            "Total",
+            { "id": "m_total", "label": "Total" }
+          ],
+          [
+            {
+              "expression": "m_total - m_simulate",
+              "id": "m_other",
+              "label": "Other"
+            }
+          ]
+        ],
+        "legend": {
+          "position": "right"
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 13,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# Agents"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 14,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Total Agents",
+        "view": "singleValue",
+        "region": "eu-central-1",
+        "metrics": [
+          [
+            {
+              "expression": "SUM(SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName} MetricName=\"jobscheduler_executor_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60))",
+              "id": "total_agents",
+              "label": "Total Agents",
+              "period": 60
+            }
+          ]
+        ],
+        "period": 300,
+        "sparkline": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 14,
+      "width": 9,
+      "height": 6,
+      "properties": {
+        "title": "Agents by Agent Pool",
+        "region": "eu-central-1",
+        "view": "timeSeries",
+        "stat": "Sum",
+        "period": 60,
+        "metrics": [
+          [
+            "simphera",
+            "jobscheduler_running_agent_count_total",
+            "agentpool",
+            "*",
+            { "label": "$${PROP('Dim.agentpool')}", "id": "m_pool" }
+          ]
+        ],
+        "legend": {
+          "position": "bottom"
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 15,
+      "y": 14,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "title": "Agent States",
+        "region": "eu-central-1",
+        "view": "bar",
+        "stat": "Sum",
+        "period": 60,
+        "metrics": [
+          [
+            { "expression": "m_idle + m_proc", "id": "total", "label": "Total" }
+          ],
+          [
+            "simphera",
+            "jobscheduler_executor_count_total",
+            "state",
+            "Idle",
+            { "id": "m_idle", "label": "Idle" }
+          ],
+          [
+            "simphera",
+            "jobscheduler_executor_count_total",
+            "state",
+            "Processing",
+            { "id": "m_proc", "label": "Processing" }
+          ]
+        ],
+        "legend": {
+          "position": "right"
+        }
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 20,
+      "width": 9,
+      "height": 6,
+      "properties": {
+        "title": "Agent States (raw logs)",
+        "region": "eu-central-1",
+        "view": "timeSeries",
+        "query": "SOURCE '/aws/containerinsights/mariog-simphera/prometheus' | fields @timestamp, jobscheduler_executor_count_total, state\n| filter ispresent(jobscheduler_executor_count_total) and ispresent(state)\n| stats max(jobscheduler_executor_count_total) by bin(1m), state"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 26,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "title": "Min Agent Count (by agentpool)",
+        "view": "bar",
+        "region": "eu-central-1",
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_min_agent_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60)",
+              "id": "min_agents",
+              "label": "$${PROP('Dim.agentpool')}",
+              "period": 60
+            }
+          ]
+        ],
+        "setPeriodToTimeRange": true,
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 26,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "title": "Max Agent Count (by agentpool)",
+        "view": "bar",
+        "region": "eu-central-1",
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_max_agent_count_total\" AND Namespace=\"simphera\"', 'Maximum', 60)",
+              "id": "max_agents",
+              "label": "$${PROP('Dim.agentpool')}",
+              "period": 60
+            }
+          ]
+        ],
+        "setPeriodToTimeRange": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 9,
+      "y": 20,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_running_agent_count_total\" AND Namespace=\"simphera\"', 'Minimum', 60)",
+              "id": "running_agents",
+              "label": "$${PROP('Dim.agentpool')}",
+              "period": 60,
+              "region": "eu-central-1",
+              "stat": "Minimum"
+            }
+          ]
+        ],
+        "title": "Running Agent Count (by agentpool)",
+        "view": "bar",
+        "region": "eu-central-1",
+        "setPeriodToTimeRange": true,
+        "period": 60,
+        "stat": "Minimum"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 32,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# Executor agent"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 33,
+      "width": 8,
+      "height": 8,
+      "properties": {
+        "view": "timeSeries",
+        "region": "eu-central-1",
+        "stacked": true,
+        "title": "Execution Time",
+        "period": 60,
+        "stat": "Sum",
+        "legend": {
+          "position": "bottom"
+        },
+        "metrics": [
+          [
+            "JobExecutor",
+            "MethodDurationSecondsSum",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "$executoragent",
+            "Method",
+            "Simulate",
+            { "label": "Simulate", "color": "#2d8745" }
+          ],
+          [
+            "JobExecutor",
+            "MethodDurationSecondsSum",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "$executoragent",
+            "Method",
+            "OtherMethod1",
+            { "label": "OtherMethod1" }
+          ],
+          [
+            "JobExecutor",
+            "PluginDurationSecondsSum",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "$executoragent",
+            { "id": "plugins", "label": "Plugins", "color": "#888888" }
+          ],
+          [
+            "JobExecutor",
+            "MethodDurationSecondsSum",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "$executoragent",
+            "Method",
+            "Total",
+            {
+              "id": "total",
+              "label": "Total",
+              "color": "#8b0000",
+              "stat": "Sum"
+            }
+          ],
+          [
+            {
+              "expression": "total - SUM(METRICS('MethodDurationSecondsSum')) - plugins",
+              "label": "Other",
+              "color": "#a0a0a0",
+              "id": "other"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 33,
+      "width": 8,
+      "height": 8,
+      "properties": {
+        "view": "timeSeries",
+        "region": "eu-central-1",
+        "stacked": false,
+        "title": "Plugins Duration Time",
+        "period": 60,
+        "stat": "Sum",
+        "legend": {
+          "position": "bottom"
+        },
+        "metrics": [
+          [
+            "JobExecutor",
+            "PluginDurationSecondsSum",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "$executoragent",
+            "Plugin",
+            "PluginA",
+            { "label": "PluginA" }
+          ],
+          [
+            "JobExecutor",
+            "PluginDurationSecondsSum",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "$executoragent",
+            "Plugin",
+            "PluginB",
+            { "label": "PluginB" }
+          ],
+          [{ "id": "total", "expression": "SUM(METRICS())", "label": "Total" }]
+        ]
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 33,
+      "width": 8,
+      "height": 8,
+      "properties": {
+        "view": "timeSeries",
+        "region": "eu-central-1",
+        "stacked": false,
+        "title": "Retry Count",
+        "period": 60,
+        "stat": "Sum",
+        "legend": {
+          "position": "bottom"
+        },
+        "metrics": [
+          [
+            "JobExecutor",
+            "RetryCount",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "$executoragent",
+            "Type",
+            "retryCount",
+            { "label": "retryCount" }
+          ],
+          [
+            "JobExecutor",
+            "RetryCount",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "$executoragent",
+            "Type",
+            "timeout",
+            { "label": "timeout" }
+          ],
+          [
+            "JobExecutor",
+            "RetryCount",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "$executoragent",
+            "Type",
+            "error",
+            { "label": "error" }
+          ]
+        ]
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 41,
+      "width": 24,
+      "height": 9,
+      "properties": {
+        "region": "eu-central-1",
+        "title": "Logs Panel",
+        "query": [
+          {
+            "logGroupNames": ["/aws/container/jobexecutor"],
+            "queryString": "fields @timestamp, @message\n| filter namespace = '$namespace' and pod like /$executoragent/\n| sort @timestamp desc",
+            "region": "eu-central-1"
+          }
+        ]
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 50,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# Jobscheduler"
+      }
+    },
+    {
+      "type": "log",
+      "x": 6,
+      "y": 51,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Agent Events Queue",
+        "region": "eu-central-1",
+        "view": "timeSeries",
+        "query": "SOURCE '/aws/containerinsights/mariog-simphera/prometheus' | fields @timestamp, jobscheduler_agent_events_total, event_name\n| filter ispresent(jobscheduler_agent_events_total)\n| stats sum(jobscheduler_agent_events_total) by bin(1m), event_name"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 51,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Agent Events Queue Count",
+        "view": "singleValue",
+        "region": "eu-central-1",
+        "metrics": [
+          [
+            {
+              "expression": "SUM(SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName} MetricName=\"jobscheduler_agent_events_total\" AND Namespace=\"simphera\"', 'Sum', 60))",
+              "id": "total_agent_events",
+              "label": "Total Events",
+              "period": 60
+            }
+          ]
+        ],
+        "sparkline": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 57,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Jobs Assigned to Agents Count",
+        "view": "singleValue",
+        "region": "eu-central-1",
+        "metrics": [
+          [
+            {
+              "expression": "SUM(SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName} MetricName=\"jobscheduler_matches_total\" AND Namespace=\"simphera\"', 'Sum', 60))",
+              "id": "matches",
+              "label": "Matches",
+              "period": 60
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 63,
+      "width": 18,
+      "height": 6,
+      "properties": {
+        "title": "Average Method Duration",
+        "region": "eu-central-1",
+        "view": "timeSeries",
+        "query": "SOURCE '/aws/containerinsights/mariog-simphera/prometheus'\n| fields @timestamp, simphera_service_method_duration_seconds_sum, simphera_service_method_duration_seconds_count, method, PodName\n| filter ispresent(simphera_service_method_duration_seconds_sum)\n  and ispresent(simphera_service_method_duration_seconds_count)\n  and PodName like /jobschedulerservice/\n| stats\n    sum(simphera_service_method_duration_seconds_sum)\n    / sum(simphera_service_method_duration_seconds_count)\n    as avg_duration\n  by bin(1m), method"
+      }
+    },
+    {
+      "type": "log",
+      "x": 6,
+      "y": 57,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Jobscheduler Avg Method Duration",
+        "region": "eu-central-1",
+        "view": "timeSeries",
+        "query": "SOURCE '/aws/containerinsights/mariog-simphera/prometheus' | fields @timestamp, simphera_service_method_duration_seconds_sum, simphera_service_method_duration_seconds_count, method, PodName\n| filter ispresent(simphera_service_method_duration_seconds_sum) and PodName like /jobschedulerservice/\n| stats sum(simphera_service_method_duration_seconds_sum) / sum(simphera_service_method_duration_seconds_count) as avg_duration by bin(1m), method"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 69,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# ScbT"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 70,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "view": "singleValue",
+        "region": "eu-central-1",
+        "title": "Job Events Queue",
+        "period": 60,
+        "stat": "Sum",
+        "metrics": [
+          [
+            "SCBTService",
+            "JobEventsTotal",
+            "Namespace",
+            "$namespace",
+            { "id": "total", "label": "Total", "color": "#ff0000" }
+          ],
+          [
+            "SCBTService",
+            "JobEventsTotal",
+            "Namespace",
+            "$namespace",
+            "EventName",
+            "Created",
+            { "label": "Created" }
+          ],
+          [
+            "SCBTService",
+            "JobEventsTotal",
+            "Namespace",
+            "$namespace",
+            "EventName",
+            "Queued",
+            { "label": "Queued" }
+          ],
+          [
+            "SCBTService",
+            "ProgressEventsTotal",
+            "Namespace",
+            "$namespace",
+            { "label": "JobProgressEvent" }
+          ]
+        ]
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 70,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "region": "eu-central-1",
+        "stacked": true,
+        "title": "Job Events Queue Count",
+        "period": 60,
+        "stat": "Sum",
+        "legend": {
+          "position": "right"
+        },
+        "metrics": [
+          [
+            "SCBTService",
+            "JobEventsTotal",
+            "Namespace",
+            "$namespace",
+            "EventName",
+            "Created",
+            { "label": "Created" }
+          ],
+          [
+            "SCBTService",
+            "JobEventsTotal",
+            "Namespace",
+            "$namespace",
+            "EventName",
+            "Queued",
+            { "label": "Queued" }
+          ],
+          [
+            "SCBTService",
+            "JobEventsTotal",
+            "Namespace",
+            "$namespace",
+            "EventName",
+            "Processed",
+            { "label": "Processed" }
+          ],
+          [
+            "SCBTService",
+            "ProgressEventsTotal",
+            "Namespace",
+            "$namespace",
+            { "id": "progress", "label": "JobProgressEvent" }
+          ]
+        ]
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 76,
+      "width": 18,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "region": "eu-central-1",
+        "stacked": false,
+        "title": "Average Method Duration",
+        "period": 60,
+        "stat": "Sum",
+        "legend": {
+          "position": "right"
+        },
+        "metrics": [
+          [
+            "SimpheraService",
+            "MethodDurationSecondsSum",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "scbtservice.*",
+            "Method",
+            "createJob",
+            { "id": "sum_create", "visible": false }
+          ],
+          [
+            "SimpheraService",
+            "MethodDurationSecondsCount",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "scbtservice.*",
+            "Method",
+            "createJob",
+            { "id": "count_create", "visible": false }
+          ],
+          [
+            {
+              "expression": "sum_create / count_create",
+              "label": "createJob",
+              "id": "avg_create"
+            }
+          ],
+          [
+            "SimpheraService",
+            "MethodDurationSecondsSum",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "scbtservice.*",
+            "Method",
+            "updateJob",
+            { "id": "sum_update", "visible": false }
+          ],
+          [
+            "SimpheraService",
+            "MethodDurationSecondsCount",
+            "Namespace",
+            "$namespace",
+            "PodName",
+            "scbtservice.*",
+            "Method",
+            "updateJob",
+            { "id": "count_update", "visible": false }
+          ],
+          [
+            {
+              "expression": "sum_update / count_update",
+              "label": "updateJob",
+              "id": "avg_update"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 82,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# DRT"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 83,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Job Events Queue",
+        "view": "bar",
+        "region": "eu-central-1",
+        "period": 300,
+        "stat": "Sum",
+        "stacked": false,
+        "legend": {
+          "position": "right"
+        },
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{Prometheus/AMP,namespace,event_name} MetricName=\"drtservice_job_events_total\" namespace=\"$namespace\"', 'Sum', 300)",
+              "label": "$${event_name}",
+              "id": "events"
+            }
+          ],
+          [
+            {
+              "expression": "SUM(events)",
+              "label": "Total",
+              "id": "total",
+              "color": "#d62728"
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 83,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "Job Events Queue Count",
+        "view": "timeSeries",
+        "region": "${region}",
+        "period": 300,
+        "stat": "Sum",
+        "stacked": true,
+        "legend": {
+          "position": "right"
+        },
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{Prometheus/AMP,namespace,event_name} MetricName=\"drtservice_job_events_total\" namespace=\"${cluster_name}\"', 'Sum', 300)",
+              "label": "$${event_name}",
+              "id": "events"
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 90,
+      "width": 18,
+      "height": 6,
+      "properties": {
+        "title": "Average Method Duration",
+        "view": "timeSeries",
+        "region": "${region}",
+        "period": 300,
+        "stat": "Sum",
+        "stacked": false,
+        "legend": {
+          "position": "right"
+        },
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{Prometheus/AMP,namespace,method,pod_name,parent} MetricName=\"simphera_service_method_duration_seconds_sum\" namespace=\"${cluster_name}\" pod_name=\"datareplaybusinesslogic.*\" parent=\"\"', 'Sum', 300)",
+              "id": "s",
+              "label": "$${method} sum"
+            }
+          ],
+          [
+            {
+              "expression": "SEARCH('{Prometheus/AMP,namespace,method,pod_name,parent} MetricName=\"simphera_service_method_duration_seconds_count\" namespace=\"${cluster_name}\" pod_name=\"datareplaybusinesslogic.*\" parent=\"\"', 'Sum', 300)",
+              "id": "c",
+              "label": "$${method} count"
+            }
+          ],
+          [
+            {
+              "expression": "s / c",
+              "label": "$${method}",
+              "id": "avg"
+            }
+          ]
+        ],
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "label": "Seconds"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 97,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# Total execution time"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 98,
+      "width": 10,
+      "height": 12,
+      "properties": {
+        "title": "Total Execution Time",
+        "view": "pie",
+        "region": "${region}",
+        "period": 300,
+        "stat": "Sum",
+        "legend": {
+          "position": "right"
+        },
+        "metrics": [
+          [
+            {
+              "expression": "SEARCH('{Prometheus/AMP,namespace,method} MetricName=\"jobexecutor_method_duration_seconds_sum\" namespace=\"${cluster_name}\" method!=\"Total\"', 'Sum', 300)",
+              "id": "methods",
+              "label": "$${method}"
+            }
+          ],
+          [
+            {
+              "expression": "SEARCH('{Prometheus/AMP,namespace} MetricName=\"jobexecutor_plugin_duration_seconds_sum\" namespace=\"${cluster_name}\"', 'Sum', 300)",
+              "id": "plugins",
+              "label": "Plugins",
+              "color": "#2d8745"
+            }
+          ],
+          [
+            {
+              "expression": "SEARCH('{Prometheus/AMP,namespace,method} MetricName=\"jobexecutor_method_duration_seconds_sum\" namespace=\"${cluster_name}\" method=\"Total\"', 'Sum', 300)",
+              "id": "total"
+            }
+          ],
+          [
+            {
+              "expression": "total - (SUM(methods) + plugins)",
+              "id": "other",
+              "label": "Other",
+              "color": "#a0a0a0"
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

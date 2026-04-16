@@ -12,6 +12,79 @@
           "kubernetes": {
             "cluster_name": "${cluster_name}",
             "enhanced_container_insights": true
+          },
+          "prometheus": {
+            "cluster_name": "${cluster_name}",
+            "log_group_name": "/aws/containerinsights/${cluster_name}/prometheus",
+            "emf_processor": {
+              "metric_declaration": [
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": ".*",
+                  "dimensions": [
+                    [
+                      "Namespace",
+                      "ServiceName",
+                      "agentpool"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^jobscheduler_min_agent_count_total$",
+                    "^jobscheduler_max_agent_count_total$",
+                    "^jobscheduler_running_agent_count_total$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": ".*",
+                  "dimensions": [
+                    [
+                      "Namespace",
+                      "ServiceName"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^jobscheduler_job_count_total$",
+                    "^jobscheduler_executor_count_total$",
+                    "^jobscheduler_agent_events_total$",
+                    "^jobscheduler_matches_total$",
+                    "^jobexecutor_method_duration_seconds_sum$",
+                    "^jobexecutor_plugin_duration_seconds_sum$",
+                    "^jobexecutor_retry_count$",
+                    "^simphera_service_method_duration_seconds_sum$",
+                    "^simphera_service_method_duration_seconds_count$",
+                    "^scbtservice_job_events_total$",
+                    "^scbtservice_progress_events_total$",
+                    "^stepbtservice_job_events_total$",
+                    "^drtservice_job_events_total$",
+                    "^billing_license_usage_count$",
+                    "^billing_max_licenses_count$"
+                  ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": ".*",
+                  "dimensions": [
+                    [
+                      "Namespace",
+                      "ServiceName",
+                      "cluster_name",
+                      "license"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^billing_license_usage_count$",
+                    "^billing_max_licenses_count$"
+                  ]
+                }
+              ]
+            }
           }
         }
       },
@@ -19,6 +92,137 @@
         "traces_collected": {
           "application_signals": {}
         }
+      }
+    },
+    "prometheus": {
+      "config": {
+        "global": {
+          "scrape_interval": "60s"
+        },
+        "scrape_configs": [
+          {
+            "job_name": "jobschedulerservice",
+            "scheme": "http",
+            "scrape_interval": "30s",
+            "metrics_path": "/metrics",
+            "kubernetes_sd_configs": [
+              {
+                "role": "pod",
+                "namespaces": {
+                  "names": [
+                    "simphera"
+                  ]
+                }
+              }
+            ],
+            "relabel_configs": [
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_name"
+                ],
+                "action": "keep",
+                "regex": "jobschedulerservice.*"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_ip"
+                ],
+                "action": "replace",
+                "target_label": "__address__",
+                "regex": "(.+)",
+                "replacement": "$1:20001"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_namespace"
+                ],
+                "action": "replace",
+                "target_label": "Namespace"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_name"
+                ],
+                "action": "replace",
+                "target_label": "PodName"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_label_app_kubernetes_io_component"
+                ],
+                "action": "replace",
+                "target_label": "ServiceName"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_label_agentpool"
+                ],
+                "action": "replace",
+                "target_label": "agentpool"
+              }
+            ]
+          },
+          {
+            "job_name": "billingservice",
+            "scheme": "http",
+            "scrape_interval": "60s",
+            "metrics_path": "/metrics",
+            "kubernetes_sd_configs": [
+              {
+                "role": "pod",
+                "namespaces": {
+                  "names": [
+                    "simphera"
+                  ]
+                }
+              }
+            ],
+            "relabel_configs": [
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_name"
+                ],
+                "action": "keep",
+                "regex": "billingservice.*"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_ip"
+                ],
+                "action": "replace",
+                "target_label": "__address__",
+                "regex": "(.+)",
+                "replacement": "$1:20001"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_namespace"
+                ],
+                "action": "replace",
+                "target_label": "Namespace"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_name"
+                ],
+                "action": "replace",
+                "target_label": "PodName"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_label_app_kubernetes_io_component"
+                ],
+                "action": "replace",
+                "target_label": "ServiceName"
+              },
+              {
+                "action": "replace",
+                "target_label": "cluster_name",
+                "replacement": "${cluster_name}"
+              }
+            ]
+          }
+        ]
       }
     }
   }
