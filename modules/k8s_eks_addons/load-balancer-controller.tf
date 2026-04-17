@@ -422,4 +422,9 @@ resource "helm_release" "aws_load_balancer_controller" {
   ]
   description       = "AWS load balancer controller helm chart deployment configuration for ingress resources"
   dependency_update = true
+
+  depends_on = [
+    aws_iam_role_policy_attachment.aws_load_balancer_controller,
+    kubernetes_service_account_v1.aws_load_balancer_controller,
+  ]
 }
