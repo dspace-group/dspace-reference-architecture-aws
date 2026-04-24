@@ -50,7 +50,7 @@
                 "source": [
                     "/aws/containerinsights/${cluster_name}/application"
                 ],
-                "region": "eu-central-1",
+                "region": "${region}",
                 "title": "Logs Panel",
                 "view": "table"
             }

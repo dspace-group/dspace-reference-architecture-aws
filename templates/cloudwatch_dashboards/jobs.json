@@ -30,14 +30,14 @@
       "width": 24,
       "height": 11,
       "properties": {
-        "query": "SOURCE \"/aws/containerinsights/simphera-sk/application\" |\nfilter kubernetes.namespace_name=\"simphera\" | filter @logStream like /agent_pod_name/ | fields jsonParse(@message) as js  | fields js.time as TimeStamp, js.log as LogMessage | sort TimeStamp desc | display TimeStamp, LogMessage | limit 100",
+        "query": "SOURCE \"/aws/containerinsights/${cluster_name}/application\" |\nfilter kubernetes.namespace_name=\"${k8s_namespace}\" | filter @logStream like /agent_pod_name/ | fields jsonParse(@message) as js  | fields js.time as TimeStamp, js.log as LogMessage | sort TimeStamp desc | display TimeStamp, LogMessage | limit 100",
         "queryBy": "logGroupName",
         "logGroupPrefixes": {
           "logClass": "STANDARD",
           "logGroupPrefix": [],
           "accountIds": []
         },
-        "region": "eu-central-1",
+        "region": "${region}",
         "stacked": false,
         "title": "Job States (raw logs)",
         "view": "table"
@@ -66,8 +66,8 @@
               "expression": "m_idle + m_proc",
               "id": "total",
               "label": "Total",
-              "region": "eu-central-1",
-              "stat": "Minimum",
+              "region": "${region}",
+              "stat": "Maximum",
               "period": 60
             }
           ],
@@ -79,10 +79,10 @@
             "state",
             "Processing",
             "Namespace",
-            "simphera",
+            "${k8s_namespace}",
             {
               "id": "m_proc",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ],
           [
@@ -92,18 +92,19 @@
             ".",
             {
               "id": "m_idle",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ]
         ],
         "title": "Agent States",
-        "region": "eu-central-1",
+        "region": "${region}",
         "view": "bar",
-        "stat": "Minimum",
+        "stat": "Maximum",
         "period": 60,
         "legend": {
           "position": "bottom"
-        }
+        },
+        "liveData": true
       }
     },
     {
@@ -116,18 +117,18 @@
         "metrics": [
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_min_agent_count_total\" AND Namespace=\"simphera\"', \"Average\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_min_agent_count_total\" AND Namespace=\"${k8s_namespace}\"', \"Average\", 60)",
               "id": "min_agents",
-              "label": "Min Agents",
+              "label": "",
               "period": 60,
-              "region": "eu-central-1",
+              "region": "${region}",
               "stat": "Average"
             }
           ]
         ],
         "title": "Min Agent Count (by agentpool)",
         "view": "bar",
-        "region": "eu-central-1",
+        "region": "${region}",
         "setPeriodToTimeRange": false,
         "stacked": false,
         "period": 60,
@@ -146,18 +147,18 @@
         "metrics": [
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_max_agent_count_total\" AND Namespace=\"simphera\"', \"Average\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_max_agent_count_total\" AND Namespace=\"${k8s_namespace}\"', \"Average\", 60)",
               "id": "max_agents",
-              "label": "Max Agents",
+              "label": "",
               "period": 60,
-              "region": "eu-central-1",
+              "region": "${region}",
               "stat": "Average"
             }
           ]
         ],
         "title": "Max Agent Count (by agentpool)",
         "view": "bar",
-        "region": "eu-central-1",
+        "region": "${region}",
         "setPeriodToTimeRange": false,
         "period": 60,
         "stat": "Average",
@@ -184,23 +185,24 @@
         "metrics": [
           [
             {
-              "expression": "SUM(METRICS())",
+              "expression": "SUM(SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"jobscheduler_agent_events_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60))",
               "label": "Total",
-              "id": "e2"
+              "id": "e2",
+              "region": "${region}"
             }
           ],
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"jobscheduler_agent_events_total\" AND Namespace=\"simphera\"', \"Maximum\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"jobscheduler_agent_events_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60)",
               "label": "",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ]
         ],
         "title": "Agent Events Queue Count",
         "view": "singleValue",
-        "region": "eu-central-1",
+        "region": "${region}",
         "sparkline": true,
         "period": 60,
         "stat": "Maximum"
@@ -226,24 +228,24 @@
         "metrics": [
           [
             {
-              "expression": "SUM(METRICS())",
+              "expression": "SUM(   SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"scbtservice_job_events_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60) )",
               "label": "Total",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ],
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"scbtservice_job_events_total\" AND Namespace=\"simphera\"', \"Maximum\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"scbtservice_job_events_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60)",
               "label": "",
               "id": "e2",
-              "region": "eu-central-1",
+              "region": "${region}",
               "stat": "Maximum"
             }
           ]
         ],
         "view": "singleValue",
-        "region": "eu-central-1",
+        "region": "${region}",
         "title": "Job Events Queue",
         "period": 60,
         "stat": "Maximum",
@@ -278,9 +280,9 @@
             "agentpool",
             "executoragentlinux22a",
             "Namespace",
-            "simphera",
+            "${k8s_namespace}",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "label": "executoragentlinux22a",
               "id": "e22"
             }
@@ -291,7 +293,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "label": "executoragentlinux23a",
               "id": "e23"
             }
@@ -303,70 +305,17 @@
             ".",
             {
               "id": "e24",
-              "region": "eu-central-1",
+              "region": "${region}",
               "label": "executoragentlinux24a"
             }
           ]
         ],
         "title": "Agents by Agent Pool",
         "view": "timeSeries",
-        "region": "eu-central-1",
+        "region": "${region}",
         "period": 60,
         "sparkline": true,
         "stat": "Maximum",
-        "stacked": false
-      }
-    },
-    {
-      "type": "metric",
-      "x": 5,
-      "y": 21,
-      "width": 12,
-      "height": 7,
-      "properties": {
-        "metrics": [
-          [
-            {
-              "expression": "m_idle + m_proc",
-              "id": "total",
-              "label": "Total",
-              "region": "eu-central-1",
-              "stat": "Minimum"
-            }
-          ],
-          [
-            "ContainerInsights/Prometheus",
-            "jobscheduler_executor_count_total",
-            "ServiceName",
-            "jobschedulerservice",
-            "state",
-            "Processing",
-            "Namespace",
-            "simphera",
-            {
-              "id": "m_proc",
-              "region": "eu-central-1"
-            }
-          ],
-          [
-            "...",
-            "Idle",
-            ".",
-            ".",
-            {
-              "id": "m_idle",
-              "region": "eu-central-1"
-            }
-          ]
-        ],
-        "title": "Agent States",
-        "region": "eu-central-1",
-        "view": "timeSeries",
-        "stat": "Minimum",
-        "period": 60,
-        "legend": {
-          "position": "bottom"
-        },
         "stacked": false
       }
     },
@@ -383,7 +332,7 @@
               "expression": "SUM(METRICS())",
               "label": "Jobs",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ],
           [
@@ -394,9 +343,9 @@
             "state",
             "Processing",
             "Namespace",
-            "simphera",
+            "${k8s_namespace}",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "id": "m1",
               "visible": false
             }
@@ -407,7 +356,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "id": "m2",
               "visible": false
             }
@@ -418,7 +367,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "id": "m3",
               "visible": false
             }
@@ -429,7 +378,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "id": "m4",
               "visible": false
             }
@@ -440,7 +389,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "id": "m5",
               "visible": false
             }
@@ -451,7 +400,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "id": "m6",
               "visible": false
             }
@@ -462,7 +411,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "id": "m7",
               "visible": false
             }
@@ -473,7 +422,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "id": "m8",
               "visible": false
             }
@@ -484,7 +433,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "id": "m9",
               "visible": false
             }
@@ -492,7 +441,7 @@
         ],
         "title": "Total Jobs",
         "view": "singleValue",
-        "region": "eu-central-1",
+        "region": "${region}",
         "legend": {
           "position": "right"
         },
@@ -512,16 +461,16 @@
         "metrics": [
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"jobscheduler_agent_events_total\" AND Namespace=\"simphera\"', \"Maximum\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"jobscheduler_agent_events_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60)",
               "label": "",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ]
         ],
         "title": "Agent Events Queue Count",
         "view": "timeSeries",
-        "region": "eu-central-1",
+        "region": "${region}",
         "sparkline": true,
         "period": 60,
         "stat": "Maximum",
@@ -541,16 +490,16 @@
         "metrics": [
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,state} MetricName=\"jobscheduler_job_count_total\" AND Namespace=\"simphera\"', \"Maximum\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,state} MetricName=\"jobscheduler_job_count_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60)",
               "label": "",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ]
         ],
         "title": "Agent Events Queue Count",
         "view": "timeSeries",
-        "region": "eu-central-1",
+        "region": "${region}",
         "sparkline": true,
         "period": 60,
         "stat": "Maximum",
@@ -570,16 +519,16 @@
         "metrics": [
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,state} MetricName=\"jobscheduler_job_count_total\" AND Namespace=\"simphera\"', \"Maximum\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,state} MetricName=\"jobscheduler_job_count_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60)",
               "label": "",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ]
         ],
         "title": "Agent Events Queue Count",
         "view": "singleValue",
-        "region": "eu-central-1",
+        "region": "${region}",
         "sparkline": true,
         "period": 60,
         "stat": "Maximum",
@@ -599,16 +548,16 @@
         "metrics": [
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_running_job_count_total\" AND Namespace=\"simphera\"', \"Maximum\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,agentpool} MetricName=\"jobscheduler_running_job_count_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60)",
               "label": "",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ]
         ],
         "title": "Agent Events Queue Count",
         "view": "timeSeries",
-        "region": "eu-central-1",
+        "region": "${region}",
         "sparkline": true,
         "period": 60,
         "stat": "Maximum",
@@ -631,7 +580,7 @@
               "expression": "SUM(METRICS())",
               "label": "Agents",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ],
           [
@@ -642,9 +591,9 @@
             "agentpool",
             "executoragentlinux22a",
             "Namespace",
-            "simphera",
+            "${k8s_namespace}",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "label": "executoragentlinux22a",
               "id": "e22",
               "visible": false
@@ -656,7 +605,7 @@
             ".",
             ".",
             {
-              "region": "eu-central-1",
+              "region": "${region}",
               "label": "executoragentlinux23a",
               "id": "e23",
               "visible": false
@@ -669,7 +618,7 @@
             ".",
             {
               "id": "e24",
-              "region": "eu-central-1",
+              "region": "${region}",
               "label": "executoragentlinux24a",
               "visible": false
             }
@@ -677,7 +626,7 @@
         ],
         "title": "Total Agents",
         "view": "singleValue",
-        "region": "eu-central-1",
+        "region": "${region}",
         "period": 60,
         "sparkline": true,
         "stat": "Maximum",
@@ -694,15 +643,15 @@
         "metrics": [
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"scbtservice_job_events_total\" AND Namespace=\"simphera\"', \"Maximum\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"scbtservice_job_events_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60)",
               "label": "",
               "id": "e2",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ]
         ],
         "view": "timeSeries",
-        "region": "eu-central-1",
+        "region": "${region}",
         "title": "Job Events Queue Count",
         "period": 60,
         "stat": "Sum",
@@ -725,24 +674,24 @@
         "metrics": [
           [
             {
-              "expression": "SUM(METRICS())",
+              "expression": "SUM(SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"drtservice_job_events_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60))",
               "label": "Total",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ],
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"drtservice_job_events_total\" AND Namespace=\"simphera\"', \"Maximum\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"drtservice_job_events_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60)",
               "label": "",
               "id": "e2",
-              "region": "eu-central-1",
+              "region": "${region}",
               "stat": "Maximum"
             }
           ]
         ],
         "view": "singleValue",
-        "region": "eu-central-1",
+        "region": "${region}",
         "title": "Job Events Queue",
         "period": 60,
         "stat": "Maximum",
@@ -764,27 +713,82 @@
               "expression": "SUM(METRICS())",
               "label": "Total",
               "id": "e1",
-              "region": "eu-central-1"
+              "region": "${region}"
             }
           ],
           [
             {
-              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"drtservice_job_events_total\" AND Namespace=\"simphera\"', \"Maximum\", 60)",
+              "expression": "SEARCH('{ContainerInsights/Prometheus,Namespace,ServiceName,event_name} MetricName=\"drtservice_job_events_total\" AND Namespace=\"${k8s_namespace}\"', \"Maximum\", 60)",
               "label": "",
               "id": "e2",
-              "region": "eu-central-1",
+              "region": "${region}",
               "stat": "Maximum"
             }
           ]
         ],
         "view": "timeSeries",
-        "region": "eu-central-1",
+        "region": "${region}",
         "title": "Job Events Queue Count",
         "period": 60,
         "stat": "Maximum",
         "liveData": true,
         "singleValueFullPrecision": false,
         "sparkline": false,
+        "stacked": false
+      }
+    },
+    {
+      "type": "metric",
+      "x": 5,
+      "y": 21,
+      "width": 12,
+      "height": 7,
+      "properties": {
+        "metrics": [
+          [
+            {
+              "expression": "m_idle + m_proc",
+              "id": "total",
+              "label": "Total",
+              "region": "${region}",
+              "stat": "Maximum",
+              "period": 60
+            }
+          ],
+          [
+            "ContainerInsights/Prometheus",
+            "jobscheduler_executor_count_total",
+            "ServiceName",
+            "jobschedulerservice",
+            "state",
+            "Processing",
+            "Namespace",
+            "${k8s_namespace}",
+            {
+              "id": "m_proc",
+              "region": "${region}"
+            }
+          ],
+          [
+            "...",
+            "Idle",
+            ".",
+            ".",
+            {
+              "id": "m_idle",
+              "region": "${region}"
+            }
+          ]
+        ],
+        "title": "Agent States",
+        "region": "${region}",
+        "view": "timeSeries",
+        "stat": "Maximum",
+        "period": 60,
+        "legend": {
+          "position": "bottom"
+        },
+        "liveData": true,
         "stacked": false
       }
     }

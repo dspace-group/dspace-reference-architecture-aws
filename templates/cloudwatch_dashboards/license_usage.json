@@ -28,7 +28,7 @@
                     ]
                 ],
                 "sparkline": false,
-                "view": "gauge",
+                "view": "singleValue",
                 "region": "${region}",
                 "stat": "Average",
                 "period": 60,
