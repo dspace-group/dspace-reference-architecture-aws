@@ -13,6 +13,7 @@ module "eks" {
   aws_context                            = local.aws_context
   tags                                   = var.tags
   aws_managed_kms                        = var.aws_managed_kms
+  vpc_cni_addon_configuration            = var.vpc_cni_addon_configuration
 
   depends_on = [module.vpc]
 }

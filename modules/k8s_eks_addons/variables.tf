@@ -44,11 +44,10 @@ variable "traefik_config" {
   description = "Traefik configuration"
   type = object({
     enable          = bool
+    chain_mode      = optional(bool, false)
     helm_repository = string
     helm_version    = string
     chart_values    = string
-    tls_secret_name = optional(string, "")
-    tls_namespace   = optional(string, "")
   })
 }
 

@@ -1,14 +1,14 @@
 controller:
   publishService:
     enabled: true
-%{ if traefik_enabled }
+%{ if chain_mode }
     pathOverride: "traefik-ingress/traefik-ingress"
 %{ endif }
   config:
-    use-forwarded-headers: "${traefik_enabled ? "true" : "false"}"
+    use-forwarded-headers: "${chain_mode ? "true" : "false"}"
   service:
-    type: ${traefik_enabled ? "ClusterIP" : "LoadBalancer"}
-%{ if !traefik_enabled }
+    type: ${chain_mode ? "ClusterIP" : "LoadBalancer"}
+%{ if !chain_mode }
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "${tags}"
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "${protocol}"

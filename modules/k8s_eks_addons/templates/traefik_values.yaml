@@ -93,18 +93,7 @@ ports:
         enabled: true
 
 extraObjects:
-%{ if tls_secret_name != "" }
-  - apiVersion: traefik.io/v1alpha1
-    kind: TLSStore
-    metadata:
-      name: default
-      namespace: ${tls_namespace}
-    spec:
-      defaultCertificate:
-        secretName: ${tls_secret_name}
-%{ endif }
-
-%{ if ingress_nginx_enabled }
+%{ if chain_mode }
   - apiVersion: v1
     kind: Service
     metadata:

@@ -20,12 +20,10 @@ resource "helm_release" "traefik" {
     templatefile("${path.module}/templates/traefik_values.yaml", {
       tags                   = local.string_tags
       public_subnets         = join(", ", var.ingress_nginx_config.subnets_ids)
-      ingress_nginx_enabled  = var.ingress_nginx_config.enable
+      chain_mode             = var.traefik_config.chain_mode
       protocol               = var.aws_load_balancer_controller_config.enable ? "ssl" : "tcp"
       aws_load_balancer_type = var.aws_load_balancer_controller_config.enable ? "external" : "nlb"
       aws_load_target-type   = var.aws_load_balancer_controller_config.enable ? "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip" : ""
-      tls_secret_name        = coalesce(var.traefik_config.tls_secret_name, "")
-      tls_namespace          = coalesce(var.traefik_config.tls_namespace, "")
     }),
     var.traefik_config.chart_values
   ]

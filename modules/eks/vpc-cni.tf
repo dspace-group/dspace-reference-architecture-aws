@@ -19,7 +19,7 @@ resource "aws_eks_addon" "aws_vpc_cni" {
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"
   tags                        = var.tags
-  configuration_values        = local.windows_enabled ? local.windows_vpc_cni_configuration : null
+  configuration_values        = local.windows_enabled ? yamlencode(merge(yamldecode(local.windows_vpc_cni_configuration), yamldecode(var.vpc_cni_addon_configuration))) : var.vpc_cni_addon_configuration
 }
 
 resource "aws_iam_role" "aws_vpc_cni_role" {
