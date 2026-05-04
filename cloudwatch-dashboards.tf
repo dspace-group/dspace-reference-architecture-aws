@@ -1,9 +1,8 @@
 locals {
-  dashboards = var.cloudwatch_observability_config.enable ? [
-    "jobs",
-    "license_usage",
-    "quicksearch_logs"
-  ] : []
+  dashboards = var.cloudwatch_observability_config.enable ? concat(
+    length(var.simpheraInstances) > 0 ? ["jobs", "license_usage"] : [],
+    ["quicksearch_logs"]
+  ) : []
 }
 
 resource "aws_cloudwatch_dashboard" "cloudwatch_dashboard" {
