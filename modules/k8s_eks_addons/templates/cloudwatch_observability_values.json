@@ -6,9 +6,6 @@
       },
       "logs": {
         "metrics_collected": {
-          "application_signals": {
-            "hosted_in": "${cluster_name}"
-          },
           "kubernetes": {
             "cluster_name": "${cluster_name}",
             "enhanced_container_insights": true
@@ -179,11 +176,6 @@
               ]
             }
           }
-        }
-      },
-      "traces": {
-        "traces_collected": {
-          "application_signals": {}
         }
       }
     },
