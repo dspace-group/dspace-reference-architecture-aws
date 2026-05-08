@@ -1,8 +1,11 @@
+## v0.12.0
+
+- Add Cloudwatch dashboards configurations
+
 ## v0.11.1
 
 - Removed TLSStore resource from ref.arch
 - Added seperate chain_mode boolean to deploy Traefik and Nginx in chain mode
-
 
 ## v0.11.0
 
