@@ -1,3 +1,6 @@
+## v0.12.1
+- Add metrics collection for SIMPHERA coreservice pod
+
 ## v0.12.0
 
 - Add Cloudwatch dashboards configurations

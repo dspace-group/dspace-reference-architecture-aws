@@ -172,6 +172,40 @@
                     "^billing_license_usage_count$",
                     "^billing_max_licenses_count$"
                   ]
+                },
+                {
+                  "source_labels": [
+                    "job"
+                  ],
+                  "label_matcher": ".*",
+                  "dimensions": [
+                    [
+                      "Namespace",
+                      "PodName"
+                    ]
+                  ],
+                  "metric_selectors": [
+                    "^system_runtime_exception_count_total$",
+                    "^system_runtime_monitor_lock_contention_count_total$",
+                    "^system_runtime_alloc_total$",
+                    "^system_runtime_gen_0_gc_count_total$",
+                    "^system_runtime_threadpool_completed_items_count_total$",
+                    "^system_runtime_total_pause_time_by_gc_total$",
+                    "^system_runtime_cpu_usage$",
+                    "^system_runtime_threadpool_queue_length$",
+                    "^system_runtime_threadpool_thread_count$",
+                    "^process_working_set_bytes$",
+                    "^dotnet_total_memory_bytes$",
+                    "^process_private_memory_bytes$",
+                    "^system_runtime_gc_heap_size$",
+                    "^system_runtime_gen_0_size$",
+                    "^system_runtime_gen_1_size$",
+                    "^system_runtime_gc_committed$",
+                    "^system_runtime_gc_fragmentation$",
+                    "^system_runtime_time_in_gc$",
+                    "^dotnet_total_memory_bytes$",
+                    "^system_runtime_active_timer_count$"
+                  ]
                 }
               ]
             }
@@ -539,6 +573,54 @@
                 ],
                 "action": "replace",
                 "target_label": "plugin"
+              }
+            ]
+          },
+          {
+            "job_name": "coreservice",
+            "scheme": "http",
+            "scrape_interval": "30s",
+            "metrics_path": "/metrics",
+            "kubernetes_sd_configs": [
+              {
+                "role": "pod",
+                "namespaces": {
+                  "names": [
+                    "simphera"
+                  ]
+                }
+              }
+            ],
+            "relabel_configs": [
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_name"
+                ],
+                "action": "keep",
+                "regex": "coreservice.*"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_ip"
+                ],
+                "action": "replace",
+                "target_label": "__address__",
+                "regex": "(.+)",
+                "replacement": "$1:20001"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_namespace"
+                ],
+                "action": "replace",
+                "target_label": "Namespace"
+              },
+              {
+                "source_labels": [
+                  "__meta_kubernetes_pod_name"
+                ],
+                "action": "replace",
+                "target_label": "PodName"
               }
             ]
           }
