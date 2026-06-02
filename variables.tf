@@ -287,7 +287,7 @@ variable "traefik_config" {
     enable          = bool
     chain_mode      = optional(bool, false)
     helm_repository = optional(string, "https://helm.traefik.io/traefik")
-    helm_version    = optional(string, "39.0.2")
+    helm_version    = optional(string, "40.2.0")
     chart_values    = optional(string, "")
   })
   description = "Input configuration for Traefik ingress controller. Deployed in front of ingress-nginx when using chaining mode."
