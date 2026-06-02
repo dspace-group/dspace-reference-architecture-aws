@@ -1,3 +1,7 @@
+## v0.13.0
+
+- Update Traefik version to 40.2.0
+
 ## v0.12.0
 
 - Add Cloudwatch dashboards configurations
