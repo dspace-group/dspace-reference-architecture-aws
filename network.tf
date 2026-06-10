@@ -25,20 +25,15 @@ module "vpc" {
 }
 
 module "security_group" {
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "~> 4"
-  name        = "${var.infrastructurename}-db-sg"
-  description = "PostgreSQL security group"
-  vpc_id      = local.vpc_id
-  tags        = var.tags
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = 5432
-      to_port     = 5432
-      protocol    = "tcp"
-      description = "PostgreSQL access from within VPC"
-      cidr_blocks = local.create_vpc ? module.vpc[0].vpc_cidr_block : data.aws_vpc.preconfigured[0].cidr_block
-    },
+  source        = "terraform-aws-modules/security-group/aws"
+  version       = "~> 5"
+  name          = "${var.infrastructurename}-db-sg"
+  description   = "PostgreSQL security group"
+  vpc_id        = local.vpc_id
+  tags          = var.tags
+  ingress_rules = ["postgresql-tcp"]
+  ingress_cidr_blocks = [
+    local.create_vpc ? module.vpc[0].vpc_cidr_block : data.aws_vpc.preconfigured[0].cidr_block
   ]
 }
 
