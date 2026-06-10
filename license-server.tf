@@ -173,18 +173,17 @@ resource "aws_iam_instance_profile" "license_server_profile" {
 }
 
 module "security_group_license_server" {
-  count   = var.licenseServer ? 1 : 0
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 5.0"
-
+  count       = var.licenseServer ? 1 : 0
+  source      = "terraform-aws-modules/security-group/aws"
+  version     = "~> 5.0"
   name        = "${var.infrastructurename}-license-server"
   description = "License server security group"
   vpc_id      = local.vpc_id
   tags        = var.tags
-
-  ingress_with_source_security_group_ids = concat(
+  ingress_with_source_security_group_id = concat(
     local.create_simphera_resources ? [
       {
+        type                     = "ingress"
         from_port                = 22350
         to_port                  = 22350
         protocol                 = "tcp"
@@ -194,6 +193,7 @@ module "security_group_license_server" {
     ] : [],
     local.create_ivs_resources ? [
       {
+        type                     = "ingress"
         from_port                = 5053
         to_port                  = 5053
         protocol                 = "tcp"
@@ -201,6 +201,7 @@ module "security_group_license_server" {
         source_security_group_id = module.eks.cluster_primary_security_group_id
       },
       {
+        type                     = "ingress"
         from_port                = 60403
         to_port                  = 60403
         protocol                 = "tcp"
@@ -209,7 +210,13 @@ module "security_group_license_server" {
       }
     ] : []
   )
-
-  egress_rules       = ["all-all"]
-  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      description = "allow all outbound traffic"
+      cidr_blocks = "0.0.0.0/0"
+    },
+  ]
 }
