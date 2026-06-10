@@ -175,7 +175,7 @@ resource "aws_iam_instance_profile" "license_server_profile" {
 module "security_group_license_server" {
   count       = var.licenseServer ? 1 : 0
   source      = "terraform-aws-modules/security-group/aws"
-  version     = "~> 4"
+  version     = "~> 5.0"
   name        = "${var.infrastructurename}-license-server"
   description = "License server security group"
   vpc_id      = local.vpc_id

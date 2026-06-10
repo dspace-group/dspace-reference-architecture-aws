@@ -1,3 +1,7 @@
+## v0.13.1
+
+- Fix version constraint of the security_group module from "~> 4" to "~> 5.0"
+
 ## v0.13.0
 
 - Update Traefik version to 40.2.0
