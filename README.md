@@ -558,6 +558,62 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 - Backup Vault
   - encrypted using AWS managed KMS key of alias `aws/backup`
 
+## Monitoring and Observability
+
+This reference architecture can provision AWS CloudWatch observability for the EKS cluster so you can monitor infrastructure health and performance through Container Insights dashboards, and it also creates custom SIMPHERA-specific CloudWatch dashboards for application-level monitoring.
+
+### Enable CloudWatch Observability
+
+CloudWatch observability is controlled by variable `cloudwatch_observability_config` in [variables.tf](./variables.tf). Configure it in your `.tfvars` file:
+
+```hcl
+cloudwatch_observability_config = {
+  enable           = true
+  retention_period = 30
+}
+```
+
+Configuration keys:
+
+- `enable`: Enables or disables deployment of the `amazon-cloudwatch-observability` EKS add-on, Container Insights Dashboards, SIMPHERA Custom Dashboards.
+- `retention_period`: Retention in days for CloudWatch Container Insights log groups created for the cluster.
+
+### AWS Container Insights Infrastructure Monitoring
+
+CloudWatch Container Insights can be used to collect, aggregate, and summarize metrics and logs for containerized applications and microservices.
+
+When CloudWatch observability is enabled, Container Insights also exposes native EKS infrastructure monitoring dashboards in the CloudWatch console.
+
+The infrastructure monitoring performance views include the following items:
+
+| View | Widgets shown |
+| ---- | ------------------------- |
+| **Cluster** | <ul><li><strong>Cluster summary</strong>: Node status, Container restarts, Node CPU utilization, Node memory utilization</li><li><strong>Node performance</strong>: Filesystem utilization, Filesystem inodes utilization, Node network total bytes</li><li><strong>Node capacity and health</strong>: Number of ready nodes, Nodes error condition, Running pods per node, Allocatable pods on nodes utilization, Persistent volume count</li><li><strong>Pod utilization and networking</strong>: Pod CPU/memory utilization over pod and node limits, Pod network received/transmitted bytes, Container restarts</li><li><strong>Control plane</strong>: API server requests, REST client requests, API server admission controller duration, ETCD request duration, API server storage objects</li></ul> |
+| **Namespaces** | <ul><li><strong>Namespace overview</strong>: Number of running pods, Pod CPU utilization, Pod memory utilization, Pod network bytes</li><li><strong>Pod limit and network indicators</strong>: Number of pods, Pod CPU utilization over pod limit, Pod memory utilization over pod limit, Network bytes</li></ul> |
+| **Nodes** | <ul><li><strong>Node overview</strong>: Node status, Pods per node, CPU utilization, Memory utilization</li><li><strong>Resource utilization</strong>: Disk utilization, Network utilization</li><li><strong>Node conditions and capacity</strong>: Number of running pods, Number of containers, Node status conditions (disk pressure, memory pressure, ready, PID pressure), Pods capacity, Allocatable pods</li></ul> |
+| **Pods** | <ul><li><strong>Pod overview</strong>: Number of containers, Number of running containers, Pod CPU utilization, Pod memory utilization</li><li><strong>Pod performance</strong>: Pod CPU/memory utilization over pod limit, Network RX, Network TX</li><li><strong>Pod state</strong>: Number of container restarts, Pod container status running, Pod container status terminated, Pod container status waiting, Pod container status waiting reason crashed</li></ul> |
+| **Workloads** | <ul><li><strong>Workload overview</strong>: Number of containers, Number of running containers, Pod CPU utilization, Pod memory utilization</li><li><strong>Workload performance</strong>: Pod CPU/memory utilization over pod limit, Network RX, Network TX</li><li><strong>Workload state</strong>: Status ready, Status scheduled, Status unknown</li></ul> |
+| **Containers** | <ul><li><strong>Container overview</strong>: CPU utilization Top, Memory utilization Top, Pod container status waiting, Page faults</li><li><strong>Container performance</strong>: CPU utilization over container limit, Memory utilization over container limit, Filesystem usage</li><li><strong>Container state</strong>: Containers running, Containers terminated, Containers waiting, Containers waiting because of crash</li></ul> |
+| **Services** | <ul><li><strong>Service overview</strong>: Number of running pods, Number of container restarts, Pod CPU utilization, Pod memory utilization</li><li><strong>Service traffic and limits</strong>: Network received bytes, Network transmitted bytes, Pod CPU utilization over pod limit, Pod memory utilization over pod limit, Number of pods</li></ul> |
+
+
+### CloudWatch Dashboards for SIMPHERA
+
+When `cloudwatch_observability_config.enable = true`, Terraform creates CloudWatch dashboards from templates in [templates/cloudwatch_dashboards](./templates/cloudwatch_dashboards).
+
+The following dashboards are available for SIMPHERA observability:
+
+| Dashboard | Widgets shown |
+| --------- | ------------- |
+| Jobs ([jobs.json](./templates/cloudwatch_dashboards/jobs.json)) | Agent Events Queue Count (Aborted, Aborting, Blocked, Deleting, Error, Executed, None, Pending, Processing), Total Agents, Agents by Agent Pool, Min Agent Count (by agent pool), Agent States (Total, Processing, Idle), Max Agent Count (by agent pool), Job States (raw logs), Jobscheduler Agent Events Queue Count, ScbT Job Events Queue Count, DRT Job Events Queue Count, Total Jobs, ScbT Job Events Queue, DRT Job Events Queue |
+| License Usage ([license_usage.json](./templates/cloudwatch_dashboards/license_usage.json)) | Number of Licenses in Use, Max Used Licenses |
+| Quicksearch Logs ([quicksearch_logs.json](./templates/cloudwatch_dashboards/quicksearch_logs.json)) | Interactive log search panel for executoragent pod logs with pod-name and free-text keyword filters |
+
+Dashboard names follow the pattern `<infrastructurename>-<dashboard>`, for example `simphera-jobs`.
+
+Note: `jobs` and `license_usage` dashboards are created when SIMPHERA instances are configured, while `quicksearch_logs` is created whenever CloudWatch observability is enabled.
+
+
 ## List of tools with versions needed for dSPACE cloud products reference architecture deployment
 
 | Tool name | Version |
