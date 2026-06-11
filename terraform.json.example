@@ -120,7 +120,6 @@
       "simphera_url": null
     }
   },
-  "simphera_monitoring_namespace": "monitoring",
   "tags": {},
   "traefik_config": {
     "enable": false
