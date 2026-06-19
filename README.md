@@ -558,6 +558,62 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 - Backup Vault
   - encrypted using AWS managed KMS key of alias `aws/backup`
 
+## Monitoring and Observability
+
+This reference architecture can provision AWS CloudWatch observability for the EKS cluster so you can monitor infrastructure health and performance through Container Insights dashboards, and it also creates custom SIMPHERA-specific CloudWatch dashboards for application-level monitoring.
+
+### Enable CloudWatch Observability
+
+CloudWatch observability is controlled by variable `cloudwatch_observability_config` in [variables.tf](./variables.tf). Configure it in your `.tfvars` file:
+
+```hcl
+cloudwatch_observability_config = {
+  enable           = true
+  retention_period = 30
+}
+```
+
+Configuration keys:
+
+- `enable`: Enables or disables deployment of the `amazon-cloudwatch-observability` EKS add-on, Container Insights Dashboards, SIMPHERA Custom Dashboards.
+- `retention_period`: Retention in days for CloudWatch Container Insights log groups created for the cluster.
+
+### AWS Container Insights Infrastructure Monitoring
+
+CloudWatch Container Insights can be used to collect, aggregate, and summarize metrics and logs for containerized applications and microservices.
+
+When CloudWatch observability is enabled, Container Insights also exposes native EKS infrastructure monitoring dashboards in the CloudWatch console.
+
+The infrastructure monitoring performance views include the following items:
+
+| View | Widgets shown |
+| ---- | ------------------------- |
+| **Cluster** | <ul><li><strong>Cluster summary</strong>: Node status, Container restarts, Node CPU utilization, Node memory utilization</li><li><strong>Node performance</strong>: Filesystem utilization, Filesystem inodes utilization, Node network total bytes</li><li><strong>Node capacity and health</strong>: Number of ready nodes, Nodes error condition, Running pods per node, Allocatable pods on nodes utilization, Persistent volume count</li><li><strong>Pod utilization and networking</strong>: Pod CPU/memory utilization over pod and node limits, Pod network received/transmitted bytes, Container restarts</li><li><strong>Control plane</strong>: API server requests, REST client requests, API server admission controller duration, ETCD request duration, API server storage objects</li></ul> |
+| **Namespaces** | <ul><li><strong>Namespace overview</strong>: Number of running pods, Pod CPU utilization, Pod memory utilization, Pod network bytes</li><li><strong>Pod limit and network indicators</strong>: Number of pods, Pod CPU utilization over pod limit, Pod memory utilization over pod limit, Network bytes</li></ul> |
+| **Nodes** | <ul><li><strong>Node overview</strong>: Node status, Pods per node, CPU utilization, Memory utilization</li><li><strong>Resource utilization</strong>: Disk utilization, Network utilization</li><li><strong>Node conditions and capacity</strong>: Number of running pods, Number of containers, Node status conditions (disk pressure, memory pressure, ready, PID pressure), Pods capacity, Allocatable pods</li></ul> |
+| **Pods** | <ul><li><strong>Pod overview</strong>: Number of containers, Number of running containers, Pod CPU utilization, Pod memory utilization</li><li><strong>Pod performance</strong>: Pod CPU/memory utilization over pod limit, Network RX, Network TX</li><li><strong>Pod state</strong>: Number of container restarts, Pod container status running, Pod container status terminated, Pod container status waiting, Pod container status waiting reason crashed</li></ul> |
+| **Workloads** | <ul><li><strong>Workload overview</strong>: Number of containers, Number of running containers, Pod CPU utilization, Pod memory utilization</li><li><strong>Workload performance</strong>: Pod CPU/memory utilization over pod limit, Network RX, Network TX</li><li><strong>Workload state</strong>: Status ready, Status scheduled, Status unknown</li></ul> |
+| **Containers** | <ul><li><strong>Container overview</strong>: CPU utilization Top, Memory utilization Top, Pod container status waiting, Page faults</li><li><strong>Container performance</strong>: CPU utilization over container limit, Memory utilization over container limit, Filesystem usage</li><li><strong>Container state</strong>: Containers running, Containers terminated, Containers waiting, Containers waiting because of crash</li></ul> |
+| **Services** | <ul><li><strong>Service overview</strong>: Number of running pods, Number of container restarts, Pod CPU utilization, Pod memory utilization</li><li><strong>Service traffic and limits</strong>: Network received bytes, Network transmitted bytes, Pod CPU utilization over pod limit, Pod memory utilization over pod limit, Number of pods</li></ul> |
+
+
+### CloudWatch Dashboards for SIMPHERA
+
+When `cloudwatch_observability_config.enable = true`, Terraform creates CloudWatch dashboards from templates in [templates/cloudwatch_dashboards](./templates/cloudwatch_dashboards).
+
+The following dashboards are available for SIMPHERA observability:
+
+| Dashboard | Widgets shown |
+| --------- | ------------- |
+| Jobs ([jobs.json](./templates/cloudwatch_dashboards/jobs.json)) | Agent Events Queue Count (Aborted, Aborting, Blocked, Deleting, Error, Executed, None, Pending, Processing), Total Agents, Agents by Agent Pool, Min Agent Count (by agent pool), Agent States (Total, Processing, Idle), Max Agent Count (by agent pool), Job States (raw logs), Jobscheduler Agent Events Queue Count, ScbT Job Events Queue Count, DRT Job Events Queue Count, Total Jobs, ScbT Job Events Queue, DRT Job Events Queue |
+| License Usage ([license_usage.json](./templates/cloudwatch_dashboards/license_usage.json)) | Number of Licenses in Use, Max Used Licenses |
+| Quicksearch Logs ([quicksearch_logs.json](./templates/cloudwatch_dashboards/quicksearch_logs.json)) | Interactive log search panel for executoragent pod logs with pod-name and free-text keyword filters |
+
+Dashboard names follow the pattern `<infrastructurename>-<dashboard>`, for example `simphera-jobs`.
+
+Note: `jobs` and `license_usage` dashboards are created when SIMPHERA instances are configured, while `quicksearch_logs` is created whenever CloudWatch observability is enabled.
+
+
 ## List of tools with versions needed for dSPACE cloud products reference architecture deployment
 
 | Tool name | Version |
@@ -643,7 +699,6 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | [aws_ssm_maintenance_window_task.scan](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_maintenance_window_task) | resource |
 | [aws_ssm_patch_baseline.production](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_patch_baseline) | resource |
 | [aws_ssm_patch_group.patch_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_patch_group) | resource |
-| [kubernetes_namespace.monitoring_namespace](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [kubernetes_storage_class_v1.efs](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/storage_class_v1) | resource |
 | [random_string.policy_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_ami.amazon_linux_kernel5](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
@@ -714,7 +769,6 @@ Encryption is enabled at all AWS resources that are created by Terraform:
 | <a name="input_s3_csi_config"></a> [s3\_csi\_config](#input\_s3\_csi\_config) | Input configuration for AWS EKS add-on aws-mountpoint-s3-csi-driver. By setting key 'enable' to 'true', aws-mountpoint-s3-csi-driver add-on is deployed. Key 'configuration\_values' is used to change add-on configuration. Its content should follow add-on configuration schema (see https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/). | <pre>object({<br>    enable = optional(bool, false)<br>    configuration_values = optional(string, <<-YAML<br>node:<br>    tolerateAllTaints: true<br>YAML<br>    )<br>  })</pre> | <pre>{<br>  "enable": false<br>}</pre> | no |
 | <a name="input_scan_schedule"></a> [scan\_schedule](#input\_scan\_schedule) | 6-field Cron expression describing the scan maintenance schedule. Must not overlap with variable install\_schedule. | `string` | `"cron(0 0 * * ? *)"` | no |
 | <a name="input_simpheraInstances"></a> [simpheraInstances](#input\_simpheraInstances) | A list containing the individual SIMPHERA instances, such as 'staging' and 'production'. | <pre>map(object({<br>    name                         = string<br>    postgresqlApplyImmediately   = bool<br>    postgresqlVersion            = string<br>    postgresqlStorage            = number<br>    postgresqlMaxStorage         = number<br>    db_instance_type_simphera    = string<br>    enable_keycloak              = bool<br>    postgresqlStorageKeycloak    = number<br>    postgresqlMaxStorageKeycloak = number<br>    db_instance_type_keycloak    = string<br>    k8s_namespace                = string<br>    secretname                   = string<br>    simphera_url                 = string<br>    enable_backup_service        = bool<br>    backup_retention             = number<br>    enable_deletion_protection   = bool<br>    enable_minio                 = bool<br>    s3_lifecycle_rules = list(object({<br>      id              = string<br>      path            = string<br>      expiration_days = number<br>    }))<br>  }))</pre> | <pre>{<br>  "production": {<br>    "backup_retention": 35,<br>    "db_instance_type_keycloak": "db.t4g.large",<br>    "db_instance_type_simphera": "db.t4g.large",<br>    "enable_backup_service": true,<br>    "enable_deletion_protection": true,<br>    "enable_keycloak": true,<br>    "enable_minio": true,<br>    "k8s_namespace": "simphera",<br>    "name": "production",<br>    "postgresqlApplyImmediately": false,<br>    "postgresqlMaxStorage": 100,<br>    "postgresqlMaxStorageKeycloak": 100,<br>    "postgresqlStorage": 20,<br>    "postgresqlStorageKeycloak": 20,<br>    "postgresqlVersion": "16",<br>    "s3_lifecycle_rules": null,<br>    "secretname": "aws-simphera-dev-production",<br>    "simphera_url": null<br>  }<br>}</pre> | no |
-| <a name="input_simphera_monitoring_namespace"></a> [simphera\_monitoring\_namespace](#input\_simphera\_monitoring\_namespace) | Name of the K8s namespace used for deploying SIMPHERA monitoring chart | `string` | `"monitoring"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | The tags to be added to all resources. | `map(string)` | `{}` | no |
 | <a name="input_traefik_config"></a> [traefik\_config](#input\_traefik\_config) | Input configuration for Traefik ingress controller. Deployed in front of ingress-nginx when using chaining mode. | <pre>object({<br>    enable          = bool<br>    chain_mode      = optional(bool, false)<br>    helm_repository = optional(string, "https://helm.traefik.io/traefik")<br>    helm_version    = optional(string, "40.2.0")<br>    chart_values    = optional(string, "")<br>  })</pre> | <pre>{<br>  "enable": false<br>}</pre> | no |
 | <a name="input_vpcCidr"></a> [vpcCidr](#input\_vpcCidr) | The CIDR for the virtual private cluster. | `string` | `"10.1.0.0/18"` | no |

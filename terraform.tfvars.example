@@ -252,9 +252,6 @@ simpheraInstances = {
   }
 }
 
-# Name of the K8s namespace used for deploying SIMPHERA monitoring chart
-simphera_monitoring_namespace = "monitoring"
-
 # The tags to be added to all resources.
 tags = {}
 
