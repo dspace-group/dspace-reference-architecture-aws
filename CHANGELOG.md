@@ -1,3 +1,8 @@
+## v0.13.2
+
+- Update default version of NVidia GPU Operator from `v24.9.0` to `v26.3.2` for compatibility with Ubuntu `24.04`.
+- Update default version of NVidia GPU driver from `550.90.07` to `595.71.05` as required for AURELION `26.2`.
+
 ## v0.13.1
 
 - Fix version constraint of the security_group module from "~> 4" to "~> 5.0"

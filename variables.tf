@@ -508,8 +508,8 @@ variable "gpu_operator_config" {
   type = object({
     enable          = optional(bool, true)
     helm_repository = optional(string, "https://helm.ngc.nvidia.com/nvidia")
-    helm_version    = optional(string, "v24.9.0")
-    driver_versions = optional(list(string), ["550.90.07"])
+    helm_version    = optional(string, "v26.3.2")
+    driver_versions = optional(list(string), ["595.71.05"])
     chart_values = optional(string, <<-YAML
 operator:
   defaultRuntime: containerd
