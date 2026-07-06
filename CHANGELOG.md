@@ -1,3 +1,7 @@
+## v0.13.3
+
+- Enable service monitors for GPU nodes and cluster-autoscaler by default.
+
 ## v0.13.2
 
 - Update default version of NVidia GPU Operator from `v24.9.0` to `v26.3.2` for compatibility with Ubuntu `24.04`.

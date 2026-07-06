@@ -511,49 +511,7 @@ variable "gpu_operator_config" {
     helm_version    = optional(string, "v26.3.2")
     driver_versions = optional(list(string), ["595.71.05"])
     chart_values = optional(string, <<-YAML
-operator:
-  defaultRuntime: containerd
 
-dcgmExporter:
-  enabled: false
-
-driver:
-  enabled: true
-  nvidiaDriverCRD:
-    enabled: true
-    deployDefaultCR: false
-
-validator:
-  driver:
-    env:
-    - name: DISABLE_DEV_CHAR_SYMLINK_CREATION
-      value: "true"
-
-toolkit:
-  enabled: true
-
-daemonsets:
-  tolerations:
-  - key: purpose
-    value: gpu
-    operator: Equal
-    effect: NoSchedule
-  - key: nvidia.com/gpu
-    value: ""
-    operator: Exists
-    effect: NoSchedule
-
-node-feature-discovery:
-  worker:
-    tolerations:
-    - key: purpose
-      value: gpu
-      operator: Equal
-      effect: NoSchedule
-    - key: nvidia.com/gpu
-      value: ""
-      operator: Exists
-      effect: NoSchedule
 YAML
     )
   })
