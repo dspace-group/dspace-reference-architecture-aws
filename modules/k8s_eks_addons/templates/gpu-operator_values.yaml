@@ -2,7 +2,7 @@ operator:
   defaultRuntime: containerd
 
 dcgmExporter:
-  enabled: true
+  enabled: false
 
 driver:
   enabled: true
