@@ -23,3 +23,7 @@ rbac:
   serviceAccount:
     name: ${service_account}
     create: false
+
+serviceMonitor:
+  enabled: true
+  namespace: kube-system

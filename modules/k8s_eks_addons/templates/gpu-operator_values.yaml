@@ -1,6 +1,11 @@
 operator:
   defaultRuntime: containerd
 
+dcgmExporter:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
 driver:
   enabled: true
   nvidiaDriverCRD:
