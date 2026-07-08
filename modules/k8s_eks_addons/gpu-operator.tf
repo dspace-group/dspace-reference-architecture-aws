@@ -15,6 +15,7 @@ resource "helm_release" "gpu_operator" {
   description       = "The GPU operator HelmChart deployment configuration"
   dependency_update = true
   values = [
+    file("${path.module}/templates/gpu-operator_values.yaml"),
     var.gpu_operator_config.chart_values
   ]
   timeout = 1200

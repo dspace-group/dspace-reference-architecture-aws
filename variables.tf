@@ -511,50 +511,8 @@ variable "gpu_operator_config" {
     helm_version    = optional(string, "v26.3.2")
     driver_versions = optional(list(string), ["595.71.05"])
     chart_values = optional(string, <<-YAML
-operator:
-  defaultRuntime: containerd
 
-dcgmExporter:
-  enabled: false
-
-driver:
-  enabled: true
-  nvidiaDriverCRD:
-    enabled: true
-    deployDefaultCR: false
-
-validator:
-  driver:
-    env:
-    - name: DISABLE_DEV_CHAR_SYMLINK_CREATION
-      value: "true"
-
-toolkit:
-  enabled: true
-
-daemonsets:
-  tolerations:
-  - key: purpose
-    value: gpu
-    operator: Equal
-    effect: NoSchedule
-  - key: nvidia.com/gpu
-    value: ""
-    operator: Exists
-    effect: NoSchedule
-
-node-feature-discovery:
-  worker:
-    tolerations:
-    - key: purpose
-      value: gpu
-      operator: Equal
-      effect: NoSchedule
-    - key: nvidia.com/gpu
-      value: ""
-      operator: Exists
-      effect: NoSchedule
-YAML
+    YAML
     )
   })
   description = "Input configuration for the GPU operator chart deployed with helm release. By setting key 'enable' to 'true', GPU operator will be deployed. 'helm_repository' is an URL for the repository of the GPU operator helm chart, where 'helm_version' is its respective version of a chart. 'chart_values' is used for changing default values.yaml of the GPU operator chart."
