@@ -1,6 +1,6 @@
 ## v0.13.3
 
-- Enable service monitors for GPU nodes and cluster-autoscaler by default.
+- Allow adding or overriding single values for NVidiaGPU Operator chart.
 
 ## v0.13.2
 
