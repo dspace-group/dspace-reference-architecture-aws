@@ -512,7 +512,7 @@ variable "gpu_operator_config" {
     driver_versions = optional(list(string), ["595.71.05"])
     chart_values = optional(string, <<-YAML
 
-YAML
+    YAML
     )
   })
   description = "Input configuration for the GPU operator chart deployed with helm release. By setting key 'enable' to 'true', GPU operator will be deployed. 'helm_repository' is an URL for the repository of the GPU operator helm chart, where 'helm_version' is its respective version of a chart. 'chart_values' is used for changing default values.yaml of the GPU operator chart."
