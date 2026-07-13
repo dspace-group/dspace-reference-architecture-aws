@@ -8,8 +8,8 @@ resource "kubernetes_storage_class_v1" "gp3" {
   storage_provisioner = "ebs.csi.aws.com"
   volume_binding_mode = "WaitForFirstConsumer"
   parameters = {
-    type   = "gp3"
-    fsType = "ext4"
+    type                        = "gp3"
+    "csi.storage.k8s.io/fstype" = "ext4"
   }
   depends_on = [aws_eks_cluster.eks]
 }

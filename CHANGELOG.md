@@ -1,3 +1,8 @@
+## v0.13.4
+
+- Use correct input variable in k8s_eks_addons module for `s3_csi_config`
+- Fix parameters for gp3 storageClass
+
 ## v0.13.3
 
 - Allow adding or overriding single values for NVidiaGPU Operator chart.
