@@ -164,14 +164,14 @@ kind: PersistentVolume
 metadata:
   name: $pv_name
 spec:
-  storageClassName: gp2
+  storageClassName: gp3
   accessModes:
   - ReadWriteOnce
   capacity:
     storage: $storage
   persistentVolumeReclaimPolicy: Delete
   awsElasticBlockStore:
-    fsType: ext4
+    csi.storage.k8s.io/fstype: ext4
     volumeID: "aws://$availability_zone/$volume_id"
 "@
     $manifest | kubectl apply --kubeconfig $kubeconfig -f -
