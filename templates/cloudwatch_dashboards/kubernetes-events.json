@@ -39,7 +39,7 @@
             "height": 10,
             "properties": {
                 "query": "SOURCE \"/aws/containerinsights/${cluster_name}/events\" |\nfilter message like /(?i)keyword/ | filter metadata.namespace like /(?i)k8s_namespace/| \nfields metadata.namespace as namespace |\nlimit 1000 | \ndisplay type, message, namespace, count, lastTimestamp",
-                "region": "eu-central-1",
+                "region": "${region}",
                 "stacked": false,
                 "view": "table",
                 "title": "Overview"
