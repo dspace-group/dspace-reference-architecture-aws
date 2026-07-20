@@ -38,7 +38,7 @@
             "width": 24,
             "height": 10,
             "properties": {
-                "query": "SOURCE \"/aws/containerinsights/${cluster_name}/events\" |\nfilter message like /(?i)keyword/ | filter metadata.namespace like /(?i)k8s_namespace/| \nfields @message as raw_message |\nlimit 1000 | \ndisplay type, message, metadata.namespace as namespace, involvedObject.uid as involved_object, source.component, count, lastTimestamp, raw_message",
+                "query": "SOURCE \"/aws/containerinsights/${cluster_name}/events\" |\nfilter message like /(?i)keyword/ | filter metadata.namespace like /(?i)k8s_namespace/| \nfields metadata.namespace as namespace |\nlimit 1000 | \ndisplay type, message, namespace, count, lastTimestamp",
                 "region": "eu-central-1",
                 "stacked": false,
                 "view": "table",
