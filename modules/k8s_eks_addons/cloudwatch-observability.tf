@@ -3,6 +3,7 @@ locals {
   aws_cloudwatch_observability_service_account = "cloudwatch-observability-sa"
   aws_cloudwatch_log_group_names = var.cloudwatch_observability_config.enable ? [
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/application",
+    "/aws/containerinsights/${var.addon_context.eks_cluster_id}/events",
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/dataplane",
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/host",
     "/aws/containerinsights/${var.addon_context.eks_cluster_id}/performance",
@@ -76,4 +77,35 @@ resource "aws_cloudwatch_log_group" "cloudwatch_log_groups" {
   retention_in_days = var.cloudwatch_observability_config.retention_period
   log_group_class   = "STANDARD"
   tags              = var.tags
+}
+
+resource "kubernetes_cluster_role" "cloudwatch_events" {
+  metadata {
+    name = "cloudwatch-events-reader"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["events"]
+    verbs      = ["get", "list", "watch"]
+  }
+  depends_on = [aws_eks_addon.cloudwatch_observability]
+}
+
+resource "kubernetes_cluster_role_binding" "cloudwatch_events" {
+  metadata {
+    name = "cloudwatch-events-reader"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = "cloudwatch-agent"
+    namespace = "amazon-cloudwatch"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.cloudwatch_events.metadata[0].name
+  }
 }
