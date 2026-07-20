@@ -1,3 +1,7 @@
+## v0.13.5
+
+- Add kubernetes events to Cloudwatch dashboards
+
 ## v0.13.4
 
 - Use correct input variable in k8s_eks_addons module for `s3_csi_config`
