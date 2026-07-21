@@ -26,7 +26,7 @@ locals {
   s3_instance_buckets                       = flatten([for name, instance in module.simphera_instance : instance.s3_buckets])
   license_server_bucket                     = var.licenseServer ? [aws_s3_bucket.license_server_bucket[0].bucket] : []
   ivs_buckets                               = flatten([for name, instance in var.ivsInstances : concat(instance.data_bucket.create ? [instance.data_bucket.name] : [], instance.raw_data_bucket.create ? [instance.raw_data_bucket.name] : [])])
-  s3_buckets                                = concat(local.s3_instance_buckets, [aws_s3_bucket.bucket_logs.bucket], local.license_server_bucket, local.ivs_buckets)
+  s3_buckets                                = concat(local.s3_instance_buckets, [aws_s3_bucket.bucket_logs.bucket], local.license_server_bucket, local.ivs_buckets, var.dockerImagesArchive.enable ? [var.dockerImagesArchive.bucket_name] : [])
   private_subnets                           = local.create_vpc ? module.vpc[0].private_subnets : (local.use_private_subnets_ids ? var.private_subnet_ids : [for s in data.aws_subnet.private_subnet : s.id])
   public_subnets                            = local.create_vpc ? module.vpc[0].public_subnets : (local.use_public_subnet_ids ? var.public_subnet_ids : [for s in data.aws_subnet.public_subnet : s.id])
   create_simphera_resources                 = length(var.simpheraInstances) > 0 ? true : false
@@ -49,6 +49,9 @@ locals {
       min_size        = var.linuxNodeCountMin
       volume_size     = var.linuxNodeDiskSize
       ami_type        = var.linuxNodeAmiType
+      k8s_labels = {
+        "purpose" = "default"
+      }
     },
     "execnodes" = {
       node_group_name = "execnodes"
@@ -61,7 +64,6 @@ locals {
       ami_type        = var.linuxNodeAmiType
       k8s_labels = {
         "purpose" = "execution"
-        "product" = "ivs"
       }
       k8s_taints = [
         {
@@ -146,13 +148,14 @@ locals {
     local.default_node_pools,
     var.gpuNodePool ? local.gpu_node_pool : {},
     var.ivsGpuNodePool ? local.ivsgpu_node_pool : {},
-    var.windows_execution_node.enable ? local.ivs_windows_node_pool : {}
+    var.windows_execution_node.enable ? local.ivs_windows_node_pool : {},
+    { for name, value in var.ivs_node_groups : name => merge(value, { subnet_ids = local.private_subnets }) }
   )
   ivs_node_groups_roles = merge(
     {
-      default   = module.eks.node_groups[0]["default"].nodegroup_role_id
-      execnodes = module.eks.node_groups[0]["execnodes"].nodegroup_role_id
+      default = module.eks.node_groups[0]["default"].nodegroup_role_id
     },
+    { for name, value in var.ivs_node_groups : name => module.eks.node_groups[0][name].nodegroup_role_id },
     var.ivsGpuNodePool ? { gpuivsnodes = module.eks.node_groups[0]["gpuivsnodes"].nodegroup_role_id } : {}
   )
   aws_context = {

@@ -9,7 +9,7 @@ module "ivs_instance" {
   database_secretname                  = each.value.database_secretname
   data_bucket                          = each.value.data_bucket
   db_instance_type_ivs                 = each.value.db_instance_type_ivs
-  eks_cluster_id                       = var.infrastructurename
+  eks_cluster_id                       = module.eks.eks_cluster_id
   eks_oidc_issuer                      = replace(module.eks.eks_oidc_issuer_url, "https://", "")
   eks_oidc_provider_arn                = module.eks.eks_oidc_provider_arn
   enable_deletion_protection           = each.value.enable_deletion_protection
@@ -22,7 +22,7 @@ module "ivs_instance" {
   log_bucket                           = aws_s3_bucket.bucket_logs.id
   nodeRoleNames                        = local.ivs_node_groups_roles
   opensearch = merge(each.value.opensearch, {
-    domain_name        = "${var.infrastructurename}-${each.key}"
+    domain_name        = each.value.opensearch.domain_name == null ? "${var.infrastructurename}-${each.key}" : each.value.opensearch.domain_name
     subnet_ids         = local.private_subnets
     security_group_ids = [module.eks.cluster_primary_security_group_id]
     }
@@ -33,6 +33,8 @@ module "ivs_instance" {
   private_subnets              = local.private_subnets
   raw_data_bucket              = each.value.raw_data_bucket
   region                       = local.region
+  instance_identifier          = each.value.instance_identifier
+  enable_service_mesh          = each.value.enable_service_mesh
   tags                         = var.tags
   depends_on                   = [module.k8s_eks_addons]
 }

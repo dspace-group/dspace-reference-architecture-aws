@@ -10,7 +10,7 @@ module "simphera_instance" {
   enable_backup_service        = each.value.enable_backup_service
   enable_deletion_protection   = each.value.enable_deletion_protection
   enableKeycloak               = each.value.enable_keycloak
-  infrastructurename           = local.infrastructurename
+  infrastructurename           = var.infrastructurename
   k8s_namespace                = each.value.k8s_namespace
   kms_key_cloudwatch           = var.aws_managed_kms ? null : aws_kms_key.kms_key_cloudwatch_log_group[0].arn
   log_bucket                   = aws_s3_bucket.bucket_logs.id
@@ -28,6 +28,13 @@ module "simphera_instance" {
   simphera_url                 = each.value.simphera_url
   enable_minio                 = each.value.enable_minio
   s3_lifecycle_rules           = each.value.s3_lifecycle_rules
+  main_bucket_name             = each.value.main_bucket_name
+  extra_buckets                = each.value.extra_buckets
+  db_subnet_group_name         = each.value.db_subnet_group_name
+  psql_simphera_name           = each.value.psql_simphera_name
+  backup_vault_name            = each.value.backup_vault_name
+  simphera_db_name             = each.value.simphera_db_name
+  enable_service_mesh          = each.value.enable_service_mesh
   tags                         = var.tags
   depends_on                   = [module.eks, kubernetes_storage_class_v1.efs]
 }

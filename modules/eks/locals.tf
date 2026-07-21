@@ -1,5 +1,5 @@
 locals {
-  cluster_iam_role_name       = "${var.cluster_name}-cluster-role"
+  cluster_iam_role_name       = var.existing_cluster_role_name != "" ? var.existing_cluster_role_name : "${var.cluster_name}-cluster-role"
   cluster_iam_role_pathed_arn = "arn:${var.aws_context.partition_id}:iam::${var.aws_context.caller_identity_account_id}:role/${local.cluster_iam_role_name}"
   policy_arn_prefix           = "arn:${var.aws_context.partition}:iam::aws:policy"
   eks_api_subnet_ids          = length(var.eks_api_subnet_ids) > 0 ? var.eks_api_subnet_ids : var.subnet_ids

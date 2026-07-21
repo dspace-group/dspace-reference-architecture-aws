@@ -1,9 +1,9 @@
 locals {
   master_user_secret          = var.opensearch.enable ? jsondecode(data.aws_secretsmanager_secret_version.opensearch_secret[0].secret_string) : null
   secret_postgres_username    = "dbuser" # username is hardcoded because changing the username forces replacement of the db instance
-  database_secretname         = jsondecode(data.aws_secretsmanager_secret_version.database_secrets.secret_string)
+  database_secretname         = var.enableIVSAuthentication ? jsondecode(data.aws_secretsmanager_secret_version.database_secrets[0].secret_string) : null
   db_ivs_id                   = "ivs-authentication-${var.instancename}"
-  instance_identifier         = "${var.eks_cluster_id}-${var.instancename}-${var.k8s_namespace}"
+  instance_identifier         = var.instance_identifier == null ? "${var.eks_cluster_id}-${var.instancename}-${var.k8s_namespace}" : var.instance_identifier
   goofys_user_agent_name      = "aws:UserAgent\": \"aws-sdk-go/${var.goofys_user_agent_sdk_and_go_version["sdk_version"]} (go${var.goofys_user_agent_sdk_and_go_version["go_version"]}; linux; amd64)"
   ivs_buckets_service_account = "${local.instance_identifier}-sa"
   data_bucket_arn             = "arn:aws:s3:::${var.data_bucket.name}"

@@ -113,3 +113,31 @@ resource "aws_kms_key" "kms_key_cloudwatch_log_group" {
 }
 POLICY
 }
+
+resource "aws_s3_bucket_logging" "buckets" {
+  for_each      = toset([for bucket in local.s3_buckets : bucket if bucket != aws_s3_bucket.bucket_logs.id])
+  bucket        = each.value
+  target_bucket = aws_s3_bucket.bucket_logs.id
+  target_prefix = "logs/bucket/${each.value}/"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle_configuration" {
+  bucket = aws_s3_bucket.bucket_logs.id
+
+  dynamic "rule" {
+    for_each = toset([for bucket in local.s3_buckets : bucket if bucket != aws_s3_bucket.bucket_logs.id])
+    content {
+      id     = "${rule.value}-s3-logging-retention"
+      status = "Enabled"
+      filter {
+        prefix = "logs/bucket/${rule.value}/"
+      }
+      expiration {
+        days = var.s3_logging_retention
+      }
+      noncurrent_version_expiration {
+        noncurrent_days = var.s3_logging_retention
+      }
+    }
+  }
+}

@@ -1,34 +1,38 @@
 module "vpc" {
-  count                = local.create_vpc ? 1 : 0
-  source               = "terraform-aws-modules/vpc/aws"
-  version              = "v5.8.1"
-  name                 = "${local.infrastructurename}-vpc"
-  cidr                 = var.vpcCidr
-  azs                  = data.aws_availability_zones.available.names
-  private_subnets      = var.vpcPrivateSubnets
-  public_subnets       = var.vpcPublicSubnets
-  enable_nat_gateway   = true
-  create_igw           = true
-  enable_dns_hostnames = true
-  single_nat_gateway   = true
-  tags                 = var.tags
+  count                           = local.create_vpc ? 1 : 0
+  source                          = "terraform-aws-modules/vpc/aws"
+  version                         = "v5.8.1"
+  name                            = "${local.infrastructurename}-vpc"
+  cidr                            = var.vpcCidr
+  azs                             = data.aws_availability_zones.available.names
+  private_subnets                 = var.vpcPrivateSubnets
+  public_subnets                  = var.vpcPublicSubnets
+  enable_nat_gateway              = true
+  create_igw                      = true
+  enable_dns_hostnames            = true
+  single_nat_gateway              = false
+  create_egress_only_igw          = false
+  create_database_subnet_group    = false
+  create_elasticache_subnet_group = false
+  create_redshift_subnet_group    = false
+  tags                            = var.tags
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.infrastructurename}" = "shared"
-    "kubernetes.io/role/elb"                            = "1"
-    "purpose"                                           = "public"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                    = "1"
+    "purpose"                                   = "public"
   }
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.infrastructurename}" = "shared"
-    "kubernetes.io/role/internal-elb"                   = "1"
-    "purpose"                                           = "private"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"           = "1"
+    "purpose"                                   = "private"
   }
 }
 
 module "security_group" {
   source      = "terraform-aws-modules/security-group/aws"
-  version     = "~> 4"
-  name        = "${var.infrastructurename}-db-sg"
-  description = "PostgreSQL security group"
+  version     = "= 4"
+  name        = var.psql_sg_name == null ? "${var.infrastructurename}-db-sg" : var.psql_sg_name
+  description = "Complete PostgreSQL example security group"
   vpc_id      = local.vpc_id
   tags        = var.tags
   ingress_with_cidr_blocks = [
@@ -110,4 +114,24 @@ resource "aws_iam_role_policy_attachment" "flowlogs_attachment" {
   count      = local.create_vpc ? 1 : 0
   role       = aws_iam_role.flowlogs_role[0].id
   policy_arn = aws_iam_policy.flowlogs_policy[0].arn
+}
+
+
+data "aws_alb" "network_load_balancer" {
+  count = var.connected_account != "" ? 1 : 0
+  tags = {
+    "kubernetes.io/service-name"                = "nginx/ingress-nginx-controller"
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+  }
+  depends_on = [module.k8s_eks_addons]
+}
+
+
+resource "aws_vpc_endpoint_service" "privatelink" {
+  count                      = var.connected_account != "" ? 1 : 0
+  network_load_balancer_arns = [data.aws_alb.network_load_balancer[0].arn]
+  acceptance_required        = true
+  allowed_principals         = ["arn:aws:iam::${var.connected_account}:root"]
+
+  tags = var.tags
 }

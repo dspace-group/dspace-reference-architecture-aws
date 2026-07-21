@@ -1,11 +1,11 @@
 resource "aws_instance" "license_server" {
   count                   = var.licenseServer ? 1 : 0
   ami                     = data.aws_ami.amazon_linux_kernel5.id
-  instance_type           = "t3a.large"
+  instance_type           = "t3.micro"
   iam_instance_profile    = aws_iam_instance_profile.license_server_profile[0].name
-  subnet_id               = local.private_subnets[0]
+  subnet_id               = local.private_subnets[1]
   disable_api_termination = true
-  vpc_security_group_ids  = [module.security_group_license_server[0].security_group_id]
+  vpc_security_group_ids  = [aws_security_group.license_server_sg[0].id]
 
   metadata_options {
     # [EC2.8] EC2 instances should use IMDSv2
@@ -16,14 +16,12 @@ resource "aws_instance" "license_server" {
   user_data = <<-EOF
 #!/bin/bash
 yum update -y
-if ${local.create_simphera_resources}; then
-  wget -O CodeMeter.rpm "${var.codemeter}"
-  yum -y localinstall CodeMeter.rpm
-  systemctl stop codemeter
-  sed -i -e '/IsNetworkServer=/ s/=.*/=1/' /etc/wibu/CodeMeter/Server.ini
-  systemctl start codemeter
-  systemctl enable codemeter
-fi
+wget -O CodeMeter.rpm "${var.codemeter}"
+yum -y localinstall CodeMeter.rpm
+systemctl stop codemeter
+sed -i -e '/IsNetworkServer=/ s/=.*/=1/' /etc/wibu/CodeMeter/Server.ini
+systemctl start codemeter
+systemctl enable codemeter
 
 if ${local.create_ivs_resources}; then
 
@@ -76,6 +74,7 @@ echo "Enable the rlm.service"
 systemctl enable rlm.service
 fi
 EOF
+
 
   lifecycle {
     ignore_changes = [
@@ -159,64 +158,77 @@ resource "aws_s3_bucket_policy" "license_server_bucket_ssl" {
   policy = templatefile("${path.module}/templates/s3_ssl_policy.json", { bucket = aws_s3_bucket.license_server_bucket[0].id })
 }
 
-resource "aws_s3_bucket_logging" "license_server_bucket_logging" {
-  count         = var.licenseServer ? 1 : 0
-  bucket        = aws_s3_bucket.license_server_bucket[0].id
-  target_bucket = aws_s3_bucket.bucket_logs.id
-  target_prefix = "logs/bucket/${aws_s3_bucket.license_server_bucket[0].id}/"
-}
-
 resource "aws_iam_instance_profile" "license_server_profile" {
   count = var.licenseServer ? 1 : 0
   name  = local.license_server_instance_profile
   role  = aws_iam_role.license_server_role[0].name
 }
 
-module "security_group_license_server" {
+resource "aws_security_group" "license_server_sg" {
   count       = var.licenseServer ? 1 : 0
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "~> 4"
-  name        = "${var.infrastructurename}-license-server"
-  description = "License server security group"
+  name        = "license-server-sg"
+  description = "Allow inbound traffic to license server"
   vpc_id      = local.vpc_id
-  tags        = var.tags
-  ingress_with_source_security_group_id = concat(
-    local.create_simphera_resources ? [
-      {
-        type                     = "ingress"
-        from_port                = 22350
-        to_port                  = 22350
-        protocol                 = "tcp"
-        description              = "Inbound TCP on port 22350 from kubernetes nodes security group"
-        source_security_group_id = module.eks.cluster_primary_security_group_id
-      },
-    ] : [],
-    local.create_ivs_resources ? [
-      {
-        type                     = "ingress"
-        from_port                = 5053
-        to_port                  = 5053
-        protocol                 = "tcp"
-        description              = "Allow ingoing RTMaps license request (rlm)"
-        source_security_group_id = module.eks.cluster_primary_security_group_id
-      },
-      {
-        type                     = "ingress"
-        from_port                = 60403
-        to_port                  = 60403
-        protocol                 = "tcp"
-        description              = "Allow ingoing RTMaps license request (IVS intempora)"
-        source_security_group_id = module.eks.cluster_primary_security_group_id
-      }
-    ] : []
-  )
-  egress_with_cidr_blocks = [
+
+  ingress = [
     {
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      description = "allow all outbound traffic"
-      cidr_blocks = "0.0.0.0/0"
+      description      = "Allow ingoing dSPACE license requests"
+      from_port        = 22350
+      to_port          = 22350
+      protocol         = "tcp"
+      cidr_blocks      = [var.vpcCidr]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
     },
+    {
+      description      = "Allow ingoing RTMaps license request (rlm)"
+      from_port        = 5053
+      to_port          = 5053
+      protocol         = "tcp"
+      cidr_blocks      = [var.vpcCidr]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
+    },
+    {
+      description      = "Allow ingoing RTMaps license request (IVS intempora)"
+      from_port        = 60403
+      to_port          = 60403
+      protocol         = "tcp"
+      cidr_blocks      = [var.vpcCidr]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
+    }
   ]
+
+  egress = [
+    {
+      description      = "Allow all outgoing traffic"
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
+    }
+  ]
+
+  tags = var.tags
+}
+
+resource "aws_s3_bucket_public_access_block" "license_server_bucket_public_access" {
+  count  = var.licenseServer ? 1 : 0
+  bucket = aws_s3_bucket.license_server_bucket[0].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }

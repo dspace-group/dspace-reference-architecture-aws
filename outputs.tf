@@ -71,5 +71,5 @@ output "ivs_buckets_service_accounts" {
 }
 
 output "ivs_node_groups_roles" {
-  value = merge(local.ivs_node_groups_roles, var.windows_execution_node.enable ? { winexecnode : module.eks.node_groups[0]["winexecnodes"].nodegroup_role_id } : {})
+  value = local.ivs_node_groups_roles
 }

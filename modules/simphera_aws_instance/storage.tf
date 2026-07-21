@@ -1,6 +1,5 @@
-
 resource "aws_s3_bucket" "bucket" {
-  bucket        = local.instancename
+  bucket        = var.main_bucket_name != null ? var.main_bucket_name : local.instancename
   tags          = var.tags
   force_destroy = var.enable_deletion_protection ? false : true
 }
@@ -39,13 +38,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle_configuration
       }
     }
   }
-}
-
-resource "aws_s3_bucket_logging" "logging" {
-  bucket = aws_s3_bucket.bucket.id
-  #[S3.9] S3 bucket server access logging should be enabled
-  target_bucket = var.log_bucket
-  target_prefix = "logs/bucket/${aws_s3_bucket.bucket.id}/"
 }
 
 resource "aws_s3_bucket_versioning" "bucket_versioning" {
@@ -91,7 +83,7 @@ resource "aws_iam_policy" "bucket_access" {
 
 resource "aws_iam_role" "minio_irsa" {
   count       = var.enable_minio ? 1 : 0
-  name        = "${local.instancename}-minio-role"
+  name        = "${var.name}-minio-role"
   description = "IAM role for the MinIO service account"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",

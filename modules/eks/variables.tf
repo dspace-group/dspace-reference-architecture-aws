@@ -130,3 +130,13 @@ variable "vpc_cni_addon_configuration" {
     enableNetworkPolicy: "true"
     YAML
 }
+
+variable "existing_cluster_role_name" {
+  type    = string
+  default = ""
+}
+
+variable "oidc_thumbprint" {
+  type    = string
+  default = null
+}

@@ -5,6 +5,10 @@ resource "aws_kms_key" "cluster" {
   enable_key_rotation     = true
   deletion_window_in_days = 30
   tags                    = var.tags
+
+  lifecycle {
+    ignore_changes = [policy]
+  }
 }
 
 resource "aws_kms_alias" "cluster" {

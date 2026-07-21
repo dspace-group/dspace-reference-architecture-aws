@@ -16,7 +16,7 @@ output "database_endpoints" {
 
 output "s3_buckets" {
   description = "S3 buckets created for this SIMPHERA instance."
-  value       = [aws_s3_bucket.bucket.bucket]
+  value       = flatten([aws_s3_bucket.bucket.bucket, [for bucket in aws_s3_bucket.extra : bucket.bucket]])
 }
 
 output "s3_lifecycle_rules" {

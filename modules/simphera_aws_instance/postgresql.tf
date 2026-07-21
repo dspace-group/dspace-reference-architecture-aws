@@ -1,5 +1,5 @@
 resource "aws_db_subnet_group" "database" {
-  name       = "${local.instancename}-vpc"
+  name       = var.db_subnet_group_name == null ? "${var.infrastructurename}-vpc" : var.db_subnet_group_name
   subnet_ids = var.private_subnets
   tags       = var.tags
 }
@@ -14,7 +14,7 @@ resource "aws_db_instance" "simphera" {
   engine_version                      = var.postgresqlVersion
   instance_class                      = var.db_instance_type_simphera
   identifier                          = local.db_simphera_id
-  db_name                             = "simphera"
+  db_name                             = var.simphera_db_name == null ? "simphera" : var.simphera_db_name
   username                            = local.secret_postgres_username
   password                            = local.secrets["postgresql_password"]
   multi_az                            = true # [RDS.5] RDS DB instances should be configured with multiple Availability Zones
@@ -33,11 +33,11 @@ resource "aws_db_instance" "simphera" {
   depends_on = [
     aws_cloudwatch_log_group.db_simphera
   ]
-  timeouts {
-    create = "2h"
-    delete = "2h"
-    update = "2h"
-  }
+  # timeouts {
+  #   create = "2h"
+  #   delete = "2h"
+  #   update = "2h"
+  # }
 }
 
 resource "aws_db_instance" "keycloak" {

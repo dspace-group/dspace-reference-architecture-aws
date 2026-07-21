@@ -170,3 +170,14 @@ variable "database_secretname" {
   description = "Secrets manager secret"
   type        = string
 }
+
+variable "instance_identifier" {
+  description = "Custom instance identifier"
+  type        = string
+  default     = null
+}
+
+variable "enable_service_mesh" {
+  type    = bool
+  default = false
+}

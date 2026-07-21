@@ -78,13 +78,31 @@ resource "aws_backup_selection" "ebs" {
       key   = "aws:ResourceTag/KubernetesCluster"
       value = var.eks_cluster_id
     }
-    string_equals {
+    string_like {
       key   = "aws:ResourceTag/kubernetes.io/created-for/pvc/name"
-      value = "datadir-${var.ivs_release_name}-mongodb-0"
+      value = "datadir-${var.ivs_release_name}-mongodb-*"
     }
     string_equals {
       key   = "aws:ResourceTag/kubernetes.io/created-for/pvc/namespace"
       value = var.k8s_namespace
+    }
+  }
+}
+
+resource "aws_backup_selection" "monitoring_ebs" {
+  count        = var.backup_service_enable ? 1 : 0
+  iam_role_arn = aws_iam_role.backup_iam_role[0].arn
+  name         = "${local.instance_identifier}-monitoring-ebs"
+  plan_id      = aws_backup_plan.backup_plan[0].id
+  resources    = ["arn:aws:ec2:*:*:volume/*"]
+  condition {
+    string_equals {
+      key   = "aws:ResourceTag/KubernetesCluster"
+      value = var.eks_cluster_id
+    }
+    string_equals {
+      key   = "aws:ResourceTag/kubernetes.io/created-for/pvc/namespace"
+      value = "simphera-monitoring"
     }
   }
 }

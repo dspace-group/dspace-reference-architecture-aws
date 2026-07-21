@@ -6,16 +6,17 @@ resource "aws_backup_vault" "backup-vault" {
 
 resource "aws_backup_plan" "backup-plan" {
   count = var.enable_backup_service ? 1 : 0
-  name  = "${local.instancename}-backup-plan"
+  name  = "${var.name}-backup-plan"
 
   rule {
-    rule_name                = "${local.instancename}-backup-rule"
+    rule_name                = "${var.name}-backup-rule"
     target_vault_name        = aws_backup_vault.backup-vault[0].name
     recovery_point_tags      = var.tags
     enable_continuous_backup = true
 
     lifecycle {
-      delete_after = var.backup_retention
+      cold_storage_after = 0
+      delete_after       = var.backup_retention
     }
   }
   tags = var.tags
@@ -23,7 +24,7 @@ resource "aws_backup_plan" "backup-plan" {
 
 resource "aws_backup_selection" "backup-selection-rds-s3" {
   count        = var.enable_backup_service ? 1 : 0
-  name         = "${local.instancename}-rds-s3"
+  name         = "${var.name}-rds-s3"
   iam_role_arn = aws_iam_role.backup_iam_role[0].arn
   plan_id      = aws_backup_plan.backup-plan[0].id
   resources    = local.backup_resources

@@ -6,9 +6,25 @@ data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.eks_cluster_id
 }
 
+locals {
+  allowed_account_ids = [var.aws_account_id]
+}
+
 provider "aws" {
-  profile = "change_me"
-  region  = "change_me"
+  region              = "eu-central-1" #local.region
+  allowed_account_ids = local.allowed_account_ids
+}
+
+provider "aws" {
+  alias  = "tagged_ivs"
+  region = "eu-central-1" #local.region
+  default_tags {
+    tags = {
+      application_name   = "IVS"
+      application_vendor = "INTEMPORA"
+      deployment         = var.deployment_name
+    }
+  }
 }
 
 provider "kubernetes" {
@@ -18,7 +34,7 @@ provider "kubernetes" {
   # https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs#exec-plugins
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--profile", "change_me", "--cluster-name", data.aws_eks_cluster.cluster.name]
+    args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
     command     = "aws"
   }
 }
@@ -30,11 +46,11 @@ provider "helm" {
     token                  = data.aws_eks_cluster_auth.cluster.token
 
     # Uncomment if you run into Helm timeout issues on Linux
-    #exec {
-    #  api_version = "client.authentication.k8s.io/v1beta1"
-    #  args        = ["eks", "--profile=change_me", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
-    #  command     = "aws"
-    #}
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
+      command     = "aws"
+    }
   }
 }
 
@@ -45,7 +61,7 @@ provider "kubectl" {
   load_config_file       = false
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--profile", "change_me", "--cluster-name", data.aws_eks_cluster.cluster.name]
+    args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
     command     = "aws"
   }
 }

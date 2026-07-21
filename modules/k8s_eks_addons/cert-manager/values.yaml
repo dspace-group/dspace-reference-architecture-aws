@@ -1,0 +1,8 @@
+installCRDs: true
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: "${rolearn}"
+securityContext:
+  fsGroup: 1001
+extraArgs:
+  - --enable-certificate-owner-ref=true

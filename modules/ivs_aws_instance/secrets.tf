@@ -9,9 +9,11 @@ data "aws_secretsmanager_secret_version" "opensearch_secret" {
 }
 
 data "aws_secretsmanager_secret" "database_secrets" {
-  name = var.database_secretname
+  count = var.enableIVSAuthentication ? 1 : 0
+  name  = var.database_secretname
 }
 
 data "aws_secretsmanager_secret_version" "database_secrets" {
-  secret_id = data.aws_secretsmanager_secret.database_secrets.id
+  count     = var.enableIVSAuthentication ? 1 : 0
+  secret_id = data.aws_secretsmanager_secret.database_secrets[0].id
 }

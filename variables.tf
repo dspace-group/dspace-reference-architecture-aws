@@ -319,7 +319,30 @@ variable "simpheraInstances" {
       id              = string
       path            = string
       expiration_days = number
-    }))
+    })),
+    main_bucket_name = optional(string, null)
+    extra_buckets = optional(
+      list(
+        object({
+          name = string
+          s3_lifecycle_rules = optional(
+            list(
+              object({
+                id              = string
+                path            = string
+                expiration_days = number
+              })
+            ),
+          null)
+        })
+      ),
+      []
+    ),
+    db_subnet_group_name = optional(string, null),
+    psql_simphera_name   = optional(string, null)
+    backup_vault_name    = optional(string, null)
+    simphera_db_name     = optional(string, null)
+    enable_service_mesh  = optional(bool, false)
   }))
   description = "A list containing the individual SIMPHERA instances, such as 'staging' and 'production'."
   default = {
@@ -376,6 +399,7 @@ variable "ivsInstances" {
     k8s_namespace                        = string
     opensearch = optional(object({
       enable                  = optional(bool, false)
+      domain_name             = optional(string, null)
       engine_version          = optional(string, "OpenSearch_2.17")
       instance_count          = optional(number, 1)
       instance_type           = optional(string, "m7g.medium.search")
@@ -391,6 +415,8 @@ variable "ivsInstances" {
       create = optional(bool, true)
     })
     database_secretname = optional(string, "aws-ivs-auth")
+    instance_identifier = optional(string, null)
+    enable_service_mesh = optional(bool, false)
   }))
   description = "A list containing the individual IVS instances, such as 'staging' and 'production'. 'opensearch' object is used for enabling AWS OpenSearch Domain creation.'opensearch.master_user_secret_name' is an AWS secret containing key 'master_user' and 'master_password'. 'opensearch.instance_type' must have option for ebs storage, check available type at https://aws.amazon.com/opensearch-service/pricing/"
   default = {
@@ -618,4 +644,142 @@ variable "vpc_cni_addon_configuration" {
   default     = <<-YAML
     enableNetworkPolicy: "true"
     YAML
+}
+
+variable "region" {
+  type = string
+}
+
+variable "aws_account_id" {
+  type = string
+}
+
+variable "enable_route53" {
+  type        = bool
+  description = ""
+  default     = false
+}
+
+variable "route53_rtmaps_licence" {
+  type        = string
+  description = "Route53 DNS for RTMaps Licence Server"
+  default     = ""
+}
+
+variable "cert_arn" {
+  type        = string
+  description = "Cert ARN"
+  default     = ""
+}
+
+variable "external_oidc" {
+  type = object({
+    authorization_endpoint = string
+    client_id              = string
+    issuer                 = string
+    token_endpoint         = string
+    user_info_endpoint     = string
+    oidc_secret_name       = string
+  })
+  description = "oidc_secret_name has to contain authentication_openid_client_secret"
+
+}
+
+variable "simphera_dns" {
+  type = string
+}
+
+variable "hosted_zone" {
+  type = string
+}
+
+variable "cluster_name" {
+  type = string
+}
+
+variable "existing_cluster_role_name" {
+  type    = string
+  default = ""
+}
+
+variable "deployment_name" {
+  type = string
+}
+
+variable "eks_tags" {
+  type        = map(string)
+  description = "The tags to be added to EKS resources."
+  default     = {}
+}
+
+variable "connected_account" {
+  type    = string
+  default = ""
+}
+
+variable "dockerImagesArchive" {
+  type = object({
+    enable      = bool
+    bucket_name = string
+  })
+  default = {
+    enable      = false
+    bucket_name = "docker_images_archive"
+  }
+}
+
+variable "onpremCidr" {
+  type    = string
+  default = null
+}
+
+variable "enable_alb" {
+  type    = bool
+  default = false
+}
+
+variable "enable_api_gateway" {
+  type    = bool
+  default = false
+}
+
+variable "ivs_node_groups" {
+  type = map(object({
+    node_group_name   = string
+    instance_types    = list(string)
+    capacity_type     = optional(string, "ON_DEMAND")
+    max_size          = number
+    min_size          = number
+    custom_ami_id     = optional(string, "")
+    ami_type          = optional(string, "AL2023_x86_64_STANDARD")
+    block_device_name = optional(string, "/dev/xvdb")
+    volume_size       = number
+    k8s_labels        = optional(map(string), {})
+    k8s_taints = optional(list(object({
+      key    = string
+      value  = string
+      effect = string
+    })), [])
+  }))
+  default = {}
+}
+
+variable "psql_sg_name" {
+  type    = string
+  default = null
+}
+
+variable "enable_certmanager" {
+  type    = bool
+  default = false
+}
+
+variable "eks_oidc_thumbrint" {
+  type    = string
+  default = null
+}
+
+variable "s3_logging_retention" {
+  type    = number
+  default = 1
 }

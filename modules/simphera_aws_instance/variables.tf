@@ -52,8 +52,8 @@ variable "postgresqlMaxStorage" {
   description = "The upper limit to which Amazon RDS can automatically scale the storage of the SIMPHERA database. Must be greater than or equal to postgresqlStorage or 0 to disable Storage Autoscaling."
   default     = 20
   validation {
-    condition     = 20 <= var.postgresqlMaxStorage && var.postgresqlMaxStorage <= 65536
-    error_message = "The variable postgresqlMaxStorage must be between 20 and 65536 GiB."
+    condition     = (20 <= var.postgresqlMaxStorage && var.postgresqlMaxStorage <= 65536) || var.postgresqlMaxStorage == 0
+    error_message = "The variable postgresqlMaxStorage must be between 20 and 65536 GiB, or 0"
   }
 }
 
@@ -186,4 +186,48 @@ variable "s3_lifecycle_rules" {
     expiration_days = number
   }))
   default = null
+}
+
+variable "main_bucket_name" {
+  type        = string
+  description = "Name of the S3 bucket for storing data"
+  default     = null
+}
+
+variable "extra_buckets" {
+  type = list(object({
+    name = string
+    s3_lifecycle_rules = optional(list(object({
+      id              = string
+      path            = string
+      expiration_days = number
+    })), null)
+    })
+  )
+  default = []
+}
+
+variable "db_subnet_group_name" {
+  type    = string
+  default = null
+}
+
+variable "psql_simphera_name" {
+  type    = string
+  default = null
+}
+
+variable "backup_vault_name" {
+  type    = string
+  default = null
+}
+
+variable "simphera_db_name" {
+  type    = string
+  default = null
+}
+
+variable "enable_service_mesh" {
+  type    = bool
+  default = false
 }
