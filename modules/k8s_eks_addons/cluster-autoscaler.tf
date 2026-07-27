@@ -149,3 +149,34 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
   policy_arn = aws_iam_policy.cluster_autoscaler[0].arn
   role       = aws_iam_role.cluster_autoscaler[0].name
 }
+
+resource "kubernetes_cluster_role" "cluster_autoscaler_additional_role" {
+  metadata {
+    name = "cluster-autoscaler-additional-role"
+  }
+
+  rule {
+    api_groups = ["resource.k8s.io"]
+    resources  = ["resourceslices", "deviceclasses", "resourceclaims"]
+    verbs      = ["get", "list", "watch"]
+  }
+  depends_on = [helm_release.cluster_autoscaler]
+}
+
+resource "kubernetes_cluster_role_binding" "cluster_autoscaler_role_binding" {
+  metadata {
+    name = "cluster-autoscaler-role-binding"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = "cluster-autoscaler-sa"
+    namespace = "kube-system"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.cluster_autoscaler_additional_role.metadata[0].name
+  }
+}
