@@ -1,0 +1,49 @@
+{
+    "variables": [
+        {
+            "type": "pattern",
+            "pattern": "k8s_namespace",
+            "inputType": "input",
+            "id": "Namespace",
+            "label": "Namespace",
+            "defaultValue": ".*",
+            "visible": true
+        },
+        {
+            "type": "pattern",
+            "pattern": "keyword",
+            "inputType": "input",
+            "id": "Keyword",
+            "label": "Search events",
+            "defaultValue": ".*",
+            "visible": true
+        }
+    ],
+    "widgets": [
+        {
+            "type": "text",
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 1,
+            "properties": {
+                "markdown": "# Kubernetes Events",
+                "background": "transparent"
+            }
+        },
+        {
+            "type": "log",
+            "x": 0,
+            "y": 1,
+            "width": 24,
+            "height": 10,
+            "properties": {
+                "query": "SOURCE \"/aws/containerinsights/${cluster_name}/events\" |\nfilter message like /(?i)keyword/ | filter metadata.namespace like /(?i)k8s_namespace/| \nfields metadata.namespace as namespace |\nlimit 1000 | \ndisplay type, message, namespace, count, lastTimestamp",
+                "region": "${region}",
+                "stacked": false,
+                "view": "table",
+                "title": "Overview"
+            }
+        }
+    ]
+}

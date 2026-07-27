@@ -545,5 +545,14 @@
         ]
       }
     }
+  },
+  "containerLogs": {
+    "fluentBit": {
+      "config": {
+        "extraFiles": {
+          "events_export.conf": "[INPUT]\n Name kubernetes_events\n Tag k8s_events\n Kube_URL https://kubernetes.default.svc\n\n[OUTPUT]\n Name cloudwatch_logs\n Match k8s_events\n region $${AWS_REGION}\n log_group_name /aws/containerinsights/$${CLUSTER_NAME}/events\n log_stream_prefix $${HOST_NAME}-\n extra_user_agent container-insights\n add_entity true"
+        }
+      }
+    }
   }
 }

@@ -1,7 +1,7 @@
 locals {
   dashboards = var.cloudwatch_observability_config.enable ? concat(
     length(var.simpheraInstances) > 0 ? ["jobs", "license_usage"] : [],
-    ["quicksearch_logs"]
+    ["quicksearch_logs", "kubernetes-events"]
   ) : []
 }
 
