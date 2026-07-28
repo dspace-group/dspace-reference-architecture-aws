@@ -170,7 +170,7 @@ resource "kubernetes_cluster_role_binding" "dynamic_resource_allocation_role_bin
 
   subject {
     kind      = "ServiceAccount"
-    name      = local.name
+    name      = local.service_account
     namespace = local.namespace
   }
 
