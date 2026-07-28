@@ -1,6 +1,7 @@
 ## v0.13.5
 
 - Add kubernetes events to Cloudwatch dashboards
+- Update kubernetes version to 1.36
 
 ## v0.13.4
 

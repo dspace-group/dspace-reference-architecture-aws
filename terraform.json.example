@@ -59,7 +59,7 @@
       }
     }
   },
-  "kubernetesVersion": "1.34",
+  "kubernetesVersion": "1.36",
   "licenseServer": false,
   "linuxExecutionNodeCapacityType": "ON_DEMAND",
   "linuxExecutionNodeCountMax": 10,
