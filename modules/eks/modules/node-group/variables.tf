@@ -80,7 +80,7 @@ variable "node_group_context" {
     cluster_version   = string
     aws_context = object({
       partition_dns_suffix = string
-      partition_id         = string
+      partition            = string
     })
   })
 }

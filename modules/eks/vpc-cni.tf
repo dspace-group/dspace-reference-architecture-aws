@@ -32,7 +32,7 @@ resource "aws_iam_role" "aws_vpc_cni_role" {
       {
         "Effect" : "Allow",
         "Principal" : {
-          "Federated" : "arn:${var.aws_context.partition_id}:iam::${var.aws_context.caller_identity_account_id}:oidc-provider/${split("//", aws_eks_cluster.eks.identity[0].oidc[0].issuer)[1]}"
+          "Federated" : "arn:${var.aws_context.partition}:iam::${var.aws_context.caller_identity_account_id}:oidc-provider/${split("//", aws_eks_cluster.eks.identity[0].oidc[0].issuer)[1]}"
         },
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {

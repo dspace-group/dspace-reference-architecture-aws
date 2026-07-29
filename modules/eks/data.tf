@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "eks_key" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:${var.aws_context.partition_id}:iam::${var.aws_context.caller_identity_account_id}:root"
+        "arn:${var.aws_context.partition}:iam::${var.aws_context.caller_identity_account_id}:root"
       ]
     }
 
@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "eks_key" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:${var.aws_context.partition_id}:iam::${var.aws_context.caller_identity_account_id}:root"
+        "arn:${var.aws_context.partition}:iam::${var.aws_context.caller_identity_account_id}:root"
       ]
     }
   }

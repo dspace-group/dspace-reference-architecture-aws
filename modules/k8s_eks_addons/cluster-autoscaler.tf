@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "cluster_autoscaler" {
   statement {
     sid       = ""
     effect    = "Allow"
-    resources = ["arn:${var.addon_context.aws_context.partition_id}:autoscaling:${var.addon_context.aws_context.region_name}:${var.addon_context.aws_context.caller_identity_account_id}:autoScalingGroup:*"]
+    resources = ["arn:${var.addon_context.aws_context.partition}:autoscaling:${var.addon_context.aws_context.region_name}:${var.addon_context.aws_context.caller_identity_account_id}:autoScalingGroup:*"]
 
     actions = [
       "autoscaling:SetDesiredCapacity",
@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "cluster_autoscaler" {
   statement {
     sid       = ""
     effect    = "Allow"
-    resources = ["arn:${var.addon_context.aws_context.partition_id}:eks:${var.addon_context.aws_context.region_name}:${var.addon_context.aws_context.caller_identity_account_id}:nodegroup/${var.addon_context.eks_cluster_id}/*"]
+    resources = ["arn:${var.addon_context.aws_context.partition}:eks:${var.addon_context.aws_context.region_name}:${var.addon_context.aws_context.caller_identity_account_id}:nodegroup/${var.addon_context.eks_cluster_id}/*"]
 
     actions = [
       "eks:DescribeNodegroup",
@@ -126,7 +126,7 @@ resource "aws_iam_role" "cluster_autoscaler" {
       {
         "Effect" : "Allow",
         "Principal" : {
-          "Federated" : "arn:${var.addon_context.aws_context.partition_id}:iam::${var.addon_context.aws_context.caller_identity_account_id}:oidc-provider/${var.addon_context.eks_oidc_issuer_url}"
+          "Federated" : "arn:${var.addon_context.aws_context.partition}:iam::${var.addon_context.aws_context.caller_identity_account_id}:oidc-provider/${var.addon_context.eks_oidc_issuer_url}"
         },
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {

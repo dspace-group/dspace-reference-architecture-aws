@@ -45,7 +45,7 @@ resource "aws_iam_role" "cloudwatch_observability_role" {
       {
         "Effect" : "Allow",
         "Principal" : {
-          "Federated" : "arn:${var.addon_context.aws_context.partition_id}:iam::${var.addon_context.aws_context.caller_identity_account_id}:oidc-provider/${var.addon_context.eks_oidc_issuer_url}"
+          "Federated" : "arn:${var.addon_context.aws_context.partition}:iam::${var.addon_context.aws_context.caller_identity_account_id}:oidc-provider/${var.addon_context.eks_oidc_issuer_url}"
         },
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {
