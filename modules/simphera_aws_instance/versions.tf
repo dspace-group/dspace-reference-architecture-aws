@@ -5,17 +5,17 @@ terraform {
 
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 4.0.0"
+      version = ">= 6.28.0"
       # beginning with version 5.0 some arguments are removed from resource "aws_vpc".
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.10"
+      version = ">= 3.0.1"
     }
 
     http = {
       source  = "hashicorp/http"
-      version = ">= 2.2.0"
+      version = ">= 3.4.3"
     }
   }
 }
