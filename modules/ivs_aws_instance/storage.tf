@@ -155,7 +155,7 @@ resource "aws_iam_role_policy" "s3_access" {
     EOF
 }
 
-resource "kubernetes_service_account" "s3_access" {
+resource "kubernetes_service_account_v1" "s3_access" {
   metadata {
     name      = local.ivs_buckets_service_account
     namespace = var.k8s_namespace

@@ -81,10 +81,10 @@ data "http" "aws_tls_certificate" {
   url = "https://truststore.pki.rds.amazonaws.com/${var.region}/${var.region}-bundle.pem"
 }
 
-resource "kubernetes_secret" "aws_tls_certificate" {
+resource "kubernetes_secret_v1" "aws_tls_certificate" {
   metadata {
     name      = "customsslrootcertificate"
-    namespace = kubernetes_namespace.k8s_namespace.metadata[0].name
+    namespace = kubernetes_namespace_v1.k8s_namespace.metadata[0].name
   }
   data = {
     "databaseCertificates.pem" = data.http.aws_tls_certificate.response_body
