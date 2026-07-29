@@ -79,7 +79,7 @@ resource "aws_cloudwatch_log_group" "cloudwatch_log_groups" {
   tags              = var.tags
 }
 
-resource "kubernetes_cluster_role" "cloudwatch_events" {
+resource "kubernetes_cluster_role_v1" "cloudwatch_events" {
   metadata {
     name = "cloudwatch-events-reader"
   }
@@ -92,7 +92,7 @@ resource "kubernetes_cluster_role" "cloudwatch_events" {
   depends_on = [aws_eks_addon.cloudwatch_observability]
 }
 
-resource "kubernetes_cluster_role_binding" "cloudwatch_events" {
+resource "kubernetes_cluster_role_binding_v1" "cloudwatch_events" {
   metadata {
     name = "cloudwatch-events-reader"
   }
@@ -106,6 +106,6 @@ resource "kubernetes_cluster_role_binding" "cloudwatch_events" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.cloudwatch_events.metadata[0].name
+    name      = kubernetes_cluster_role_v1.cloudwatch_events.metadata[0].name
   }
 }

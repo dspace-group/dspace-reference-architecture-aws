@@ -150,7 +150,7 @@ resource "aws_iam_role_policy_attachment" "cluster_autoscaler" {
   role       = aws_iam_role.cluster_autoscaler[0].name
 }
 
-resource "kubernetes_cluster_role" "dynamic_resource_allocation_role" {
+resource "kubernetes_cluster_role_v1" "dynamic_resource_allocation_role" {
   metadata {
     name = "dynamic-resource-allocation-role"
   }
@@ -163,7 +163,7 @@ resource "kubernetes_cluster_role" "dynamic_resource_allocation_role" {
   depends_on = [helm_release.cluster_autoscaler]
 }
 
-resource "kubernetes_cluster_role_binding" "dynamic_resource_allocation_role_binding" {
+resource "kubernetes_cluster_role_binding_v1" "dynamic_resource_allocation_role_binding" {
   metadata {
     name = "dynamic-resource-allocation-role-binding"
   }
@@ -177,6 +177,6 @@ resource "kubernetes_cluster_role_binding" "dynamic_resource_allocation_role_bin
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.dynamic_resource_allocation_role.metadata[0].name
+    name      = kubernetes_cluster_role_v1.dynamic_resource_allocation_role.metadata[0].name
   }
 }

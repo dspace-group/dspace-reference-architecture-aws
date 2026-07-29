@@ -17,5 +17,5 @@ module "node_group" {
   node_group_context        = local.node_group_context
   tags                      = var.tags
 
-  depends_on = [kubernetes_config_map.aws_auth]
+  depends_on = [kubernetes_config_map_v1.aws_auth]
 }
