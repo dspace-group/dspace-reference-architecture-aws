@@ -614,7 +614,19 @@ Dashboard names follow the pattern `<infrastructurename>-<dashboard>`, for examp
 Note: `jobs` and `license_usage` dashboards are created when SIMPHERA instances are configured, while `quicksearch_logs` is created whenever CloudWatch observability is enabled.
 
 
-### AWS Cloudwatch monitoring solution cost estimate
+### AWS Cloudwatch monitoring solution cost
+
+AWS Cloudwatch detailed breakdown and pricing can be found at links:
+- [Cloudwatch pricing](https://aws.amazon.com/cloudwatch/pricing/)
+- [Analyzing, optimizing, and reducing CloudWatch costs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_billing.html)
+
+
+Cost components by usage type:
+
+![alt text](AWSMonitoringCost.jpg)
+
+
+Cost estimation:
 
 | Type | Cost Summary | Additional |
 | --- | --- | --- |
