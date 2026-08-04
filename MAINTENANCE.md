@@ -78,13 +78,13 @@ moved {
 }
 ```
 
-1. Run command:
+4. Run command:
 
 ```
 terraform apply
 ```
 
-2. Remove `move.tf` file
+5. Remove `move.tf` file
 
 # Migrate cluster-autoscaler addon to the module
 
