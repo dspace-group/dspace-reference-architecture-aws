@@ -33,6 +33,7 @@ To rotate the password for the PostgreSQL databases, change the password manuall
 ```bash
 terraform apply
 ```
+
 > **Note:** Before running `terraform apply`, ensure that all unrelated infrastructure changes have already been applied. This helps avoid introducing unintended updates during the password rotation process.
 
 # Updating CA certificate
@@ -77,13 +78,13 @@ moved {
 }
 ```
 
-4. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-5. Remove `move.tf` file
+2. Remove `move.tf` file
 
 # Migrate cluster-autoscaler addon to the module
 
@@ -119,13 +120,13 @@ moved {
 }
 ```
 
-3. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-4. Remove `move.tf` file
+2. Remove `move.tf` file
 
 # Migrate coredns addon to the module
 
@@ -188,10 +189,12 @@ terraform apply
 4. Remove `move.tf` file
 
 # Migrate kube_proxy addon to the module
+
 To migrate from terraform-aws-eks-blueprint addon kube_proxy to custom module `modules/k8s_eks_addons/kube-proxy.tf` follow steps:
 
 1. create 'move.tf' in repository root
 2. Add following code:
+
 ```
 moved {
   from = module.eks-addons.module.aws_kube_proxy[0].data.aws_eks_addon_version.this
@@ -202,17 +205,22 @@ moved {
   to   = module.k8s_eks_addons.aws_eks_addon.kube_proxy
 }
 ```
+
 3. Run command:
+
 ```
 terraform apply
 ```
+
 4. Remove `move.tf` file
 
 # Migrate ebs_csi addon to the module
+
 To migrate from terraform-aws-eks-blueprint addon ebs_csi to custom module `modules/k8s_eks_addons/ebs-csi.tf` follow steps:
 
 1. create 'move.tf' in repository root
 2. Add following code:
+
 ```
 moved {
   from =  module.eks-addons.module.aws_ebs_csi_driver[0].data.aws_eks_addon_version.this
@@ -232,17 +240,22 @@ moved {
 }
 
 ```
+
 3. Run command:
+
 ```
 terraform apply
 ```
+
 4. Remove `move.tf` file
 
 # Migrate vpc_cni addon to the module
+
 To migrate from terraform-aws-eks-blueprint addon vpc_cni to custom module `modules/k8s_eks_addons/vpc-cni.tf` follow steps:
 
 1. create 'move.tf' in repository root
 2. Add following code:
+
 ```
 moved {
   from = module.eks-addons.module.aws_vpc_cni[0].data.aws_eks_addon_version.this
@@ -262,18 +275,22 @@ moved {
 }
 
 ```
+
 3. Run command:
+
 ```
 terraform apply
 ```
+
 4. Remove `move.tf` file
 
-
 # Migrate aws_load_balancer_controller addon to the module
+
 To migrate from terraform-aws-eks-blueprint addon aws_load_balancer_controller to custom module `modules/k8s_eks_addons/aws-load-balancer-controller.tf` follow steps:
 
 1. create 'move.tf' in repository root
 2. Add following code:
+
 ```
 moved {
   from = module.eks-addons.module.aws_load_balancer_controller[0].data.aws_iam_policy_document.aws_load_balancer_controller
@@ -301,13 +318,17 @@ moved {
 }
 
 ```
+
 3. Run command:
+
 ```
 terraform apply
 ```
+
 4. Remove `move.tf` file
 
 # Migrate from v0.3.0 to v0.4.0
+
 By removing terraform blueprints for the deployment of EKS, terraform state has been changed significantly.
 For successful migration to the new release you should use "moved" block to minimize recreation of the resources.
 For quicker migration, it is suggested to scale down all of the node groups in AWS portal to 0 (minimum and desired node count).
@@ -315,6 +336,7 @@ For quicker migration, it is suggested to scale down all of the node groups in A
 1. In your `providers.tf`, for data block `aws_eks_cluster` and `aws_eks_cluster_auth` change value of argument `name` with hardcoded name of your EKS. This change can be reverted uppon successfull migration.
 
 2. Create `move.tf` file, and according to the flags you have (`variables.tf`), add following moved blocks (flags mostly affect node groups and their related resources):
+
 ```terraform
 moved {
   from = module.eks.module.kms[0].aws_kms_alias.this
@@ -564,23 +586,107 @@ moved {
 ```
 
 3. Run init command:
+
 ```
 terraform init
 ```
 
 4. Remove state for data that has changed provider:
+
 ```
 terraform state rm "module.eks.data.http.eks_cluster_readiness[0]"
 ```
 
 5. Add cloudwatch log group to the state:
+
 ```
 terraform import "module.eks.aws_cloudwatch_log_group.log_group[0]" "/aws/eks/YOUR_CLUSTER_NAME/cluster"
 ```
 
 6. Run apply command:
+
 ```
 terraform apply
 ```
 
 7. Remove `move.tf` file.
+
+# Migrate from v0.13.5 to v0.13.6
+
+1. Run init command:
+
+```
+terraform init -upgrade -reconfigure
+```
+
+2. Create `move.tf` file, and according to the flags you have (`variables.tf`), add following moved blocks (flags mostly affect node groups and their related resources):
+
+```
+removed {
+    from = module.eks.kubernetes_config_map.aws_auth
+    lifecycle {
+        destroy = false
+    }
+}
+
+import {
+  id = "kube-system/aws-auth"
+  to = module.eks.kubernetes_config_map_v1.aws_auth
+}
+
+removed {
+    from = module.k8s_eks_addons.kubernetes_cluster_role_binding.dynamic_resource_allocation_role_binding
+    lifecycle {
+        destroy = false
+    }
+}
+
+import {
+    id = "dynamic-resource-allocation-role-binding"
+    to = module.k8s_eks_addons.kubernetes_cluster_role_binding_v1.dynamic_resource_allocation_role_binding
+}
+
+removed {
+    from = module.k8s_eks_addons.kubernetes_cluster_role_binding.cloudwatch_events
+    lifecycle {
+        destroy = false
+    }
+}
+
+import {
+    id = "cloudwatch-events-reader"
+    to = module.k8s_eks_addons.kubernetes_cluster_role_binding_v1.cloudwatch_events
+}
+
+removed {
+    from = module.k8s_eks_addons.kubernetes_cluster_role.dynamic_resource_allocation_role
+    lifecycle {
+        destroy = false
+    }
+}
+
+import {
+    id = "dynamic-resource-allocation-role"
+    to = module.k8s_eks_addons.kubernetes_cluster_role_v1.dynamic_resource_allocation_role
+}
+
+removed {
+    from = module.k8s_eks_addons.kubernetes_cluster_role.cloudwatch_events
+    lifecycle {
+        destroy = false
+    }
+}
+
+import {
+    id = "cloudwatch-events-reader"
+    to = module.k8s_eks_addons.kubernetes_cluster_role_v1.cloudwatch_events
+}
+```
+
+3. Run apply command:
+
+```
+terraform apply
+```
+
+4. Remove `move.tf` file.
