@@ -22,6 +22,9 @@ resource "helm_release" "gpu_operator" {
   wait    = false
 }
 
+# kubernetes_manifest from hashicorp/kubernetes provider doesnt work with custom resources yet,
+# see https://github.com/hashicorp/terraform-provider-kubernetes/issues/1775 for more information
+
 resource "kubectl_manifest" "nvidia-driver" {
   for_each = local.gpu_driver_versions_escaped
 
