@@ -631,7 +631,7 @@ Note: `jobs` and `license_usage` dashboards are created when SIMPHERA instances 
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.28.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.17.0 |
-| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | >= 0.1.13 |
+| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | >= 1.19.0 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 3.0.1 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.8.0 |
 
@@ -639,7 +639,7 @@ Note: `jobs` and `license_usage` dashboards are created when SIMPHERA instances 
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.57.1 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.58.0 |
 | <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | 3.2.1 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.9.0 |
 
