@@ -78,13 +78,13 @@ moved {
 }
 ```
 
-4. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-5. Remove `move.tf` file
+1. Remove `move.tf` file
 
 # Migrate cluster-autoscaler addon to the module
 
@@ -120,13 +120,13 @@ moved {
 }
 ```
 
-3. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-4. Remove `move.tf` file
+1. Remove `move.tf` file
 
 # Migrate coredns addon to the module
 
@@ -146,13 +146,13 @@ moved {
 }
 ```
 
-3. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-4. Remove `move.tf` file
+1. Remove `move.tf` file
 
 # Migrate efs csi driver addon to the module
 
@@ -180,13 +180,13 @@ moved {
 }
 ```
 
-3. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-4. Remove `move.tf` file
+1. Remove `move.tf` file
 
 # Migrate kube_proxy addon to the module
 
@@ -206,13 +206,13 @@ moved {
 }
 ```
 
-3. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-4. Remove `move.tf` file
+1. Remove `move.tf` file
 
 # Migrate ebs_csi addon to the module
 
@@ -241,13 +241,13 @@ moved {
 
 ```
 
-3. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-4. Remove `move.tf` file
+1. Remove `move.tf` file
 
 # Migrate vpc_cni addon to the module
 
@@ -276,13 +276,13 @@ moved {
 
 ```
 
-3. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-4. Remove `move.tf` file
+1. Remove `move.tf` file
 
 # Migrate aws_load_balancer_controller addon to the module
 
@@ -319,13 +319,13 @@ moved {
 
 ```
 
-3. Run command:
+1. Run command:
 
 ```
 terraform apply
 ```
 
-4. Remove `move.tf` file
+1. Remove `move.tf` file
 
 # Migrate from v0.3.0 to v0.4.0
 
@@ -585,31 +585,31 @@ moved {
 }
 ```
 
-3. Run init command:
+1. Run init command:
 
 ```
 terraform init
 ```
 
-4. Remove state for data that has changed provider:
+1. Remove state for data that has changed provider:
 
 ```
 terraform state rm "module.eks.data.http.eks_cluster_readiness[0]"
 ```
 
-5. Add cloudwatch log group to the state:
+1. Add cloudwatch log group to the state:
 
 ```
 terraform import "module.eks.aws_cloudwatch_log_group.log_group[0]" "/aws/eks/YOUR_CLUSTER_NAME/cluster"
 ```
 
-6. Run apply command:
+1. Run apply command:
 
 ```
 terraform apply
 ```
 
-7. Remove `move.tf` file.
+1. Remove `move.tf` file.
 
 # Migrate from v0.13.5 to v0.13.6
 
@@ -619,7 +619,7 @@ terraform apply
 terraform init -upgrade -reconfigure
 ```
 
-2. Create `move.tf` file, and according to the flags you have (`variables.tf`), add following moved blocks (flags mostly affect node groups and their related resources):
+1. Create `move.tf` file, add following moved blocks:
 
 ```
 removed {
@@ -683,10 +683,10 @@ import {
 }
 ```
 
-3. Run apply command:
+1. Run apply command:
 
 ```
 terraform apply
 ```
 
-4. Remove `move.tf` file.
+1. Remove `move.tf` file.
