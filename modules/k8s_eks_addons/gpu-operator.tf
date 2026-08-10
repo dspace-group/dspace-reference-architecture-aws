@@ -30,7 +30,7 @@ resource "kubectl_manifest" "nvidia-driver-manifest" {
 
   manifest = {
     apiVersion = "nvidia.com/v1alpha1"
-    kind = "NVIDIADriver"
+    kind       = "NVIDIADriver"
 
     metadata = {
       name = "driver-gpu-nodes-${each.value}"
@@ -38,25 +38,25 @@ resource "kubectl_manifest" "nvidia-driver-manifest" {
 
     spec = {
       driverType = "gpu"
-      image = "driver"
+      image      = "driver"
       repository = "nvcr.io/nvidia"
-      version = "${each.key}"
+      version    = "${each.key}"
       nodeSelector = {
         gpu-driver = "${each.key}"
       }
 
       tolerations = [
         {
-          key = "purpose"
+          key      = "purpose"
           operator = "Equal"
-          value = "gpu"
-          effect = "NoSchedule"
+          value    = "gpu"
+          effect   = "NoSchedule"
         },
         {
-          key = "nvidia.com/gpu"
-          value = ""
+          key      = "nvidia.com/gpu"
+          value    = ""
           operator = "Exists"
-          effect = "NoSchedule"
+          effect   = "NoSchedule"
         }
       ]
     }
