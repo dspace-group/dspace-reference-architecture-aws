@@ -4,7 +4,6 @@ variable "addon_context" {
     aws_context = object({
       caller_identity_account_id = string
       partition_dns_suffix       = string
-      partition_id               = string
       partition                  = string
       region_name                = string
       iam_issuer_arn             = string

@@ -13,7 +13,7 @@ locals {
   use_public_subnet_ids                     = length(var.public_subnet_ids) == 0 ? false : true
   infrastructurename                        = var.infrastructurename
   account_id                                = data.aws_caller_identity.current.account_id
-  region                                    = data.aws_region.current.name
+  region                                    = data.aws_region.current.region
   license_server_role                       = "${local.infrastructurename}-license-server-role"
   license_server_policy                     = "${local.infrastructurename}-license-server-policy"
   license_server_bucket_name                = "${local.infrastructurename}-license-server-bucket"
@@ -158,9 +158,8 @@ locals {
   aws_context = {
     caller_identity_account_id = data.aws_caller_identity.current.account_id
     partition_dns_suffix       = data.aws_partition.current.dns_suffix
-    partition_id               = data.aws_partition.current.id
     partition                  = data.aws_partition.current.partition
-    region_name                = data.aws_region.current.name
+    region_name                = data.aws_region.current.region
     iam_issuer_arn             = data.aws_iam_session_context.current.issuer_arn
   }
 }

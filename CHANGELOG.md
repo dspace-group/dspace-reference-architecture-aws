@@ -1,3 +1,8 @@
+## v0.13.6
+
+- Update providers version
+- Change gavinbunney/kubectl with hashicorp-oss/kubectl
+
 ## v0.13.5
 
 - Add kubernetes events to Cloudwatch dashboards
