@@ -38,3 +38,14 @@ resource "kubernetes_service_account_v1" "executoragentlinux" {
     }
   }
 }
+
+resource "kubernetes_service_account_v1" "executoragentlinuxsubjob" {
+  count = var.enable_minio ? 0 : 1
+  metadata {
+    name      = "executoragentlinuxsubjob-irsa"
+    namespace = kubernetes_namespace_v1.k8s_namespace.metadata[0].name
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.executoragentlinuxsubjob_irsa[0].arn
+    }
+  }
+}
