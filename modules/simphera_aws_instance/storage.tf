@@ -156,7 +156,10 @@ resource "aws_iam_role" "executoragentlinux_irsa" {
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {
           "StringEquals" : {
-            "${local.eks_oidc_issuer}:sub" : "system:serviceaccount:${var.k8s_namespace}:executoragentlinux-irsa"
+            "${local.eks_oidc_issuer}:sub" : [
+              "system:serviceaccount:${var.k8s_namespace}:executoragentlinux-irsa",
+              "system:serviceaccount:${var.k8s_namespace}:executoragentlinuxsubjob-irsa"
+            ]
           }
         }
       }
