@@ -139,32 +139,6 @@ resource "aws_iam_role" "simphera_irsa" {
   tags = var.tags
 }
 
-resource "aws_iam_role" "executoragentlinuxsubjob_irsa" {
-  count       = var.enable_minio ? 0 : 1
-  name        = "${var.name}-executoragentlinuxsubjob-irsa-role"
-  description = "IAM role for the executoragentlinuxsubjob-irsa service account"
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
-  assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Principal" : {
-          "Federated" : var.eks_oidc_provider_arn
-        },
-        "Action" : "sts:AssumeRoleWithWebIdentity",
-        "Condition" : {
-          "StringEquals" : {
-            "${local.eks_oidc_issuer}:sub" : "system:serviceaccount:${var.k8s_namespace}:executoragentlinuxsubjob-irsa"
-          }
-        }
-      }
-    ]
-  })
-  tags = var.tags
-}
-
 resource "aws_iam_role" "executoragentlinux_irsa" {
   count       = var.enable_minio ? 0 : 1
   name        = "${var.name}-executoragentlinux-irsa-role"
@@ -182,7 +156,10 @@ resource "aws_iam_role" "executoragentlinux_irsa" {
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {
           "StringEquals" : {
-            "${local.eks_oidc_issuer}:sub" : "system:serviceaccount:${var.k8s_namespace}:executoragentlinux-irsa"
+            "${local.eks_oidc_issuer}:sub" : [
+              "system:serviceaccount:${var.k8s_namespace}:executoragentlinux-irsa",
+              "system:serviceaccount:${var.k8s_namespace}:executoragentlinuxsubjob-irsa"
+            ]
           }
         }
       }
@@ -206,11 +183,5 @@ resource "aws_iam_role_policy_attachment" "simphera" {
 resource "aws_iam_role_policy_attachment" "executoragentlinux" {
   count      = var.enable_minio ? 0 : 1
   role       = aws_iam_role.executoragentlinux_irsa[0].name
-  policy_arn = aws_iam_policy.bucket_access.arn
-}
-
-resource "aws_iam_role_policy_attachment" "executoragentlinuxsubjob" {
-  count      = var.enable_minio ? 0 : 1
-  role       = aws_iam_role.executoragentlinuxsubjob_irsa[0].name
   policy_arn = aws_iam_policy.bucket_access.arn
 }

@@ -45,7 +45,7 @@ resource "kubernetes_service_account_v1" "executoragentlinuxsubjob" {
     name      = "executoragentlinuxsubjob-irsa"
     namespace = kubernetes_namespace_v1.k8s_namespace.metadata[0].name
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.executoragentlinuxsubjob_irsa[0].arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.executoragentlinux_irsa[0].arn
     }
   }
 }
