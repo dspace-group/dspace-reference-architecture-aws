@@ -107,6 +107,12 @@ variable "enable_deletion_protection" {
   default     = true
 }
 
+variable "enable_s3_mounting_pvc" {
+  type        = bool
+  default     = false
+  description = "Enable creation of the PersistentVolume and PersistentVolumeClaim used to mount the SIMPHERA S3 bucket into pods via the AWS Mountpoint S3 CSI driver."
+}
+
 variable "secretname" {
   description = "Secrets manager secret"
   type        = string

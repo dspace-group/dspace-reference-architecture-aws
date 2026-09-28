@@ -55,6 +55,11 @@ output "s3_lifecycle_rules" {
   value       = [for name, instance in module.simphera_instance : instance.s3_lifecycle_rules]
 }
 
+output "simphera_s3_mounting_pvc_names" {
+  description = "Names of the PersistentVolumeClaims bound to the SIMPHERA S3 buckets"
+  value       = { for name, instance in module.simphera_instance : name => instance.s3_mounting_pvc_name }
+}
+
 output "eks_cluster_id" {
   description = "Amazon EKS Cluster Name"
   value       = module.eks.eks_cluster_id
