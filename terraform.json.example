@@ -107,7 +107,7 @@
       "enable_deletion_protection": true,
       "enable_keycloak": true,
       "enable_minio": true,
-      "enable_s3_mounting_pvc": false,
+      "enable_s3_mount": false,
       "k8s_namespace": "simphera",
       "name": "production",
       "postgresqlApplyImmediately": false,
