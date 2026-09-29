@@ -815,5 +815,5 @@ Cost estimation:
 | <a name="output_pullthrough_cache_prefix"></a> [pullthrough\_cache\_prefix](#output\_pullthrough\_cache\_prefix) | n/a |
 | <a name="output_s3_buckets"></a> [s3\_buckets](#output\_s3\_buckets) | S3 buckets managed by terraform. |
 | <a name="output_s3_lifecycle_rules"></a> [s3\_lifecycle\_rules](#output\_s3\_lifecycle\_rules) | Lifecycle rules created for Simphera S3 bucket |
-| <a name="output_simphera_s3_mounting_pvc_names"></a> [simphera\_s3\_mounting\_pvc\_names](#output\_simphera\_s3\_mounting\_pvc\_names) | Names of the PersistentVolumeClaims bound to the SIMPHERA S3 buckets |
+| <a name="output_simphera_s3_mounting_pvc_names"></a> [simphera\_s3\_mounting\_pvc\_names](#output\_simphera\_s3\_mounting\_pvc\_names) | Names of the PersistentVolumeClaims bound to the SIMPHERA S3 buckets. |
 <!-- END_TF_DOCS -->
