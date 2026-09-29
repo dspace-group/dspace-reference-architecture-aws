@@ -1,5 +1,5 @@
-resource "kubernetes_persistent_volume_v1" "s3_bucket" {
-  count = var.enable_s3_mounting_pvc ? 1 : 0
+resource "kubernetes_persistent_volume_v1" "s3_pv" {
+  count = var.enable_s3_mount ? 1 : 0
   metadata {
     name = "${aws_s3_bucket.bucket.bucket}-s3-pv"
   }
@@ -30,8 +30,8 @@ resource "kubernetes_persistent_volume_v1" "s3_bucket" {
 }
 
 # PVC statically bound to the S3-backed PV above, for use as a SIMPHERA PersistentVolume storage.
-resource "kubernetes_persistent_volume_claim_v1" "s3_bucket" {
-  count = var.enable_s3_mounting_pvc ? 1 : 0
+resource "kubernetes_persistent_volume_claim_v1" "s3_pvc" {
+  count = var.enable_s3_mount ? 1 : 0
   metadata {
     name      = "${aws_s3_bucket.bucket.bucket}-s3-pvc"
     namespace = kubernetes_namespace_v1.k8s_namespace.metadata[0].name
@@ -39,7 +39,7 @@ resource "kubernetes_persistent_volume_claim_v1" "s3_bucket" {
   spec {
     access_modes       = ["ReadWriteMany"]
     storage_class_name = ""
-    volume_name        = kubernetes_persistent_volume_v1.s3_bucket[0].metadata[0].name
+    volume_name        = kubernetes_persistent_volume_v1.s3_pv[0].metadata[0].name
     resources {
       requests = {
         storage = "1Gi"

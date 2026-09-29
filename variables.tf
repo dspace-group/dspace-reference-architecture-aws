@@ -315,7 +315,7 @@ variable "simpheraInstances" {
     backup_retention             = number
     enable_deletion_protection   = bool
     enable_minio                 = bool
-    enable_s3_mounting_pvc       = optional(bool, false)
+    enable_s3_mount            = optional(bool, false)
     s3_lifecycle_rules = list(object({
       id              = string
       path            = string
@@ -326,9 +326,9 @@ variable "simpheraInstances" {
   validation {
     condition = (
       var.s3_csi_config.enable ||
-      alltrue([for instance in var.simpheraInstances : !instance.enable_s3_mounting_pvc])
+      alltrue([for instance in var.simpheraInstances : !instance.enable_s3_mount])
     )
-    error_message = "enable_s3_mounting_pvc requires s3_csi_config.enable to be true."
+    error_message = "enable_s3_mount requires s3_csi_config.enable to be true."
   }
   default = {
     "production" = {
@@ -349,7 +349,7 @@ variable "simpheraInstances" {
       backup_retention             = 35
       enable_deletion_protection   = true
       enable_minio                 = true
-      enable_s3_mounting_pvc       = false
+      enable_s3_mount              = false
       s3_lifecycle_rules           = null
     }
   }

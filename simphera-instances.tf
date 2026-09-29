@@ -9,7 +9,7 @@ module "simphera_instance" {
   eks_oidc_provider_arn        = module.eks.eks_oidc_provider_arn
   enable_backup_service        = each.value.enable_backup_service
   enable_deletion_protection   = each.value.enable_deletion_protection
-  enable_s3_mounting_pvc       = each.value.enable_s3_mounting_pvc
+  enable_s3_mount              = each.value.enable_s3_mount
   enableKeycloak               = each.value.enable_keycloak
   infrastructurename           = local.infrastructurename
   k8s_namespace                = each.value.k8s_namespace

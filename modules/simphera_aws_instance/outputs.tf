@@ -30,7 +30,7 @@ output "s3_lifecycle_rules" {
   description = "Lifecycle rules created for Simphera S3 bucket"
 }
 
-output "s3_mounting_pvc_name" {
+output "s3_pvc_name" {
   description = "Name of the PersistentVolumeClaim bound to the SIMPHERA S3 bucket."
-  value       = var.enable_s3_mounting_pvc ? kubernetes_persistent_volume_claim_v1.s3_bucket[0].metadata[0].name : null
+  value       = var.enable_s3_mount ? kubernetes_persistent_volume_claim_v1.s3_pvc[0].metadata[0].name : null
 }
