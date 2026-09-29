@@ -1,4 +1,3 @@
-# Static PV backed by the SIMPHERA S3 bucket, mounted via the AWS Mountpoint S3 CSI driver.
 resource "kubernetes_persistent_volume_v1" "s3_bucket" {
   count = var.enable_s3_mounting_pvc ? 1 : 0
   metadata {
@@ -43,7 +42,6 @@ resource "kubernetes_persistent_volume_claim_v1" "s3_bucket" {
     volume_name        = kubernetes_persistent_volume_v1.s3_bucket[0].metadata[0].name
     resources {
       requests = {
-        # Placeholder required for PV/PVC binding; S3 capacity is not limited by this value.
         storage = "1Gi"
       }
     }
