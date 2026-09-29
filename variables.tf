@@ -315,7 +315,7 @@ variable "simpheraInstances" {
     backup_retention             = number
     enable_deletion_protection   = bool
     enable_minio                 = bool
-    enable_s3_mount            = optional(bool, false)
+    enable_s3_mount              = optional(bool, false)
     s3_lifecycle_rules = list(object({
       id              = string
       path            = string
