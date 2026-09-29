@@ -349,6 +349,7 @@ variable "simpheraInstances" {
       backup_retention             = 35
       enable_deletion_protection   = true
       enable_minio                 = true
+      enable_s3_mounting_pvc       = false
       s3_lifecycle_rules           = null
     }
   }
