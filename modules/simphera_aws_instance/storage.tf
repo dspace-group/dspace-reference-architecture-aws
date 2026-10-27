@@ -6,15 +6,19 @@ resource "aws_s3_bucket" "bucket" {
 }
 
 resource "aws_s3_bucket_cors_configuration" "bucket_cors" {
-  count  = var.simphera_url != null ? 1 : 0
+  count  = length(local.s3_cors_rules) > 0 ? 1 : 0
   bucket = aws_s3_bucket.bucket.id
 
-  cors_rule {
-    id              = "simphera-access"
-    allowed_methods = ["GET", "HEAD"]
-    allowed_origins = [var.simphera_url]
-    allowed_headers = ["Authorization"]
-    expose_headers  = ["Access-Control-Allow-Origin"]
+  dynamic "cors_rule" {
+    for_each = local.s3_cors_rules
+    content {
+      id              = cors_rule.value.id
+      allowed_methods = cors_rule.value.allowed_methods
+      allowed_origins = cors_rule.value.allowed_origins
+      allowed_headers = cors_rule.value.allowed_headers
+      expose_headers  = cors_rule.value.expose_headers
+      max_age_seconds = cors_rule.value.max_age_seconds
+    }
   }
 }
 

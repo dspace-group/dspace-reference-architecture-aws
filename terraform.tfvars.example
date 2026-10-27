@@ -247,9 +247,17 @@ simpheraInstances = {
     "postgresqlStorage": 20,
     "postgresqlStorageKeycloak": 20,
     "postgresqlVersion": "16",
+    "s3_cors_rules": [
+      {
+        "id": "simphera-access",
+        "allowed_methods": ["GET", "HEAD"],
+        "allowed_origins": ["https://simphera.example.com"],
+        "allowed_headers": ["Authorization"],
+        "expose_headers": ["Access-Control-Allow-Origin"]
+      }
+    ],
     "s3_lifecycle_rules": null,
-    "secretname": "aws-simphera-dev-production",
-    "simphera_url": null
+    "secretname": "aws-simphera-dev-production"
   }
 }
 
