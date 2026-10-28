@@ -6,11 +6,11 @@ resource "aws_s3_bucket" "bucket" {
 }
 
 resource "aws_s3_bucket_cors_configuration" "bucket_cors" {
-  count  = length(local.s3_cors_rules) > 0 ? 1 : 0
+  count  = length(var.s3_cors_rules) > 0 ? 1 : 0
   bucket = aws_s3_bucket.bucket.id
 
   dynamic "cors_rule" {
-    for_each = local.s3_cors_rules
+    for_each = var.s3_cors_rules
     content {
       id              = cors_rule.value.id
       allowed_methods = cors_rule.value.allowed_methods

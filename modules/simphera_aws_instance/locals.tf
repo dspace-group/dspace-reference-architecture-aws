@@ -8,15 +8,4 @@ locals {
   db_simphera_id           = "${local.instancename}-simphera"
   db_keycloak_id           = "${local.instancename}-keycloak"
   backup_vault_name        = "${local.instancename}-backup-vault"
-  s3_cors_rules = concat(
-    var.simphera_url == null ? [] : [{
-      id              = "simphera-access"
-      allowed_methods = ["GET", "HEAD"]
-      allowed_origins = [var.simphera_url]
-      allowed_headers = ["Authorization"]
-      expose_headers  = ["Access-Control-Allow-Origin"]
-      max_age_seconds = null
-    }],
-    var.s3_cors_rules
-  )
 }

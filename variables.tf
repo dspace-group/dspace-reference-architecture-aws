@@ -310,7 +310,6 @@ variable "simpheraInstances" {
     db_instance_type_keycloak    = string
     k8s_namespace                = string
     secretname                   = string
-    simphera_url                 = optional(string)
     enable_backup_service        = bool
     backup_retention             = number
     enable_deletion_protection   = bool
@@ -352,7 +351,6 @@ variable "simpheraInstances" {
       db_instance_type_simphera    = "db.t4g.large"
       k8s_namespace                = "simphera"
       secretname                   = "aws-simphera-dev-production"
-      simphera_url                 = null
       enable_backup_service        = true
       backup_retention             = 35
       enable_deletion_protection   = true
