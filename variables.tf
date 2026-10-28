@@ -359,6 +359,7 @@ variable "simpheraInstances" {
       enable_minio                 = true
       enable_s3_mount              = false
       s3_lifecycle_rules           = null
+      s3_cors_rules                = null
     }
   }
 }

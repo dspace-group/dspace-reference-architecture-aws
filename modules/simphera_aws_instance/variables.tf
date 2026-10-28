@@ -173,7 +173,7 @@ variable "enable_minio" {
 
 variable "simphera_url" {
   default     = null
-  description = "Deprecated Simphera URL variable for CORS S3 bucket configuration. Use s3_cors_rules instead."
+  description = "Simphera URL variable for deafualt Simphera CORS S3 bucket configuration."
   type        = string
 
   validation {
@@ -186,7 +186,7 @@ variable "simphera_url" {
 }
 
 variable "s3_cors_rules" {
-  description = "CORS rules for the Simphera S3 bucket."
+  description = "Additional CORS rules for the Simphera S3 bucket."
   type = list(object({
     id              = optional(string)
     allowed_methods = list(string)
