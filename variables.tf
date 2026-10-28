@@ -310,12 +310,20 @@ variable "simpheraInstances" {
     db_instance_type_keycloak    = string
     k8s_namespace                = string
     secretname                   = string
-    simphera_url                 = string
+    simphera_url                 = optional(string)
     enable_backup_service        = bool
     backup_retention             = number
     enable_deletion_protection   = bool
     enable_minio                 = bool
     enable_s3_mount              = optional(bool, false)
+    s3_cors_rules = optional(list(object({
+      id              = optional(string)
+      allowed_methods = list(string)
+      allowed_origins = list(string)
+      allowed_headers = optional(list(string), [])
+      expose_headers  = optional(list(string), [])
+      max_age_seconds = optional(number)
+    })), [])
     s3_lifecycle_rules = list(object({
       id              = string
       path            = string
@@ -351,6 +359,7 @@ variable "simpheraInstances" {
       enable_minio                 = true
       enable_s3_mount              = false
       s3_lifecycle_rules           = null
+      s3_cors_rules                = null
     }
   }
 }
