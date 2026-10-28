@@ -248,7 +248,8 @@ simpheraInstances = {
     "postgresqlStorageKeycloak": 20,
     "postgresqlVersion": "16",
     "s3_lifecycle_rules": null,
-    "secretname": "aws-simphera-dev-production"
+    "secretname": "aws-simphera-dev-production",
+    "simphera_url": null
   }
 }
 
