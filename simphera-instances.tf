@@ -26,6 +26,7 @@ module "simphera_instance" {
   private_subnets              = local.private_subnets
   region                       = local.region
   secretname                   = each.value.secretname
+  simphera_url                 = each.value.simphera_url
   enable_minio                 = each.value.enable_minio
   s3_cors_rules                = each.value.s3_cors_rules
   s3_lifecycle_rules           = each.value.s3_lifecycle_rules

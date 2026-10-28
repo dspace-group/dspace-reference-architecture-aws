@@ -171,6 +171,20 @@ variable "enable_minio" {
   type        = bool
 }
 
+variable "simphera_url" {
+  default     = null
+  description = "Deprecated Simphera URL variable for CORS S3 bucket configuration. Use s3_cors_rules instead."
+  type        = string
+
+  validation {
+    condition = (
+      var.simphera_url == null ||
+      can(regex("^(https?://)(www\\.)?[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+(:[0-9]{2,5})?(/[^\\s]*)?$", var.simphera_url))
+    )
+    error_message = "If provided, Simphera URL must be a valid http(s) URL."
+  }
+}
+
 variable "s3_cors_rules" {
   description = "CORS rules for the Simphera S3 bucket."
   type = list(object({
