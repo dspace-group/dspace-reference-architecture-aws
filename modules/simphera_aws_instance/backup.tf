@@ -11,6 +11,7 @@ resource "aws_backup_plan" "backup-plan" {
   rule {
     rule_name                = "${local.instancename}-backup-rule"
     target_vault_name        = aws_backup_vault.backup-vault[0].name
+    schedule                 = "cron(0 5 ? * * *)"
     recovery_point_tags      = var.tags
     enable_continuous_backup = true
 
