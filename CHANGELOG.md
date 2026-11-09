@@ -1,3 +1,9 @@
+## v0.13.7
+
+- Add schedule to SIMPHERA backup-plan rule
+- Add optional S3 mounts for SIMPHERA pods
+- Add service account with S3 access for executoragentlinuxsubjob
+
 ## v0.13.6
 
 - Update providers version
