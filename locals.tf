@@ -11,4 +11,15 @@ locals {
 
   # EKS
   eks_cluster_name = var.infrastructure_name
+
+
+
+  # AWS Context
+  aws_context = {
+    caller_identity_account_id = data.aws_caller_identity.current.account_id
+    partition_dns_suffix       = data.aws_partition.current.dns_suffix
+    partition                  = data.aws_partition.current.partition
+    region_name                = data.aws_region.current.region
+    iam_issuer_arn             = data.aws_iam_session_context.current.issuer_arn
+  }
 }

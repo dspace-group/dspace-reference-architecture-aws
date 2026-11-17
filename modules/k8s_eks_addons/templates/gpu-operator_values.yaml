@@ -1,0 +1,43 @@
+operator:
+  defaultRuntime: containerd
+
+dcgmExporter:
+  enabled: false
+
+driver:
+  enabled: true
+  nvidiaDriverCRD:
+    enabled: true
+    deployDefaultCR: false
+
+validator:
+  driver:
+    env:
+    - name: DISABLE_DEV_CHAR_SYMLINK_CREATION
+      value: "true"
+
+toolkit:
+  enabled: true
+
+daemonsets:
+  tolerations:
+  - key: purpose
+    value: gpu
+    operator: Equal
+    effect: NoSchedule
+  - key: nvidia.com/gpu
+    value: ""
+    operator: Exists
+    effect: NoSchedule
+
+node-feature-discovery:
+  worker:
+    tolerations:
+    - key: purpose
+      value: gpu
+      operator: Equal
+      effect: NoSchedule
+    - key: nvidia.com/gpu
+      value: ""
+      operator: Exists
+      effect: NoSchedule
