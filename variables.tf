@@ -2,6 +2,20 @@ variable "infrastructure_name" {
   description = "Name of the infrastructure"
   type        = string
 }
+variable "database" {
+  type = object({
+    db_name                    = string
+    postgresqlApplyImmediately = bool
+    postgresqlStorage          = number
+    postgresqlMaxStorage       = number
+    postgresqlVersion          = string
+    db_instance_type           = string
+    enable_deletion_protection = bool
+    multi_az                   = bool
+    cloudwatch_retention       = number
+    secret_name                = string
+  })
+}
 
 variable "vpc" {
   description = "VPC configuration"
@@ -19,18 +33,6 @@ variable "vpc" {
     private_subnets_cidrs = ["10.1.0.0/22", "10.1.4.0/22", "10.1.8.0/22"]
     public_subnets_cidrs  = ["10.1.12.0/22", "10.1.16.0/22", "10.1.20.0/22"]
   }
-}
-
-variable "cloudwatch_retention" {
-  description = "Retention period for CloudWatch logs"
-  type        = number
-  default     = 7
-}
-
-variable "aws_managed_kms" {
-  type        = bool
-  description = "Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs."
-  default     = false
 }
 
 variable "eks" {
@@ -62,6 +64,19 @@ variable "eks" {
     }))
   })
 }
+
+variable "cloudwatch_retention" {
+  description = "Retention period for CloudWatch logs"
+  type        = number
+  default     = 7
+}
+
+variable "aws_managed_kms" {
+  type        = bool
+  description = "Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs."
+  default     = false
+}
+
 variable "vpc_cni_addon_configuration" {
   description = "A YAML string of the configuration values to be applied to the AWS VPC CNI addon. For a list of valid configuration values run `aws eks describe-addon-configuration` for the vpc-cni, as described here: https://docs.aws.amazon.com/cli/latest/reference/eks/describe-addon-versions.html)"
   type        = string

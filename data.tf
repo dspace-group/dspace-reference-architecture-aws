@@ -38,3 +38,7 @@ data "aws_subnets" "public" {
   }
 }
 
+data "aws_vpc" "preconfigured" {
+  count = local.create_vpc ? 0 : 1
+  id    = var.vpc.id
+}

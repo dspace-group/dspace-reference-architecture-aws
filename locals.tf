@@ -2,6 +2,7 @@ locals {
   # Network
   create_vpc = var.vpc.id == null
   vpc_id     = local.create_vpc ? module.vpc[0].vpc_id : var.vpc.id
+  vpc_cidr   = local.create_vpc ? module.vpc[0].vpc_cidr_block : data.aws_vpc.preconfigured[0].cidr_block
 
   lookup_private_subnets = !local.create_vpc && var.vpc.private_subnets_ids == null
   lookup_public_subnets  = !local.create_vpc && var.vpc.public_subnets_ids == null
@@ -12,7 +13,8 @@ locals {
   # EKS
   eks_cluster_name = var.infrastructure_name
 
-
+  # KMS
+  kms_cloudwatch_key_arn = var.aws_managed_kms ? null : aws_kms_key.cloudwatch_log_group[0].arn
 
   # AWS Context
   aws_context = {

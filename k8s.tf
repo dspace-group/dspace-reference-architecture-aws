@@ -6,7 +6,7 @@ module "eks" {
   eks_api_subnet_ids                     = var.eks.api_subnet_ids
   node_groups                            = var.eks.node_groups
   map_principals                         = var.eks.map_principals
-  cloudwatch_log_group_kms_key_id        = var.aws_managed_kms ? null : aws_kms_key.cloudwatch_log_group[0].arn
+  cloudwatch_log_group_kms_key_id        = local.kms_cloudwatch_key_arn
   cloudwatch_log_group_retention_in_days = coalesce(var.eks.cloudwatch_log_group_retention, var.cloudwatch_retention)
   aws_context                            = local.aws_context
   tags                                   = var.tags

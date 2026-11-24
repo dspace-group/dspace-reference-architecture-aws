@@ -48,7 +48,7 @@ resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
   count             = local.create_vpc ? 1 : 0
   name              = "/aws/vpc/${var.infrastructure_name}"
   retention_in_days = coalesce(var.vpc.flow_logs_retention, var.cloudwatch_retention)
-  kms_key_id        = var.aws_managed_kms ? null : aws_kms_key.cloudwatch_log_group[0].arn
+  kms_key_id        = local.kms_cloudwatch_key_arn
   tags              = var.tags
 }
 
