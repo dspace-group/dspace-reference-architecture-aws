@@ -24,4 +24,12 @@ locals {
     region_name                = data.aws_region.current.region
     iam_issuer_arn             = data.aws_iam_session_context.current.issuer_arn
   }
+
+  # S3 policies
+  s3_ssl_policy     = jsondecode(templatefile("${path.module}/templates/s3_ssl_policy.json", { bucket = aws_s3_bucket.logs_bucket.bucket }))
+  s3_logging_policy = jsondecode(templatefile("${path.module}/templates/s3_log_policy.json", { bucket = aws_s3_bucket.logs_bucket.bucket, account_id = local.aws_context.caller_identity_account_id }))
+  log_bucket_policy = {
+    Version   = "2012-10-17"
+    Statement = concat(local.s3_ssl_policy.Statement, local.s3_logging_policy.Statement)
+  }
 }

@@ -17,6 +17,27 @@ variable "database" {
   })
 }
 
+variable "data_management" {
+  type = object({
+    buckets = list(object({
+      create     = bool
+      name       = string
+      versioning = bool
+      logging    = bool
+    }))
+    opensearch = object({
+      enable                  = bool
+      domain_name             = string
+      engine_version          = string
+      instance_type           = string
+      instance_count          = number
+      volume_size             = number
+      master_user_secret_name = string
+    })
+    k8s_namespace = string
+  })
+}
+
 variable "vpc" {
   description = "VPC configuration"
   type = object({
@@ -69,6 +90,11 @@ variable "cloudwatch_retention" {
   description = "Retention period for CloudWatch logs"
   type        = number
   default     = 7
+}
+
+variable "bucket_logging_retention" {
+  type    = number
+  default = 7
 }
 
 variable "aws_managed_kms" {
