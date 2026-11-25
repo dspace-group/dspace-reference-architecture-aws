@@ -50,14 +50,20 @@ resource "aws_security_group" "database" {
 
 }
 
-resource "aws_security_group_rule" "ingress_with_cidr_blocks" {
+resource "aws_vpc_security_group_ingress_rule" "rds_in_from_vpc" {
   security_group_id = aws_security_group.database.id
-  type              = "ingress"
-  cidr_blocks       = [var.vpc_cidr]
   description       = "Allow access from within VPC"
   from_port         = 5432
   to_port           = 5432
-  protocol          = "tcp"
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.vpc_cidr
+}
+
+resource "aws_vpc_security_group_egress_rule" "rds_out_all" {
+  security_group_id = aws_security_group.database.id
+  description       = "allow all outbound traffic"
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {

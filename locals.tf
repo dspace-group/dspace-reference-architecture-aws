@@ -32,4 +32,11 @@ locals {
     Version   = "2012-10-17"
     Statement = concat(local.s3_ssl_policy.Statement, local.s3_logging_policy.Statement)
   }
+
+  # License server
+  license_server_identifier  = "${var.infrastructure_name}-license-server"
+  license_server_bucket_name = "${local.license_server_identifier}-bucket"
+
+  # Patching
+  patching_identifier = "${var.infrastructure_name}-patching"
 }

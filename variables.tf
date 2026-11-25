@@ -86,23 +86,6 @@ variable "eks" {
   })
 }
 
-variable "cloudwatch_retention" {
-  description = "Retention period for CloudWatch logs"
-  type        = number
-  default     = 7
-}
-
-variable "bucket_logging_retention" {
-  type    = number
-  default = 7
-}
-
-variable "aws_managed_kms" {
-  type        = bool
-  description = "Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs."
-  default     = false
-}
-
 variable "vpc_cni_addon_configuration" {
   description = "A YAML string of the configuration values to be applied to the AWS VPC CNI addon. For a list of valid configuration values run `aws eks describe-addon-configuration` for the vpc-cni, as described here: https://docs.aws.amazon.com/cli/latest/reference/eks/describe-addon-versions.html)"
   type        = string
@@ -117,17 +100,17 @@ variable "ingress_nginx_config" {
     helm_repository = optional(string, "https://kubernetes.github.io/ingress-nginx")
     helm_version    = optional(string, "4.12.1")
     chart_values = optional(string, <<-YAML
-controller:
-  images:
-    registry: "registry.k8s.io"
-  service:
-    annotations:
-      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-  allowSnippetAnnotations: true
-  config:
-    strict-validate-path-type: false
-    annotations-risk-level: Critical
-YAML
+      controller:
+        images:
+          registry: "registry.k8s.io"
+        service:
+          annotations:
+            service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+        allowSnippetAnnotations: true
+        config:
+          strict-validate-path-type: false
+          annotations-risk-level: Critical
+      YAML
     )
   })
   description = "Input configuration for ingress-nginx service deployed with helm release. By setting key 'enable' to 'true', ingress-nginx service will be deployed. 'helm_repository' is an URL for the repository of ingress-nginx helm chart, where 'helm_version' is its respective version of a chart. 'chart_values' is used for changing default values.yaml of an ingress-nginx chart."
@@ -201,9 +184,9 @@ variable "s3_csi_config" {
   type = object({
     enable = optional(bool, false)
     configuration_values = optional(string, <<-YAML
-node:
-    tolerateAllTaints: true
-YAML
+      node:
+          tolerateAllTaints: true
+      YAML
     )
   })
   description = "Input configuration for AWS EKS add-on aws-mountpoint-s3-csi-driver. By setting key 'enable' to 'true', aws-mountpoint-s3-csi-driver add-on is deployed. Key 'configuration_values' is used to change add-on configuration. Its content should follow add-on configuration schema (see https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/)."
@@ -243,6 +226,41 @@ variable "gpu_operator_config" {
   default = {
     enable = false
   }
+}
+
+variable "cloudwatch_retention" {
+  description = "Retention period for CloudWatch logs"
+  type        = number
+  default     = 7
+}
+
+variable "bucket_logging_retention" {
+  type    = number
+  default = 7
+}
+
+variable "aws_managed_kms" {
+  type        = bool
+  description = "Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs."
+  default     = false
+}
+
+variable "license_server" {
+  type = object({
+    enable        = optional(bool, false)
+    instance_type = optional(string, "t3a.large")
+    codemeter     = optional(string, "https://www.wibu.com/support/user/user-software/file/download/15803.html?tx_wibudownloads_downloadlist%5BdirectDownload%5D=directDownload&tx_wibudownloads_downloadlist%5BuseAwsS3%5D=0&cHash=8dba7ab094dec6267346f04fce2a2bcd")
+  })
+}
+
+variable "patching" {
+  type = object({
+    enable                = optional(bool, false)
+    maintainance_duration = optional(number, 3)
+    scan_schedule         = optional(string, "cron(0 0 * * ? *)")
+    install_schedule      = optional(string, "cron(0 3 * * ? *)")
+    ssm_logs_retention    = optional(number, null)
+  })
 }
 
 variable "tags" {
