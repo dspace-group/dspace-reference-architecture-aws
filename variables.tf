@@ -83,6 +83,25 @@ variable "eks" {
         effect = string
       })), [])
     }))
+    gpu_node_groups = optional(map(object({
+      node_group_name   = string
+      instance_types    = list(string)
+      capacity_type     = optional(string, "ON_DEMAND")
+      subnet_ids        = list(string)
+      max_size          = number
+      min_size          = number
+      custom_ami_id     = optional(string, "")
+      ami_type          = optional(string, "AL2023_x86_64_STANDARD")
+      block_device_name = optional(string, "/dev/xvdb")
+      volume_size       = number
+      driver_versions   = optional(list(string), ["550.90.07"])
+      k8s_labels        = optional(map(string), {})
+      k8s_taints = optional(list(object({
+        key    = string
+        value  = string
+        effect = string
+      })), [])
+    })), {})
   })
 }
 
