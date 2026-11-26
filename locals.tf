@@ -53,7 +53,7 @@ locals {
       key      = t.key
       operator = "Equal"
       value    = t.value
-      effect   = lookup({ NO_SCHEDULE = "NoSchedule", NO_EXECUTE = "NoExecute", PREFER_NO_SCHEDULE = "PreferNoSchedule" }, t.effect)
+      effect   = { NO_SCHEDULE = "NoSchedule", NO_EXECUTE = "NoExecute", PREFER_NO_SCHEDULE = "PreferNoSchedule" }[t.effect]
     }
   ]
   all_node_groups = merge(
