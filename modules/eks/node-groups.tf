@@ -17,5 +17,10 @@ module "node_group" {
   node_group_context        = local.node_group_context
   tags                      = var.tags
 
-  depends_on = [aws_eks_access_entry.principal]
+  # On destroy, nodes must go before the CNI addon and its IRSA role; otherwise aws-node cannot delete its ENIs and they leak.
+  depends_on = [
+    aws_eks_access_entry.principal,
+    aws_eks_addon.aws_vpc_cni,
+    aws_iam_role_policy_attachment.aws_vpc_cni_policy_attachment,
+  ]
 }
