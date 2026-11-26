@@ -3,17 +3,20 @@ name: qualitygate
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+
+  workflow_dispatch:
+
 jobs:
   qualitygate:
     name: Qualitygate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           #fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
           ref: ${{ github.event.pull_request.head.ref }}
       - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v4.0.1
         with:
         #   # The hostname of a Terraform Cloud/Enterprise instance to place within the credentials block of the Terraform CLI configuration file. Defaults to `app.terraform.io`.
         #   cli_config_credentials_hostname: # optional, default is app.terraform.io
@@ -25,7 +28,9 @@ jobs:
         #   terraform_wrapper: # optional, default is true
 
       - name: Setup tflint
-        uses: terraform-linters/setup-tflint@v2
+        uses: terraform-linters/setup-tflint@v6.3.2
+        with:
+          tflint_version: v0.66.0
 
       - name: Terraform format
         run: terraform fmt -check -recursive
@@ -44,11 +49,6 @@ jobs:
 
       - name: Terraform lint SIMPHERA Base
         run: tflint --config ../../.tflint.hcl --chdir ./modules/simphera_aws_instance
-
-      - name: tfsec action
-        uses: aquasecurity/tfsec-action@v1.0.2
-        with:
-          additional_args: --exclude-downloaded-modules --config-file tfsec.yaml
 
       - name: Terraform-docs Update README.md
         uses: terraform-docs/gh-actions@v1.0.0
@@ -80,3 +80,27 @@ jobs:
             {{ .Content }}
           git-push: "true"
 
+  trivy:
+    name: Trivy Terraform Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Scan Terraform configuration and secrets
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          trivy-config: trivy.yaml
+          version: v0.76.2
+
+      - name: Upload Trivy results to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-terraform.sarif
+          category: trivy-terraform

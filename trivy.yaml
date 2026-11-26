@@ -1,0 +1,22 @@
+severity:
+  - HIGH
+  - CRITICAL
+  - MEDIUM
+
+exit-code: 0
+format: sarif
+output: trivy-terraform.sarif
+
+misconfiguration:
+  scanners:
+    - terraform
+
+  terraform:
+    exclude-downloaded-modules: false
+
+scan:
+  scanners:
+    - misconfig
+    - secret
+
+  disable-telemetry: true
