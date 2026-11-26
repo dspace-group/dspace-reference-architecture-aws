@@ -99,6 +99,7 @@ jobs:
           scan-type: config
           scan-ref: .
           trivy-config: trivy.yaml
+          version: v0.76.2
 
       - name: Upload Trivy results to GitHub Code Scanning
         if: always()
