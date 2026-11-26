@@ -256,7 +256,7 @@ variable "eks" {
         min_size          = 1
         block_device_name = "/dev/sda1"
         volume_size       = 200
-        driver_version    = "550.90.07"
+        driver_version    = "595.71.05"
         k8s_labels = {
           "purpose" = "gpu"
         }
@@ -264,6 +264,11 @@ variable "eks" {
           {
             key      = "purpose",
             value    = "gpu",
+            "effect" = "NO_SCHEDULE"
+          },
+          {
+            key      = "nvidia.com/gpu",
+            value    = "",
             "effect" = "NO_SCHEDULE"
           }
         ]
