@@ -14,4 +14,8 @@ misconfiguration:
     exclude-downloaded-modules: false
 
 scan:
+  scanners:
+    - misconfig
+    - secret
+
   disable-telemetry: true

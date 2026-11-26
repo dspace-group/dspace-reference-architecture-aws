@@ -93,10 +93,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Scan Terraform configuration
+      - name: Scan Terraform configuration and secrets
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          scan-type: config
+          scan-type: fs
           scan-ref: .
           trivy-config: trivy.yaml
           version: v0.76.2
