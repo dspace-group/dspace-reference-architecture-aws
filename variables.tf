@@ -39,7 +39,7 @@ variable "database" {
     db_instance_type           = "db.t4g.large"
     enable_deletion_protection = false
     multi_az                   = false
-    secret_name                = "vrsimphera-db-secret"
+    secret_name                = "simphera-db-secret"
   }
 }
 
@@ -84,21 +84,27 @@ variable "data_management" {
     buckets = [
       {
         create     = true
-        name       = "raw_data_vr"
+        name       = "raw_data_storage"
+        versioning = false
+        logging    = false
+      },
+      {
+        create     = true
+        name       = "data_storage"
         versioning = false
         logging    = false
       }
     ]
     opensearch = {
       enable                  = false
-      domain_name             = "raw-data-vr"
+      domain_name             = "data_management_domain"
       engine_version          = "OpenSearch_2.17"
       instance_type           = "m7g.medium.search"
       instance_count          = 1
       volume_size             = 100
-      master_user_secret_name = "vrsimphera-opensearch-master-user"
+      master_user_secret_name = "opensearch-master-user"
     }
-    k8s_namespace = "vrdatamanagement"
+    k8s_namespace = "datamanagement"
   }
 }
 
@@ -520,6 +526,5 @@ variable "tags" {
   default = {
     managed_by = "terraform"
     PRODUCT    = "SIMPHERA"
-    OWNER      = "Valentin radicevic"
   }
 }

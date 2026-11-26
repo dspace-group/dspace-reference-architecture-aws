@@ -58,19 +58,25 @@ data_management = {
     {
       "create": true,
       "logging": false,
-      "name": "raw_data_vr",
+      "name": "raw_data_storage",
+      "versioning": false
+    },
+    {
+      "create": true,
+      "logging": false,
+      "name": "data_storage",
       "versioning": false
     }
   ],
   "enable": true,
-  "k8s_namespace": "vrdatamanagement",
+  "k8s_namespace": "datamanagement",
   "opensearch": {
-    "domain_name": "raw-data-vr",
+    "domain_name": "data_management_domain",
     "enable": false,
     "engine_version": "OpenSearch_2.17",
     "instance_count": 1,
     "instance_type": "m7g.medium.search",
-    "master_user_secret_name": "vrsimphera-opensearch-master-user",
+    "master_user_secret_name": "opensearch-master-user",
     "volume_size": 100
   }
 }
@@ -95,7 +101,7 @@ database = {
   "postgresqlMaxStorage": 100,
   "postgresqlStorage": 20,
   "postgresqlVersion": "15",
-  "secret_name": "vrsimphera-db-secret"
+  "secret_name": "simphera-db-secret"
 }
 
 # Configuration of the AWS EKS add-on efs csi.
@@ -264,7 +270,6 @@ s3_csi_config = {
 
 # Tags to apply to resources
 tags = {
-  "OWNER": "Valentin radicevic",
   "PRODUCT": "SIMPHERA",
   "managed_by": "terraform"
 }
