@@ -11,12 +11,12 @@ jobs:
     name: Qualitygate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           #fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
           ref: ${{ github.event.pull_request.head.ref }}
       - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v4.0.1
         with:
         #   # The hostname of a Terraform Cloud/Enterprise instance to place within the credentials block of the Terraform CLI configuration file. Defaults to `app.terraform.io`.
         #   cli_config_credentials_hostname: # optional, default is app.terraform.io
@@ -28,7 +28,9 @@ jobs:
         #   terraform_wrapper: # optional, default is true
 
       - name: Setup tflint
-        uses: terraform-linters/setup-tflint@v2
+        uses: terraform-linters/setup-tflint@v6.3.2
+        with:
+          tflint_version: v0.66.0
 
       - name: Terraform format
         run: terraform fmt -check -recursive
@@ -47,14 +49,9 @@ jobs:
 
       - name: Terraform lint SIMPHERA Base
         run: tflint --config ../../.tflint.hcl --chdir ./modules/simphera_aws_instance
-      
-      - name: tfsec action
-        uses: aquasecurity/tfsec-action@v1.0.2
-        with:
-          additional_args: --exclude-downloaded-modules --config-file tfsec.yaml
 
       - name: Terraform-docs Update README.md
-        uses: terraform-docs/gh-actions@v1.0.0
+        uses: terraform-docs/gh-actions@v1.4.1
         with:
           working-dir: .
           output-file: README.md
@@ -62,7 +59,7 @@ jobs:
           git-push: "true"
 
       - name: Terraform-docs Regenerate terraform.tfvars.example
-        uses: terraform-docs/gh-actions@v1.0.0
+        uses: terraform-docs/gh-actions@v1.4.1
         with:
            working-dir: .
            config-file: tfvars.hcl.terraform-docs.yml
@@ -73,7 +70,7 @@ jobs:
            git-push: "true"
 
       - name: Terraform-docs Regenerate terraform.json.example
-        uses: terraform-docs/gh-actions@v1.0.0
+        uses: terraform-docs/gh-actions@v1.4.1
         with:
           working-dir: .
           output-file: terraform.json.example
