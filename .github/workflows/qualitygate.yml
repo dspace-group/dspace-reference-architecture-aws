@@ -98,11 +98,7 @@ jobs:
         with:
           scan-type: config
           scan-ref: .
-          severity: HIGH,CRITICAL
-          exit-code: "1"
-          hide-progress: true
-          format: sarif
-          output: trivy-terraform.sarif
+          trivy-config: trivy.yaml
 
       - name: Upload Trivy results to GitHub Code Scanning
         if: always()
