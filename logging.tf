@@ -29,6 +29,24 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "logs_bucket" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle_configuration" {
+  bucket = aws_s3_bucket.logs_bucket.id
+
+  rule {
+    id     = "${aws_s3_bucket.logs_bucket.id}-s3-logging-retention"
+    status = "Enabled"
+    filter {
+      prefix = "logs/bucket/"
+    }
+    expiration {
+      days = var.bucket_logging_retention
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = var.bucket_logging_retention
+    }
+  }
+}
+
 resource "aws_kms_key" "s3_logs_key" {
   count               = var.aws_managed_kms ? 0 : 1
   description         = "KMS key for encrypting S3 access logs"

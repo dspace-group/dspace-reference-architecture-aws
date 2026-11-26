@@ -40,9 +40,9 @@ resource "kubectl_manifest" "nvidia-driver-manifest" {
       driverType = "gpu"
       image      = "driver"
       repository = "nvcr.io/nvidia"
-      version    = "${each.key}"
+      version    = each.key
       nodeSelector = {
-        gpu-driver = "${each.key}"
+        gpu-driver = each.key
       }
 
       tolerations = var.gpu_operator_config.node_tolerations

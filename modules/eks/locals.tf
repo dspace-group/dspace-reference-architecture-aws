@@ -13,16 +13,7 @@ locals {
     # Data sources
     aws_context = var.aws_context
   }
-  node_group_aws_auth_config_map = [
-    for node in var.node_groups : {
-      rolearn : "arn:${var.aws_context.partition}:iam::${var.aws_context.caller_identity_account_id}:role/${aws_eks_cluster.eks.id}-${node.node_group_name}"
-      username : "system:node:{{EC2PrivateDNSName}}"
-      groups : concat(
-        ["system:bootstrappers", "system:nodes"],
-        strcontains(node.ami_type, "WINDOWS") ? ["eks:kube-proxy-windows"] : []
-      )
-    }
-  ]
+
   windows_enabled               = anytrue([for node in var.node_groups : strcontains(node.ami_type, "WINDOWS")])
   windows_vpc_cni_configuration = <<-YAML
     enableWindowsIpam: "true"
