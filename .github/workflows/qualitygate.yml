@@ -51,7 +51,7 @@ jobs:
         run: tflint --config ../../.tflint.hcl --chdir ./modules/simphera_aws_instance
 
       - name: Terraform-docs Update README.md
-        uses: terraform-docs/gh-actions@v1.4.1
+        uses: terraform-docs/gh-actions@v1.0.0
         with:
           working-dir: .
           output-file: README.md
@@ -59,7 +59,7 @@ jobs:
           git-push: "true"
 
       - name: Terraform-docs Regenerate terraform.tfvars.example
-        uses: terraform-docs/gh-actions@v1.4.1
+        uses: terraform-docs/gh-actions@v1.0.0
         with:
            working-dir: .
            config-file: tfvars.hcl.terraform-docs.yml
@@ -70,7 +70,7 @@ jobs:
            git-push: "true"
 
       - name: Terraform-docs Regenerate terraform.json.example
-        uses: terraform-docs/gh-actions@v1.4.1
+        uses: terraform-docs/gh-actions@v1.0.0
         with:
           working-dir: .
           output-file: terraform.json.example
