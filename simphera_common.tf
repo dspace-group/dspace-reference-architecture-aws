@@ -1,5 +1,6 @@
 module "simphera_common" {
   source              = "./modules/simphera_common"
+  count               = local.create_simphera_common ? 1 : 0
   instance_identifier = var.infrastructure_name
   database = {
     db_name                    = var.database.db_name

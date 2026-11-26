@@ -1,5 +1,6 @@
 module "data_management" {
   source      = "./modules/simphera_data_management"
+  count       = var.data_management.enable ? 1 : 0
   identifier  = "${var.infrastructure_name}-dm"
   aws_context = local.aws_context
   buckets     = var.data_management.buckets

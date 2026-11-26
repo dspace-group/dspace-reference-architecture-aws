@@ -61,4 +61,7 @@ locals {
     { for k, v in local.gpu_node_groups : k => merge(v, { subnet_ids = local.private_subnets_ids }) },
   )
 
+  # Common module control
+  create_simphera_common = anytrue([var.data_management.enable])
+
 }

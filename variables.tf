@@ -33,6 +33,7 @@ variable "database" {
 
 variable "data_management" {
   type = object({
+    enable = optional(bool, true)
     buckets = list(object({
       create     = bool
       name       = string
@@ -51,6 +52,7 @@ variable "data_management" {
     k8s_namespace = string
   })
   default = {
+    enable = true
     buckets = [
       {
         create     = true
