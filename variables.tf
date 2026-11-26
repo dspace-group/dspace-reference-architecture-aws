@@ -1,8 +1,11 @@
 variable "infrastructure_name" {
   description = "Name of the infrastructure"
   type        = string
+  default     = "simphera-infra"
 }
+
 variable "database" {
+  description = "Database configuration"
   type = object({
     db_name                    = string
     postgresqlApplyImmediately = bool
@@ -12,9 +15,20 @@ variable "database" {
     db_instance_type           = string
     enable_deletion_protection = bool
     multi_az                   = bool
-    cloudwatch_retention       = number
     secret_name                = string
+    cloudwatch_retention       = optional(number)
   })
+  default = {
+    db_name                    = "simphera"
+    postgresqlApplyImmediately = true
+    postgresqlStorage          = 20
+    postgresqlMaxStorage       = 100
+    postgresqlVersion          = "15"
+    db_instance_type           = "db.t4g.large"
+    enable_deletion_protection = false
+    multi_az                   = false
+    secret_name                = "vrsimphera-db-secret"
+  }
 }
 
 variable "data_management" {
@@ -36,6 +50,26 @@ variable "data_management" {
     })
     k8s_namespace = string
   })
+  default = {
+    buckets = [
+      {
+        create     = true
+        name       = "raw_data_vr"
+        versioning = false
+        logging    = false
+      }
+    ]
+    opensearch = {
+      enable                  = false
+      domain_name             = "raw-data-vr"
+      engine_version          = "OpenSearch_2.17"
+      instance_type           = "m7g.medium.search"
+      instance_count          = 1
+      volume_size             = 100
+      master_user_secret_name = "vrsimphera-opensearch-master-user"
+    }
+    k8s_namespace = "vrdatamanagement"
+  }
 }
 
 variable "vpc" {
@@ -58,8 +92,8 @@ variable "vpc" {
 
 variable "eks" {
   type = object({
-    version        = string
-    api_subnet_ids = optional(list(string), [])
+    kubernetes_version = string
+    api_subnet_ids     = optional(list(string), [])
     map_principals = optional(list(object({
       arn    = string
       groups = list(string)
@@ -69,7 +103,6 @@ variable "eks" {
       node_group_name   = string
       instance_types    = list(string)
       capacity_type     = optional(string, "ON_DEMAND")
-      subnet_ids        = list(string)
       max_size          = number
       min_size          = number
       custom_ami_id     = optional(string, "")
@@ -87,14 +120,13 @@ variable "eks" {
       node_group_name   = string
       instance_types    = list(string)
       capacity_type     = optional(string, "ON_DEMAND")
-      subnet_ids        = list(string)
       max_size          = number
       min_size          = number
       custom_ami_id     = optional(string, "")
       ami_type          = optional(string, "AL2023_x86_64_STANDARD")
       block_device_name = optional(string, "/dev/xvdb")
       volume_size       = number
-      driver_versions   = optional(list(string), ["550.90.07"])
+      driver_version    = optional(string, "550.90.07")
       k8s_labels        = optional(map(string), {})
       k8s_taints = optional(list(object({
         key    = string
@@ -103,6 +135,65 @@ variable "eks" {
       })), [])
     })), {})
   })
+  default = {
+    kubernetes_version = "1.35"
+    node_groups = {
+      default = {
+        node_group_name   = "default"
+        instance_types    = ["m6a.4xlarge", "m5a.4xlarge", "m5.4xlarge", "m6i.4xlarge", "m4.4xlarge", "m7i.4xlarge", "m7a.4xlarge"]
+        capacity_type     = "ON_DEMAND"
+        max_size          = 3
+        min_size          = 1
+        ami_type          = "AL2023_x86_64_STANDARD"
+        block_device_name = "/dev/xvdb"
+        volume_size       = 200
+      },
+      execnodes = {
+        node_group_name   = "execnodes"
+        instance_types    = ["m6a.4xlarge", "m5a.4xlarge", "m5.4xlarge", "m6i.4xlarge", "m4.4xlarge", "m7i.4xlarge", "m7a.4xlarge"]
+        capacity_type     = "ON_DEMAND"
+        max_size          = 3
+        min_size          = 1
+        ami_type          = "AL2023_x86_64_STANDARD"
+        block_device_name = "/dev/xvdb"
+        volume_size       = 200
+        k8s_labels = {
+          "purpose" = "execution"
+          "product" = "data_management"
+        }
+        k8s_taints = [
+          {
+            key      = "purpose",
+            value    = "execution",
+            "effect" = "NO_SCHEDULE"
+          }
+        ]
+      }
+    }
+    gpu_node_groups = {
+      gpuexecnodes = {
+        node_group_name   = "gpuexecnodes"
+        instance_types    = ["g5.2xlarge"]
+        capacity_type     = "ON_DEMAND"
+        max_size          = 3
+        min_size          = 1
+        ami_type          = "AL2023_x86_64_STANDARD"
+        block_device_name = "/dev/xvdb"
+        volume_size       = 200
+        driver_version    = "550.90.07"
+        k8s_labels = {
+          "purpose" = "gpu"
+        }
+        k8s_taints = [
+          {
+            key      = "purpose",
+            value    = "gpu",
+            "effect" = "NO_SCHEDULE"
+          }
+        ]
+      }
+    }
+  }
 }
 
 variable "vpc_cni_addon_configuration" {
@@ -270,6 +361,11 @@ variable "license_server" {
     instance_type = optional(string, "t3a.large")
     codemeter     = optional(string, "https://www.wibu.com/support/user/user-software/file/download/15803.html?tx_wibudownloads_downloadlist%5BdirectDownload%5D=directDownload&tx_wibudownloads_downloadlist%5BuseAwsS3%5D=0&cHash=8dba7ab094dec6267346f04fce2a2bcd")
   })
+  default = {
+    enable        = true
+    instance_type = "t3a.large"
+    codemeter     = "https://www.wibu.com/support/user/user-software/file/download/15803.html?tx_wibudownloads_downloadlist%5BdirectDownload%5D=directDownload&tx_wibudownloads_downloadlist%5BuseAwsS3%5D=0&cHash=8dba7ab094dec6267346f04fce2a2bcd"
+  }
 }
 
 variable "patching" {
@@ -278,12 +374,22 @@ variable "patching" {
     maintainance_duration = optional(number, 3)
     scan_schedule         = optional(string, "cron(0 0 * * ? *)")
     install_schedule      = optional(string, "cron(0 3 * * ? *)")
-    ssm_logs_retention    = optional(number, null)
+    ssm_logs_retention    = optional(number)
   })
+  default = {
+    enable                = false
+    maintainance_duration = 3
+    scan_schedule         = "cron(0 0 * * ? *)"
+    install_schedule      = "cron(0 3 * * ? *)"
+  }
 }
 
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)
-  default     = {}
+  default = {
+    managed_by = "terraform"
+    PRODUCT    = "SIMPHERA"
+    OWNER      = "Valentin radicevic"
+  }
 }

@@ -11,7 +11,10 @@ module "k8s_eks_addons" {
   aws_load_balancer_controller_config = var.aws_load_balancer_controller_config
   gpu_operator_config = merge(
     var.gpu_operator_config,
-    { driver_versions = var.gpu_operator_config.driver_versions }
+    {
+      driver_versions  = local.gpu_driver_versions
+      node_tolerations = local.gpu_node_tolerations
+    }
   )
   addon_context = {
     aws_context         = local.aws_context

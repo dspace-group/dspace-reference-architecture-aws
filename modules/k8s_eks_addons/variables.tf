@@ -101,5 +101,11 @@ variable "gpu_operator_config" {
     helm_version    = string
     chart_values    = string
     driver_versions = list(string)
+    node_tolerations = list(object({
+      key      = string
+      value    = string
+      effect   = string
+      operator = string
+    }))
   })
 }

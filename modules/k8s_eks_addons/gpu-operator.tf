@@ -45,20 +45,7 @@ resource "kubectl_manifest" "nvidia-driver-manifest" {
         gpu-driver = "${each.key}"
       }
 
-      tolerations = [
-        {
-          key      = "purpose"
-          operator = "Equal"
-          value    = "gpu"
-          effect   = "NoSchedule"
-        },
-        {
-          key      = "nvidia.com/gpu"
-          value    = ""
-          operator = "Exists"
-          effect   = "NoSchedule"
-        }
-      ]
+      tolerations = var.gpu_operator_config.node_tolerations
     }
   }
 

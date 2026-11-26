@@ -42,3 +42,12 @@ data "aws_vpc" "preconfigured" {
   count = local.create_vpc ? 0 : 1
   id    = var.vpc.id
 }
+
+data "aws_ami" "gpu_ami" {
+  owners      = ["amazon"]
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["*ubuntu-eks/k8s_${var.eks.kubernetes_version}/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server*"]
+  }
+}
