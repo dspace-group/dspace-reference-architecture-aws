@@ -63,5 +63,4 @@ locals {
 
   # Common module control
   create_simphera_common = anytrue([var.data_management.enable])
-
 }

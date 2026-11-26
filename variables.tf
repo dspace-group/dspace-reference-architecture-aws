@@ -5,7 +5,19 @@ variable "infrastructure_name" {
 }
 
 variable "database" {
-  description = "Database configuration"
+  description = <<-EOT
+    Configuration of the PostgreSQL RDS instance used by SIMPHERA.
+      db_name: Name of the database created in the instance.
+      postgresqlApplyImmediately: Apply modifications immediately instead of in the next maintenance window.
+      postgresqlStorage: Initial allocated storage in GiB.
+      postgresqlMaxStorage: Upper limit in GiB for storage autoscaling.
+      postgresqlVersion: PostgreSQL major version.
+      db_instance_type: RDS instance class, e.g. db.t4g.large.
+      enable_deletion_protection: Protect the instance against deletion.
+      multi_az: Deploy a standby instance in a second availability zone.
+      secret_name: Name of the Secrets Manager secret holding the database credentials.
+      cloudwatch_retention: (optional) Retention in days of the database CloudWatch logs; defaults to the global cloudwatch_retention.
+  EOT
   type = object({
     db_name                    = string
     postgresqlApplyImmediately = bool
@@ -32,6 +44,22 @@ variable "database" {
 }
 
 variable "data_management" {
+  description = <<-EOT
+    Configuration of the SIMPHERA data management components (S3 buckets, OpenSearch).
+      enable: (optional) Deploy data management; defaults to true.
+      buckets[].create: Create the bucket.
+      buckets[].name: Name of the bucket.
+      buckets[].versioning: Enable object versioning.
+      buckets[].logging: Enable server access logging to the logging bucket.
+      opensearch.enable: Deploy an OpenSearch domain.
+      opensearch.domain_name: Name of the OpenSearch domain.
+      opensearch.engine_version: OpenSearch engine version, e.g. OpenSearch_2.17.
+      opensearch.instance_type: Instance type of the data nodes.
+      opensearch.instance_count: Number of data nodes.
+      opensearch.volume_size: EBS volume size in GiB per data node.
+      opensearch.master_user_secret_name: Name of the Secrets Manager secret holding the master user credentials.
+      k8s_namespace: Kubernetes namespace for the data management components.
+  EOT
   type = object({
     enable = optional(bool, true)
     buckets = list(object({
@@ -75,7 +103,16 @@ variable "data_management" {
 }
 
 variable "vpc" {
-  description = "VPC configuration"
+  description = <<-EOT
+    VPC configuration. Set id and the subnet ids to use an existing VPC, otherwise a new VPC is created.
+      id: (optional) Id of an existing VPC.
+      cidr_block: CIDR block of the VPC.
+      private_subnets_cidrs: CIDR blocks of the private subnets, one per availability zone.
+      public_subnets_cidrs: CIDR blocks of the public subnets, one per availability zone.
+      private_subnets_ids: (optional) Ids of existing private subnets.
+      public_subnets_ids: (optional) Ids of existing public subnets.
+      flow_logs_retention: (optional) Retention in days of the VPC flow logs.
+  EOT
   type = object({
     id                    = optional(string)
     cidr_block            = string
@@ -93,6 +130,37 @@ variable "vpc" {
 }
 
 variable "eks" {
+  description = <<-EOT
+    Configuration of the EKS cluster and its managed node groups.
+      kubernetes_version: Kubernetes version of the cluster.
+      api_subnet_ids: (optional) Subnet ids for the cluster API endpoint; defaults to [].
+      map_principals[].arn: ARN of the IAM principal granted cluster access.
+      map_principals[].groups: Kubernetes groups assigned to the principal.
+      cloudwatch_log_group_retention: (optional) Retention in days of the cluster log group.
+      node_groups.<key>.node_group_name: Name of the node group.
+      node_groups.<key>.instance_types: Instance types, in order of preference.
+      node_groups.<key>.capacity_type: (optional) ON_DEMAND or SPOT; defaults to ON_DEMAND.
+      node_groups.<key>.max_size: Maximum number of nodes.
+      node_groups.<key>.min_size: Minimum number of nodes.
+      node_groups.<key>.custom_ami_id: (optional) Custom AMI id; defaults to "" (EKS optimized AMI).
+      node_groups.<key>.ami_type: (optional) AMI type; defaults to AL2023_x86_64_STANDARD.
+      node_groups.<key>.block_device_name: (optional) Device name of the data volume; defaults to /dev/xvdb.
+      node_groups.<key>.volume_size: Size in GiB of the data volume.
+      node_groups.<key>.k8s_labels: (optional) Kubernetes labels of the nodes; defaults to {}.
+      node_groups.<key>.k8s_taints[]: (optional) Kubernetes taints of the nodes with key, value and effect (NO_SCHEDULE, PREFER_NO_SCHEDULE or NO_EXECUTE).
+      enable_gpu_node_groups: (optional) Create the GPU node groups; defaults to false.
+      gpu_node_groups.<key>.node_group_name: Name of the GPU node group.
+      gpu_node_groups.<key>.instance_types: GPU instance types, in order of preference.
+      gpu_node_groups.<key>.capacity_type: (optional) ON_DEMAND or SPOT; defaults to ON_DEMAND.
+      gpu_node_groups.<key>.max_size: Maximum number of nodes.
+      gpu_node_groups.<key>.min_size: Minimum number of nodes.
+      gpu_node_groups.<key>.custom_ami_id: (optional) Custom AMI id; defaults to "".
+      gpu_node_groups.<key>.block_device_name: (optional) Device name of the data volume; defaults to /dev/sda1.
+      gpu_node_groups.<key>.volume_size: Size in GiB of the data volume.
+      gpu_node_groups.<key>.driver_version: (optional) NVIDIA driver version; defaults to 595.71.05.
+      gpu_node_groups.<key>.k8s_labels: (optional) Kubernetes labels of the nodes; defaults to {}.
+      gpu_node_groups.<key>.k8s_taints[]: (optional) Kubernetes taints with key, value and effect.
+  EOT
   type = object({
     kubernetes_version = string
     api_subnet_ids     = optional(list(string), [])
@@ -225,7 +293,13 @@ variable "ingress_nginx_config" {
       YAML
     )
   })
-  description = "Input configuration for ingress-nginx service deployed with helm release. By setting key 'enable' to 'true', ingress-nginx service will be deployed. 'helm_repository' is an URL for the repository of ingress-nginx helm chart, where 'helm_version' is its respective version of a chart. 'chart_values' is used for changing default values.yaml of an ingress-nginx chart."
+  description = <<-EOT
+    Configuration of ingress-nginx deployed as helm release.
+      enable: Deploy ingress-nginx.
+      helm_repository: (optional) URL of the helm chart repository.
+      helm_version: (optional) Version of the helm chart.
+      chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+  EOT
   default = {
     enable = false
   }
@@ -236,7 +310,11 @@ variable "cloudwatch_observability_config" {
     enable           = bool
     retention_period = number
   })
-  description = "Input configuration for AWS EKS add-on amazon-cloudwatch-observability. By setting key 'enable' to 'true', amazon-cloudwatch-observability add-on is deployed."
+  description = <<-EOT
+    Configuration of the AWS EKS add-on amazon-cloudwatch-observability.
+      enable: Deploy the add-on.
+      retention_period: Retention in days of the add-on log groups.
+  EOT
   default = {
     enable           = false
     retention_period = 30
@@ -251,7 +329,14 @@ variable "traefik_config" {
     helm_version    = optional(string, "40.2.0")
     chart_values    = optional(string, "")
   })
-  description = "Input configuration for Traefik ingress controller. Deployed in front of ingress-nginx when using chaining mode."
+  description = <<-EOT
+    Configuration of the Traefik ingress controller, deployed in front of ingress-nginx when using chain mode.
+      enable: Deploy Traefik.
+      chain_mode: (optional) Chain Traefik in front of ingress-nginx; defaults to false.
+      helm_repository: (optional) URL of the helm chart repository.
+      helm_version: (optional) Version of the helm chart.
+      chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+  EOT
   default = {
     enable = false
   }
@@ -267,7 +352,13 @@ variable "cluster_autoscaler_config" {
     YAML
     )
   })
-  description = "Input configuration for cluster-autoscaler deployed with helm release. By setting key 'enable' to 'true', cluster-autoscaler release will be deployed. 'helm_repository' is an URL for the repository of cluster-autoscaler helm chart, where 'helm_version' is its respective version of a chart. 'chart_values' is used for changing default values.yaml of a cluster-autoscaler chart."
+  description = <<-EOT
+    Configuration of cluster-autoscaler deployed as helm release.
+      enable: (optional) Deploy cluster-autoscaler; defaults to true.
+      helm_repository: (optional) URL of the helm chart repository.
+      helm_version: (optional) Version of the helm chart.
+      chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+  EOT
   default     = {}
 }
 
@@ -276,7 +367,11 @@ variable "coredns_config" {
     enable               = optional(bool, true)
     configuration_values = optional(string, null)
   })
-  description = "Input configuration for AWS EKS add-on coredns. By setting key 'enable' to 'true', coredns add-on is deployed. Key 'configuration_values' is used to change add-on configuration. Its content should follow add-on configuration schema (see https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/)."
+  description = <<-EOT
+    Configuration of the AWS EKS add-on coredns.
+      enable: (optional) Deploy the add-on; defaults to true.
+      configuration_values: (optional) JSON/YAML add-on configuration following the add-on configuration schema.
+  EOT
   default = {
     enable = true
   }
@@ -286,7 +381,10 @@ variable "efs_csi_config" {
   type = object({
     enable = optional(bool, true)
   })
-  description = "Input configuration for AWS EKS add-on efs csi. By setting key 'enable' to 'true', efs csi add-on is deployed."
+  description = <<-EOT
+    Configuration of the AWS EKS add-on efs csi.
+      enable: (optional) Deploy the add-on; defaults to true.
+  EOT
   default = {
     enable = true
   }
@@ -301,7 +399,11 @@ variable "s3_csi_config" {
       YAML
     )
   })
-  description = "Input configuration for AWS EKS add-on aws-mountpoint-s3-csi-driver. By setting key 'enable' to 'true', aws-mountpoint-s3-csi-driver add-on is deployed. Key 'configuration_values' is used to change add-on configuration. Its content should follow add-on configuration schema (see https://aws.amazon.com/blogs/containers/amazon-eks-add-ons-advanced-configuration/)."
+  description = <<-EOT
+    Configuration of the AWS EKS add-on aws-mountpoint-s3-csi-driver.
+      enable: (optional) Deploy the add-on; defaults to false.
+      configuration_values: (optional) JSON/YAML add-on configuration following the add-on configuration schema.
+  EOT
   default = {
     enable = false
   }
@@ -317,7 +419,13 @@ variable "aws_load_balancer_controller_config" {
     YAML
     )
   })
-  description = "Input configuration for load_balancer_controller deployed with helm release. By setting key 'enable' to 'true', load_balancer_controller release will be deployed. 'helm_repository' is an URL for the repository of load_balancer_controller helm chart, where 'helm_version' is its respective version of a chart. 'chart_values' is used for changing default values.yaml of a load_balancer_controller chart."
+  description = <<-EOT
+    Configuration of the AWS load balancer controller deployed as helm release.
+      enable: (optional) Deploy the controller; defaults to false.
+      helm_repository: (optional) URL of the helm chart repository.
+      helm_version: (optional) Version of the helm chart.
+      chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+  EOT
   default = {
     enable = false
   }
@@ -333,7 +441,13 @@ variable "gpu_operator_config" {
     YAML
     )
   })
-  description = "Input configuration for the GPU operator chart deployed with helm release. By setting key 'enable' to 'true', GPU operator will be deployed. 'helm_repository' is an URL for the repository of the GPU operator helm chart, where 'helm_version' is its respective version of a chart. 'chart_values' is used for changing default values.yaml of the GPU operator chart."
+  description = <<-EOT
+    Configuration of the NVIDIA GPU operator deployed as helm release.
+      enable: (optional) Deploy the GPU operator; defaults to true.
+      helm_repository: (optional) URL of the helm chart repository.
+      helm_version: (optional) Version of the helm chart.
+      chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+  EOT
   default = {
     enable = false
   }
@@ -346,8 +460,9 @@ variable "cloudwatch_retention" {
 }
 
 variable "bucket_logging_retention" {
-  type    = number
-  default = 7
+  description = "Retention in days of the S3 access logs stored in the logging bucket"
+  type        = number
+  default     = 7
 }
 
 variable "aws_managed_kms" {
@@ -357,6 +472,12 @@ variable "aws_managed_kms" {
 }
 
 variable "license_server" {
+  description = <<-EOT
+    Configuration of the license server EC2 instance.
+      enable: (optional) Deploy the license server; defaults to false.
+      instance_type: (optional) EC2 instance type; defaults to t3a.large.
+      codemeter: (optional) Download URL of the CodeMeter runtime installed on the instance.
+  EOT
   type = object({
     enable        = optional(bool, false)
     instance_type = optional(string, "t3a.large")
@@ -370,6 +491,14 @@ variable "license_server" {
 }
 
 variable "patching" {
+  description = <<-EOT
+    Configuration of OS patching with AWS Systems Manager Patch Manager.
+      enable: (optional) Enable patching; defaults to false.
+      maintainance_duration: (optional) Duration in hours of the maintenance window; defaults to 3.
+      scan_schedule: (optional) Cron expression of the patch scan; defaults to cron(0 0 * * ? *).
+      install_schedule: (optional) Cron expression of the patch installation; defaults to cron(0 3 * * ? *).
+      ssm_logs_retention: (optional) Retention in days of the SSM logs.
+  EOT
   type = object({
     enable                = optional(bool, false)
     maintainance_duration = optional(number, 3)

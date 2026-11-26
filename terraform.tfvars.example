@@ -1,1 +1,305 @@
 
+# Configuration of the AWS load balancer controller deployed as helm release.
+#   enable: (optional) Deploy the controller; defaults to false.
+#   helm_repository: (optional) URL of the helm chart repository.
+#   helm_version: (optional) Version of the helm chart.
+#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+aws_load_balancer_controller_config = {
+  "enable": false
+}
+
+# Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs.
+aws_managed_kms = false
+
+# Retention in days of the S3 access logs stored in the logging bucket
+bucket_logging_retention = 7
+
+# Configuration of the AWS EKS add-on amazon-cloudwatch-observability.
+#   enable: Deploy the add-on.
+#   retention_period: Retention in days of the add-on log groups.
+cloudwatch_observability_config = {
+  "enable": false,
+  "retention_period": 30
+}
+
+# Retention period for CloudWatch logs
+cloudwatch_retention = 7
+
+# Configuration of cluster-autoscaler deployed as helm release.
+#   enable: (optional) Deploy cluster-autoscaler; defaults to true.
+#   helm_repository: (optional) URL of the helm chart repository.
+#   helm_version: (optional) Version of the helm chart.
+#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+cluster_autoscaler_config = {}
+
+# Configuration of the AWS EKS add-on coredns.
+#   enable: (optional) Deploy the add-on; defaults to true.
+#   configuration_values: (optional) JSON/YAML add-on configuration following the add-on configuration schema.
+coredns_config = {
+  "enable": true
+}
+
+# Configuration of the SIMPHERA data management components (S3 buckets, OpenSearch).
+#   enable: (optional) Deploy data management; defaults to true.
+#   buckets[].create: Create the bucket.
+#   buckets[].name: Name of the bucket.
+#   buckets[].versioning: Enable object versioning.
+#   buckets[].logging: Enable server access logging to the logging bucket.
+#   opensearch.enable: Deploy an OpenSearch domain.
+#   opensearch.domain_name: Name of the OpenSearch domain.
+#   opensearch.engine_version: OpenSearch engine version, e.g. OpenSearch_2.17.
+#   opensearch.instance_type: Instance type of the data nodes.
+#   opensearch.instance_count: Number of data nodes.
+#   opensearch.volume_size: EBS volume size in GiB per data node.
+#   opensearch.master_user_secret_name: Name of the Secrets Manager secret holding the master user credentials.
+#   k8s_namespace: Kubernetes namespace for the data management components.
+data_management = {
+  "buckets": [
+    {
+      "create": true,
+      "logging": false,
+      "name": "raw_data_vr",
+      "versioning": false
+    }
+  ],
+  "enable": true,
+  "k8s_namespace": "vrdatamanagement",
+  "opensearch": {
+    "domain_name": "raw-data-vr",
+    "enable": false,
+    "engine_version": "OpenSearch_2.17",
+    "instance_count": 1,
+    "instance_type": "m7g.medium.search",
+    "master_user_secret_name": "vrsimphera-opensearch-master-user",
+    "volume_size": 100
+  }
+}
+
+# Configuration of the PostgreSQL RDS instance used by SIMPHERA.
+#   db_name: Name of the database created in the instance.
+#   postgresqlApplyImmediately: Apply modifications immediately instead of in the next maintenance window.
+#   postgresqlStorage: Initial allocated storage in GiB.
+#   postgresqlMaxStorage: Upper limit in GiB for storage autoscaling.
+#   postgresqlVersion: PostgreSQL major version.
+#   db_instance_type: RDS instance class, e.g. db.t4g.large.
+#   enable_deletion_protection: Protect the instance against deletion.
+#   multi_az: Deploy a standby instance in a second availability zone.
+#   secret_name: Name of the Secrets Manager secret holding the database credentials.
+#   cloudwatch_retention: (optional) Retention in days of the database CloudWatch logs; defaults to the global cloudwatch_retention.
+database = {
+  "db_instance_type": "db.t4g.large",
+  "db_name": "simphera",
+  "enable_deletion_protection": false,
+  "multi_az": false,
+  "postgresqlApplyImmediately": true,
+  "postgresqlMaxStorage": 100,
+  "postgresqlStorage": 20,
+  "postgresqlVersion": "15",
+  "secret_name": "vrsimphera-db-secret"
+}
+
+# Configuration of the AWS EKS add-on efs csi.
+#   enable: (optional) Deploy the add-on; defaults to true.
+efs_csi_config = {
+  "enable": true
+}
+
+# Configuration of the EKS cluster and its managed node groups.
+#   kubernetes_version: Kubernetes version of the cluster.
+#   api_subnet_ids: (optional) Subnet ids for the cluster API endpoint; defaults to [].
+#   map_principals[].arn: ARN of the IAM principal granted cluster access.
+#   map_principals[].groups: Kubernetes groups assigned to the principal.
+#   cloudwatch_log_group_retention: (optional) Retention in days of the cluster log group.
+#   node_groups.<key>.node_group_name: Name of the node group.
+#   node_groups.<key>.instance_types: Instance types, in order of preference.
+#   node_groups.<key>.capacity_type: (optional) ON_DEMAND or SPOT; defaults to ON_DEMAND.
+#   node_groups.<key>.max_size: Maximum number of nodes.
+#   node_groups.<key>.min_size: Minimum number of nodes.
+#   node_groups.<key>.custom_ami_id: (optional) Custom AMI id; defaults to "" (EKS optimized AMI).
+#   node_groups.<key>.ami_type: (optional) AMI type; defaults to AL2023_x86_64_STANDARD.
+#   node_groups.<key>.block_device_name: (optional) Device name of the data volume; defaults to /dev/xvdb.
+#   node_groups.<key>.volume_size: Size in GiB of the data volume.
+#   node_groups.<key>.k8s_labels: (optional) Kubernetes labels of the nodes; defaults to {}.
+#   node_groups.<key>.k8s_taints[]: (optional) Kubernetes taints of the nodes with key, value and effect (NO_SCHEDULE, PREFER_NO_SCHEDULE or NO_EXECUTE).
+#   enable_gpu_node_groups: (optional) Create the GPU node groups; defaults to false.
+#   gpu_node_groups.<key>.node_group_name: Name of the GPU node group.
+#   gpu_node_groups.<key>.instance_types: GPU instance types, in order of preference.
+#   gpu_node_groups.<key>.capacity_type: (optional) ON_DEMAND or SPOT; defaults to ON_DEMAND.
+#   gpu_node_groups.<key>.max_size: Maximum number of nodes.
+#   gpu_node_groups.<key>.min_size: Minimum number of nodes.
+#   gpu_node_groups.<key>.custom_ami_id: (optional) Custom AMI id; defaults to "".
+#   gpu_node_groups.<key>.block_device_name: (optional) Device name of the data volume; defaults to /dev/sda1.
+#   gpu_node_groups.<key>.volume_size: Size in GiB of the data volume.
+#   gpu_node_groups.<key>.driver_version: (optional) NVIDIA driver version; defaults to 595.71.05.
+#   gpu_node_groups.<key>.k8s_labels: (optional) Kubernetes labels of the nodes; defaults to {}.
+#   gpu_node_groups.<key>.k8s_taints[]: (optional) Kubernetes taints with key, value and effect.
+eks = {
+  "enable_gpu_node_groups": false,
+  "gpu_node_groups": {
+    "gpuexecnodes": {
+      "block_device_name": "/dev/sda1",
+      "capacity_type": "ON_DEMAND",
+      "driver_version": "550.90.07",
+      "instance_types": [
+        "g5.2xlarge"
+      ],
+      "k8s_labels": {
+        "purpose": "gpu"
+      },
+      "k8s_taints": [
+        {
+          "effect": "NO_SCHEDULE",
+          "key": "purpose",
+          "value": "gpu"
+        }
+      ],
+      "max_size": 3,
+      "min_size": 1,
+      "node_group_name": "gpuexecnodes",
+      "volume_size": 200
+    }
+  },
+  "kubernetes_version": "1.35",
+  "node_groups": {
+    "default": {
+      "ami_type": "AL2023_x86_64_STANDARD",
+      "block_device_name": "/dev/xvdb",
+      "capacity_type": "ON_DEMAND",
+      "instance_types": [
+        "m6a.4xlarge",
+        "m5a.4xlarge",
+        "m5.4xlarge",
+        "m6i.4xlarge",
+        "m4.4xlarge",
+        "m7i.4xlarge",
+        "m7a.4xlarge"
+      ],
+      "max_size": 3,
+      "min_size": 1,
+      "node_group_name": "default",
+      "volume_size": 200
+    },
+    "execnodes": {
+      "ami_type": "AL2023_x86_64_STANDARD",
+      "block_device_name": "/dev/xvdb",
+      "capacity_type": "ON_DEMAND",
+      "instance_types": [
+        "m6a.4xlarge",
+        "m5a.4xlarge",
+        "m5.4xlarge",
+        "m6i.4xlarge",
+        "m4.4xlarge",
+        "m7i.4xlarge",
+        "m7a.4xlarge"
+      ],
+      "k8s_labels": {
+        "product": "data_management",
+        "purpose": "execution"
+      },
+      "k8s_taints": [
+        {
+          "effect": "NO_SCHEDULE",
+          "key": "purpose",
+          "value": "execution"
+        }
+      ],
+      "max_size": 3,
+      "min_size": 1,
+      "node_group_name": "execnodes",
+      "volume_size": 200
+    }
+  }
+}
+
+# Configuration of the NVIDIA GPU operator deployed as helm release.
+#   enable: (optional) Deploy the GPU operator; defaults to true.
+#   helm_repository: (optional) URL of the helm chart repository.
+#   helm_version: (optional) Version of the helm chart.
+#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+gpu_operator_config = {
+  "enable": false
+}
+
+# Name of the infrastructure
+infrastructure_name = "simphera-infra"
+
+# Configuration of ingress-nginx deployed as helm release.
+#   enable: Deploy ingress-nginx.
+#   helm_repository: (optional) URL of the helm chart repository.
+#   helm_version: (optional) Version of the helm chart.
+#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+ingress_nginx_config = {
+  "enable": false
+}
+
+# Configuration of the license server EC2 instance.
+#   enable: (optional) Deploy the license server; defaults to false.
+#   instance_type: (optional) EC2 instance type; defaults to t3a.large.
+#   codemeter: (optional) Download URL of the CodeMeter runtime installed on the instance.
+license_server = {
+  "codemeter": "https://www.wibu.com/support/user/user-software/file/download/15803.html?tx_wibudownloads_downloadlist%5BdirectDownload%5D=directDownload&tx_wibudownloads_downloadlist%5BuseAwsS3%5D=0&cHash=8dba7ab094dec6267346f04fce2a2bcd",
+  "enable": true,
+  "instance_type": "t3a.large"
+}
+
+# Configuration of OS patching with AWS Systems Manager Patch Manager.
+#   enable: (optional) Enable patching; defaults to false.
+#   maintainance_duration: (optional) Duration in hours of the maintenance window; defaults to 3.
+#   scan_schedule: (optional) Cron expression of the patch scan; defaults to cron(0 0 * * ? *).
+#   install_schedule: (optional) Cron expression of the patch installation; defaults to cron(0 3 * * ? *).
+#   ssm_logs_retention: (optional) Retention in days of the SSM logs.
+patching = {
+  "enable": false,
+  "install_schedule": "cron(0 3 * * ? *)",
+  "maintainance_duration": 3,
+  "scan_schedule": "cron(0 0 * * ? *)"
+}
+
+# Configuration of the AWS EKS add-on aws-mountpoint-s3-csi-driver.
+#   enable: (optional) Deploy the add-on; defaults to false.
+#   configuration_values: (optional) JSON/YAML add-on configuration following the add-on configuration schema.
+s3_csi_config = {
+  "enable": false
+}
+
+# Tags to apply to resources
+tags = {
+  "OWNER": "Valentin radicevic",
+  "PRODUCT": "SIMPHERA",
+  "managed_by": "terraform"
+}
+
+# Configuration of the Traefik ingress controller, deployed in front of ingress-nginx when using chain mode.
+#   enable: Deploy Traefik.
+#   chain_mode: (optional) Chain Traefik in front of ingress-nginx; defaults to false.
+#   helm_repository: (optional) URL of the helm chart repository.
+#   helm_version: (optional) Version of the helm chart.
+#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+traefik_config = {
+  "enable": false
+}
+
+# VPC configuration. Set id and the subnet ids to use an existing VPC, otherwise a new VPC is created.
+#   id: (optional) Id of an existing VPC.
+#   cidr_block: CIDR block of the VPC.
+#   private_subnets_cidrs: CIDR blocks of the private subnets, one per availability zone.
+#   public_subnets_cidrs: CIDR blocks of the public subnets, one per availability zone.
+#   private_subnets_ids: (optional) Ids of existing private subnets.
+#   public_subnets_ids: (optional) Ids of existing public subnets.
+#   flow_logs_retention: (optional) Retention in days of the VPC flow logs.
+vpc = {
+  "cidr_block": "10.1.0.0/18",
+  "private_subnets_cidrs": [
+    "10.1.0.0/22",
+    "10.1.4.0/22",
+    "10.1.8.0/22"
+  ],
+  "public_subnets_cidrs": [
+    "10.1.12.0/22",
+    "10.1.16.0/22",
+    "10.1.20.0/22"
+  ]
+}
+
+# A YAML string of the configuration values to be applied to the AWS VPC CNI addon. For a list of valid configuration values run `aws eks describe-addon-configuration` for the vpc-cni, as described here: https://docs.aws.amazon.com/cli/latest/reference/eks/describe-addon-versions.html)
+vpc_cni_addon_configuration = "enableNetworkPolicy: \"true\"\n"
