@@ -8,6 +8,16 @@ output "eks_cluster_id" {
   value       = aws_eks_cluster.eks.id
 }
 
+output "eks_cluster_endpoint" {
+  description = "The endpoint of the EKS cluster API server"
+  value       = aws_eks_cluster.eks.endpoint
+}
+
+output "eks_cluster_certificate_authority_data" {
+  description = "Base64 encoded certificate authority data of the EKS cluster"
+  value       = aws_eks_cluster.eks.certificate_authority[0].data
+}
+
 output "eks_cluster_version" {
   description = ""
   value       = aws_eks_cluster.eks.version
