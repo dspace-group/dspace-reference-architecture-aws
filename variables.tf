@@ -116,6 +116,7 @@ variable "eks" {
         effect = string
       })), [])
     }))
+    enable_gpu_node_groups = optional(bool, false)
     gpu_node_groups = optional(map(object({
       node_group_name   = string
       instance_types    = list(string)
@@ -123,17 +124,16 @@ variable "eks" {
       max_size          = number
       min_size          = number
       custom_ami_id     = optional(string, "")
-      ami_type          = optional(string, "AL2023_x86_64_STANDARD")
-      block_device_name = optional(string, "/dev/xvdb")
+      block_device_name = optional(string, "/dev/sda1")
       volume_size       = number
-      driver_version    = optional(string, "550.90.07")
+      driver_version    = optional(string, "595.71.05")
       k8s_labels        = optional(map(string), {})
       k8s_taints = optional(list(object({
         key    = string
         value  = string
         effect = string
-      })), [])
-    })), {})
+      })))
+    })))
   })
   default = {
     kubernetes_version = "1.35"
@@ -170,6 +170,7 @@ variable "eks" {
         ]
       }
     }
+    enable_gpu_node_groups = false
     gpu_node_groups = {
       gpuexecnodes = {
         node_group_name   = "gpuexecnodes"
@@ -177,8 +178,7 @@ variable "eks" {
         capacity_type     = "ON_DEMAND"
         max_size          = 3
         min_size          = 1
-        ami_type          = "AL2023_x86_64_STANDARD"
-        block_device_name = "/dev/xvdb"
+        block_device_name = "/dev/sda1"
         volume_size       = 200
         driver_version    = "550.90.07"
         k8s_labels = {
@@ -326,7 +326,6 @@ variable "gpu_operator_config" {
     enable          = optional(bool, true)
     helm_repository = optional(string, "https://helm.ngc.nvidia.com/nvidia")
     helm_version    = optional(string, "v26.3.2")
-    driver_versions = optional(list(string), ["595.71.05"])
     chart_values = optional(string, <<-YAML
 
     YAML

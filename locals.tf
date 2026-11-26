@@ -41,14 +41,15 @@ locals {
   patching_identifier = "${var.infrastructure_name}-patching"
 
   # Node groups
-  gpu_node_groups = {
+  gpu_node_groups = var.eks.enable_gpu_node_groups ? {
     for k, v in var.eks.gpu_node_groups : k => merge(v, {
-      k8s_labels = merge(v.k8s_labels, { "gpu-driver" = v.driver_version })
+      k8s_labels    = merge(v.k8s_labels, { "gpu-driver" = v.driver_version })
+      custom_ami_id = data.aws_ami.gpu_ami[0].image_id
     })
-  }
-  gpu_driver_versions = distinct(flatten([for g in var.eks.gpu_node_groups : g.driver_versions]))
+  } : {}
+  gpu_driver_versions = distinct(flatten([for g in local.gpu_node_groups : g.driver_version]))
   gpu_node_tolerations = [
-    for t in distinct(flatten([for g in var.eks.gpu_node_groups : g.k8s_taints])) : {
+    for t in distinct(flatten([for g in local.gpu_node_groups : g.k8s_taints])) : {
       key      = t.key
       operator = "Equal"
       value    = t.value
@@ -57,7 +58,7 @@ locals {
   ]
   all_node_groups = merge(
     { for k, v in var.eks.node_groups : k => merge(v, { subnet_ids = local.private_subnets_ids }) },
-    { for k, v in var.eks.gpu_node_groups : k => merge(v, { subnet_ids = local.private_subnets_ids }) },
+    { for k, v in local.gpu_node_groups : k => merge(v, { subnet_ids = local.private_subnets_ids }) },
   )
 
 }

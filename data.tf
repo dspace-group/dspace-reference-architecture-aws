@@ -44,6 +44,7 @@ data "aws_vpc" "preconfigured" {
 }
 
 data "aws_ami" "gpu_ami" {
+  count       = var.eks.enable_gpu_node_groups ? 1 : 0
   owners      = ["amazon"]
   most_recent = true
   filter {
