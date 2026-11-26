@@ -3,6 +3,9 @@ name: qualitygate
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+
+  workflow_dispatch:
+
 jobs:
   qualitygate:
     name: Qualitygate
@@ -44,7 +47,7 @@ jobs:
 
       - name: Terraform lint SIMPHERA Base
         run: tflint --config ../../.tflint.hcl --chdir ./modules/simphera_aws_instance
-
+      
       - name: tfsec action
         uses: aquasecurity/tfsec-action@v1.0.2
         with:
@@ -80,3 +83,30 @@ jobs:
             {{ .Content }}
           git-push: "true"
 
+  trivy:
+    name: Trivy Terraform Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Scan Terraform configuration
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          hide-progress: true
+          format: sarif
+          output: trivy-terraform.sarif
+
+      - name: Upload Trivy results to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-terraform.sarif
+          category: trivy-terraform
