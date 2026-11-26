@@ -153,7 +153,10 @@ variable "eks" {
       node_groups.<key>.block_device_name: (optional) Device name of the data volume; defaults to /dev/xvdb.
       node_groups.<key>.volume_size: Size in GiB of the data volume.
       node_groups.<key>.k8s_labels: (optional) Kubernetes labels of the nodes; defaults to {}.
-      node_groups.<key>.k8s_taints[]: (optional) Kubernetes taints of the nodes with key, value and effect (NO_SCHEDULE, PREFER_NO_SCHEDULE or NO_EXECUTE).
+      node_groups.<key>.k8s_taints: (optional) Kubernetes taints of the nodes; defaults to [].
+      node_groups.<key>.k8s_taints[].key: Taint key.
+      node_groups.<key>.k8s_taints[].value: Taint value.
+      node_groups.<key>.k8s_taints[].effect: Taint effect: NO_SCHEDULE, PREFER_NO_SCHEDULE or NO_EXECUTE.
       enable_gpu_node_groups: (optional) Create the GPU node groups; defaults to false.
       gpu_node_groups.<key>.node_group_name: Name of the GPU node group.
       gpu_node_groups.<key>.instance_types: GPU instance types, in order of preference.
@@ -165,7 +168,10 @@ variable "eks" {
       gpu_node_groups.<key>.volume_size: Size in GiB of the data volume.
       gpu_node_groups.<key>.driver_version: (optional) NVIDIA driver version; defaults to 595.71.05.
       gpu_node_groups.<key>.k8s_labels: (optional) Kubernetes labels of the nodes; defaults to {}.
-      gpu_node_groups.<key>.k8s_taints[]: (optional) Kubernetes taints with key, value and effect.
+      gpu_node_groups.<key>.k8s_taints: (optional) Kubernetes taints of the nodes.
+      gpu_node_groups.<key>.k8s_taints[].key: Taint key.
+      gpu_node_groups.<key>.k8s_taints[].value: Taint value.
+      gpu_node_groups.<key>.k8s_taints[].effect: Taint effect: NO_SCHEDULE, PREFER_NO_SCHEDULE or NO_EXECUTE.
   EOT
   type = object({
     kubernetes_version = string
