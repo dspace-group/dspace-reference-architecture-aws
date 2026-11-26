@@ -1,6 +1,7 @@
 severity:
   - HIGH
   - CRITICAL
+  - MEDIUM
 
 exit-code: 0
 format: sarif
