@@ -1,42 +1,28 @@
 
-# Configuration of the AWS load balancer controller deployed as helm release.
-#   enable: (optional) Deploy the controller; defaults to false.
-#   helm_repository: (optional) URL of the helm chart repository.
-#   helm_version: (optional) Version of the helm chart.
-#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
-aws_load_balancer_controller_config = {
-  "enable": false
-}
+# Name of the infrastructure
+infrastructure_name = "simphera-infra"
 
-# Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs.
-aws_managed_kms = false
-
-# Retention in days of the S3 access logs stored in the logging bucket
-bucket_logging_retention = 7
-
-# Configuration of the AWS EKS add-on amazon-cloudwatch-observability.
-#   enable: Deploy the add-on.
-#   retention_period: Retention in days of the add-on log groups.
-cloudwatch_observability_config = {
-  "enable": false,
-  "retention_period": 30
-}
-
-# Retention period for CloudWatch logs
-cloudwatch_retention = 7
-
-# Configuration of cluster-autoscaler deployed as helm release.
-#   enable: (optional) Deploy cluster-autoscaler; defaults to true.
-#   helm_repository: (optional) URL of the helm chart repository.
-#   helm_version: (optional) Version of the helm chart.
-#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
-cluster_autoscaler_config = {}
-
-# Configuration of the AWS EKS add-on coredns.
-#   enable: (optional) Deploy the add-on; defaults to true.
-#   configuration_values: (optional) JSON/YAML add-on configuration following the add-on configuration schema.
-coredns_config = {
-  "enable": true
+# Configuration of the PostgreSQL RDS instance used by SIMPHERA.
+#   db_name: Name of the database created in the instance.
+#   postgresqlApplyImmediately: Apply modifications immediately instead of in the next maintenance window.
+#   postgresqlStorage: Initial allocated storage in GiB.
+#   postgresqlMaxStorage: Upper limit in GiB for storage autoscaling.
+#   postgresqlVersion: PostgreSQL major version.
+#   db_instance_type: RDS instance class, e.g. db.t4g.large.
+#   enable_deletion_protection: Protect the instance against deletion.
+#   multi_az: Deploy a standby instance in a second availability zone.
+#   secret_name: Name of the Secrets Manager secret holding the database credentials.
+#   cloudwatch_retention: (optional) Retention in days of the database CloudWatch logs; defaults to the global cloudwatch_retention.
+database = {
+  "db_instance_type": "db.t4g.large",
+  "db_name": "simphera",
+  "enable_deletion_protection": false,
+  "multi_az": false,
+  "postgresqlApplyImmediately": true,
+  "postgresqlMaxStorage": 100,
+  "postgresqlStorage": 20,
+  "postgresqlVersion": "15",
+  "secret_name": "simphera-db-secret"
 }
 
 # Configuration of the SIMPHERA data management components (S3 buckets, OpenSearch).
@@ -81,33 +67,26 @@ data_management = {
   }
 }
 
-# Configuration of the PostgreSQL RDS instance used by SIMPHERA.
-#   db_name: Name of the database created in the instance.
-#   postgresqlApplyImmediately: Apply modifications immediately instead of in the next maintenance window.
-#   postgresqlStorage: Initial allocated storage in GiB.
-#   postgresqlMaxStorage: Upper limit in GiB for storage autoscaling.
-#   postgresqlVersion: PostgreSQL major version.
-#   db_instance_type: RDS instance class, e.g. db.t4g.large.
-#   enable_deletion_protection: Protect the instance against deletion.
-#   multi_az: Deploy a standby instance in a second availability zone.
-#   secret_name: Name of the Secrets Manager secret holding the database credentials.
-#   cloudwatch_retention: (optional) Retention in days of the database CloudWatch logs; defaults to the global cloudwatch_retention.
-database = {
-  "db_instance_type": "db.t4g.large",
-  "db_name": "simphera",
-  "enable_deletion_protection": false,
-  "multi_az": false,
-  "postgresqlApplyImmediately": true,
-  "postgresqlMaxStorage": 100,
-  "postgresqlStorage": 20,
-  "postgresqlVersion": "15",
-  "secret_name": "simphera-db-secret"
-}
-
-# Configuration of the AWS EKS add-on efs csi.
-#   enable: (optional) Deploy the add-on; defaults to true.
-efs_csi_config = {
-  "enable": true
+# VPC configuration. Set id and the subnet ids to use an existing VPC, otherwise a new VPC is created.
+#   id: (optional) Id of an existing VPC.
+#   cidr_block: CIDR block of the VPC.
+#   private_subnets_cidrs: CIDR blocks of the private subnets, one per availability zone.
+#   public_subnets_cidrs: CIDR blocks of the public subnets, one per availability zone.
+#   private_subnets_ids: (optional) Ids of existing private subnets.
+#   public_subnets_ids: (optional) Ids of existing public subnets.
+#   flow_logs_retention: (optional) Retention in days of the VPC flow logs.
+vpc = {
+  "cidr_block": "10.1.0.0/18",
+  "private_subnets_cidrs": [
+    "10.1.0.0/22",
+    "10.1.4.0/22",
+    "10.1.8.0/22"
+  ],
+  "public_subnets_cidrs": [
+    "10.1.12.0/22",
+    "10.1.16.0/22",
+    "10.1.20.0/22"
+  ]
 }
 
 # Configuration of the EKS cluster and its managed node groups.
@@ -217,17 +196,8 @@ eks = {
   }
 }
 
-# Configuration of the NVIDIA GPU operator deployed as helm release.
-#   enable: (optional) Deploy the GPU operator; defaults to true.
-#   helm_repository: (optional) URL of the helm chart repository.
-#   helm_version: (optional) Version of the helm chart.
-#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
-gpu_operator_config = {
-  "enable": false
-}
-
-# Name of the infrastructure
-infrastructure_name = "simphera-infra"
+# A YAML string of the configuration values to be applied to the AWS VPC CNI addon. For a list of valid configuration values run `aws eks describe-addon-configuration` for the vpc-cni, as described here: https://docs.aws.amazon.com/cli/latest/reference/eks/describe-addon-versions.html)
+vpc_cni_addon_configuration = "enableNetworkPolicy: \"true\"\n"
 
 # Configuration of ingress-nginx deployed as helm release.
 #   enable: Deploy ingress-nginx.
@@ -237,6 +207,78 @@ infrastructure_name = "simphera-infra"
 ingress_nginx_config = {
   "enable": false
 }
+
+# Configuration of the AWS EKS add-on amazon-cloudwatch-observability.
+#   enable: Deploy the add-on.
+#   retention_period: Retention in days of the add-on log groups.
+cloudwatch_observability_config = {
+  "enable": false,
+  "retention_period": 30
+}
+
+# Configuration of the Traefik ingress controller, deployed in front of ingress-nginx when using chain mode.
+#   enable: Deploy Traefik.
+#   chain_mode: (optional) Chain Traefik in front of ingress-nginx; defaults to false.
+#   helm_repository: (optional) URL of the helm chart repository.
+#   helm_version: (optional) Version of the helm chart.
+#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+traefik_config = {
+  "enable": false
+}
+
+# Configuration of cluster-autoscaler deployed as helm release.
+#   enable: (optional) Deploy cluster-autoscaler; defaults to true.
+#   helm_repository: (optional) URL of the helm chart repository.
+#   helm_version: (optional) Version of the helm chart.
+#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+cluster_autoscaler_config = {}
+
+# Configuration of the AWS EKS add-on coredns.
+#   enable: (optional) Deploy the add-on; defaults to true.
+#   configuration_values: (optional) JSON/YAML add-on configuration following the add-on configuration schema.
+coredns_config = {
+  "enable": true
+}
+
+# Configuration of the AWS EKS add-on efs csi.
+#   enable: (optional) Deploy the add-on; defaults to true.
+efs_csi_config = {
+  "enable": true
+}
+
+# Configuration of the AWS EKS add-on aws-mountpoint-s3-csi-driver.
+#   enable: (optional) Deploy the add-on; defaults to false.
+#   configuration_values: (optional) JSON/YAML add-on configuration following the add-on configuration schema.
+s3_csi_config = {
+  "enable": false
+}
+
+# Configuration of the AWS load balancer controller deployed as helm release.
+#   enable: (optional) Deploy the controller; defaults to false.
+#   helm_repository: (optional) URL of the helm chart repository.
+#   helm_version: (optional) Version of the helm chart.
+#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+aws_load_balancer_controller_config = {
+  "enable": false
+}
+
+# Configuration of the NVIDIA GPU operator deployed as helm release.
+#   enable: (optional) Deploy the GPU operator; defaults to true.
+#   helm_repository: (optional) URL of the helm chart repository.
+#   helm_version: (optional) Version of the helm chart.
+#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
+gpu_operator_config = {
+  "enable": false
+}
+
+# Retention period for CloudWatch logs
+cloudwatch_retention = 7
+
+# Retention in days of the S3 access logs stored in the logging bucket
+bucket_logging_retention = 7
+
+# Flag for using AWS managed KMS keys instead of customer managed KMS keys for EKS resources, cloudwatch log groups and S3 bucket logs.
+aws_managed_kms = false
 
 # Configuration of the license server EC2 instance.
 #   enable: (optional) Deploy the license server; defaults to false.
@@ -261,50 +303,8 @@ patching = {
   "scan_schedule": "cron(0 0 * * ? *)"
 }
 
-# Configuration of the AWS EKS add-on aws-mountpoint-s3-csi-driver.
-#   enable: (optional) Deploy the add-on; defaults to false.
-#   configuration_values: (optional) JSON/YAML add-on configuration following the add-on configuration schema.
-s3_csi_config = {
-  "enable": false
-}
-
 # Tags to apply to resources
 tags = {
   "PRODUCT": "SIMPHERA",
   "managed_by": "terraform"
 }
-
-# Configuration of the Traefik ingress controller, deployed in front of ingress-nginx when using chain mode.
-#   enable: Deploy Traefik.
-#   chain_mode: (optional) Chain Traefik in front of ingress-nginx; defaults to false.
-#   helm_repository: (optional) URL of the helm chart repository.
-#   helm_version: (optional) Version of the helm chart.
-#   chart_values: (optional) YAML string overriding the default values.yaml of the chart.
-traefik_config = {
-  "enable": false
-}
-
-# VPC configuration. Set id and the subnet ids to use an existing VPC, otherwise a new VPC is created.
-#   id: (optional) Id of an existing VPC.
-#   cidr_block: CIDR block of the VPC.
-#   private_subnets_cidrs: CIDR blocks of the private subnets, one per availability zone.
-#   public_subnets_cidrs: CIDR blocks of the public subnets, one per availability zone.
-#   private_subnets_ids: (optional) Ids of existing private subnets.
-#   public_subnets_ids: (optional) Ids of existing public subnets.
-#   flow_logs_retention: (optional) Retention in days of the VPC flow logs.
-vpc = {
-  "cidr_block": "10.1.0.0/18",
-  "private_subnets_cidrs": [
-    "10.1.0.0/22",
-    "10.1.4.0/22",
-    "10.1.8.0/22"
-  ],
-  "public_subnets_cidrs": [
-    "10.1.12.0/22",
-    "10.1.16.0/22",
-    "10.1.20.0/22"
-  ]
-}
-
-# A YAML string of the configuration values to be applied to the AWS VPC CNI addon. For a list of valid configuration values run `aws eks describe-addon-configuration` for the vpc-cni, as described here: https://docs.aws.amazon.com/cli/latest/reference/eks/describe-addon-versions.html)
-vpc_cni_addon_configuration = "enableNetworkPolicy: \"true\"\n"

@@ -20,6 +20,10 @@ provider "kubernetes" {
 }
 
 provider "helm" {
+  # Avoids parallel chart downloads colliding in %TEMP% on Windows (rename: Access is denied).
+  repository_cache       = "${path.root}/.helm/cache"
+  repository_config_path = "${path.root}/.helm/repositories.yaml"
+
   kubernetes = {
     host                   = module.eks.eks_cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.eks_cluster_certificate_authority_data)

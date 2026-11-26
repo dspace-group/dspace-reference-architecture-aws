@@ -21,6 +21,8 @@
 
 **/charts
 
+.helm/
+
 wildcard.crt
 wildcard.key
 

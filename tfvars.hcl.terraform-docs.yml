@@ -12,3 +12,5 @@ content: |
   {{ end }}
 settings:
   description: true
+sort:
+  enabled: false
