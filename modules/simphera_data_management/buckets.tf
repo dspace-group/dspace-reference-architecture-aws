@@ -1,7 +1,7 @@
 resource "aws_s3_bucket" "data_management" {
   for_each = local.buckets
   bucket   = each.value.name
-  # immutability?
+  # TODO: immutability?
   tags = var.tags
 }
 

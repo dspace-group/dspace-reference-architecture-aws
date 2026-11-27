@@ -229,6 +229,9 @@ variable "eks" {
         ami_type          = "AL2023_x86_64_STANDARD"
         block_device_name = "/dev/xvdb"
         volume_size       = 200
+        k8s_labels = {
+          "product" = "data_management"
+        }
       },
       execnodes = {
         node_group_name   = "execnodes"
@@ -265,6 +268,7 @@ variable "eks" {
         driver_version    = "595.71.05"
         k8s_labels = {
           "purpose" = "gpu"
+          "product" = "data_management"
         }
         k8s_taints = [
           {

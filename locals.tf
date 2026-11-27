@@ -25,7 +25,8 @@ locals {
     iam_issuer_arn             = data.aws_iam_session_context.current.issuer_arn
   }
 
-  # S3 policies
+  # S3
+  managed_buckets   = flatten([aws_s3_bucket.logs_bucket.bucket, module.data_management[*].buckets])
   s3_ssl_policy     = jsondecode(templatefile("${path.module}/templates/s3_ssl_policy.json", { bucket = aws_s3_bucket.logs_bucket.bucket }))
   s3_logging_policy = jsondecode(templatefile("${path.module}/templates/s3_log_policy.json", { bucket = aws_s3_bucket.logs_bucket.bucket, account_id = local.aws_context.caller_identity_account_id }))
   log_bucket_policy = {
@@ -60,6 +61,10 @@ locals {
     { for k, v in var.eks.node_groups : k => merge(v, { subnet_ids = local.private_subnets_ids }) },
     { for k, v in local.gpu_node_groups : k => merge(v, { subnet_ids = local.private_subnets_ids }) },
   )
+  data_management_node_role_names = [
+    for k, v in local.all_node_groups : module.eks.node_groups[k].nodegroup_role_id
+    if try(v.k8s_labels["product"], null) == "data_management"
+  ]
 
   # Common module control
   create_simphera_common = anytrue([var.data_management.enable])
