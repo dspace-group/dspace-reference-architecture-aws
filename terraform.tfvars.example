@@ -135,6 +135,7 @@ eks = {
         "g5.2xlarge"
       ],
       "k8s_labels": {
+        "product": "data_management",
         "purpose": "gpu"
       },
       "k8s_taints": [
@@ -170,6 +171,9 @@ eks = {
         "m7i.4xlarge",
         "m7a.4xlarge"
       ],
+      "k8s_labels": {
+        "product": "data_management"
+      },
       "max_size": 3,
       "min_size": 1,
       "node_group_name": "default",
