@@ -61,10 +61,10 @@ locals {
     { for k, v in var.eks.node_groups : k => merge(v, { subnet_ids = local.private_subnets_ids }) },
     { for k, v in local.gpu_node_groups : k => merge(v, { subnet_ids = local.private_subnets_ids }) },
   )
-  data_management_node_role_names = [
-    for k, v in local.all_node_groups : module.eks.node_groups[k].nodegroup_role_id
+  data_management_node_role_names = {
+    for k, v in local.all_node_groups : k => module.eks.node_groups[k].nodegroup_role_id
     if try(v.k8s_labels["product"], null) == "data_management"
-  ]
+  }
 
   # Common module control
   create_simphera_common = anytrue([var.data_management.enable])
