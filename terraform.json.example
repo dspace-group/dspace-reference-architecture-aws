@@ -1,0 +1,185 @@
+{
+  "aws_load_balancer_controller_config": {
+    "enable": false
+  },
+  "aws_managed_kms": false,
+  "bucket_logging_retention": 7,
+  "cloudwatch_observability_config": {
+    "enable": false,
+    "retention_period": 30
+  },
+  "cloudwatch_retention": 7,
+  "cluster_autoscaler_config": {},
+  "coredns_config": {
+    "enable": true
+  },
+  "data_management": {
+    "buckets": [
+      {
+        "create": true,
+        "logging": false,
+        "name": "raw_data_storage",
+        "versioning": false
+      },
+      {
+        "create": true,
+        "logging": false,
+        "name": "data_storage",
+        "versioning": false
+      }
+    ],
+    "enable": true,
+    "k8s_namespace": "datamanagement",
+    "opensearch": {
+      "domain_name": "data_management_domain",
+      "enable": false,
+      "engine_version": "OpenSearch_2.17",
+      "instance_count": 1,
+      "instance_type": "m7g.medium.search",
+      "master_user_secret_name": "opensearch-master-user",
+      "volume_size": 100
+    }
+  },
+  "database": {
+    "db_instance_type": "db.t4g.large",
+    "db_name": "simphera",
+    "enable_deletion_protection": false,
+    "multi_az": false,
+    "postgresqlApplyImmediately": true,
+    "postgresqlMaxStorage": 100,
+    "postgresqlStorage": 20,
+    "postgresqlVersion": "15",
+    "secret_name": "simphera-db-secret"
+  },
+  "efs_csi_config": {
+    "enable": true
+  },
+  "eks": {
+    "enable_gpu_node_groups": false,
+    "gpu_node_groups": {
+      "gpuexecnodes": {
+        "block_device_name": "/dev/sda1",
+        "capacity_type": "ON_DEMAND",
+        "driver_version": "595.71.05",
+        "instance_types": [
+          "g5.2xlarge"
+        ],
+        "k8s_labels": {
+          "product": "data_management",
+          "purpose": "gpu"
+        },
+        "k8s_taints": [
+          {
+            "effect": "NO_SCHEDULE",
+            "key": "purpose",
+            "value": "gpu"
+          },
+          {
+            "effect": "NO_SCHEDULE",
+            "key": "nvidia.com/gpu",
+            "value": ""
+          }
+        ],
+        "max_size": 3,
+        "min_size": 1,
+        "node_group_name": "gpuexecnodes",
+        "volume_size": 200
+      }
+    },
+    "kubernetes_version": "1.35",
+    "node_groups": {
+      "default": {
+        "ami_type": "AL2023_x86_64_STANDARD",
+        "block_device_name": "/dev/xvdb",
+        "capacity_type": "ON_DEMAND",
+        "instance_types": [
+          "m6a.4xlarge",
+          "m5a.4xlarge",
+          "m5.4xlarge",
+          "m6i.4xlarge",
+          "m4.4xlarge",
+          "m7i.4xlarge",
+          "m7a.4xlarge"
+        ],
+        "k8s_labels": {
+          "product": "data_management"
+        },
+        "max_size": 3,
+        "min_size": 1,
+        "node_group_name": "default",
+        "volume_size": 200
+      },
+      "execnodes": {
+        "ami_type": "AL2023_x86_64_STANDARD",
+        "block_device_name": "/dev/xvdb",
+        "capacity_type": "ON_DEMAND",
+        "instance_types": [
+          "m6a.4xlarge",
+          "m5a.4xlarge",
+          "m5.4xlarge",
+          "m6i.4xlarge",
+          "m4.4xlarge",
+          "m7i.4xlarge",
+          "m7a.4xlarge"
+        ],
+        "k8s_labels": {
+          "product": "data_management",
+          "purpose": "execution"
+        },
+        "k8s_taints": [
+          {
+            "effect": "NO_SCHEDULE",
+            "key": "purpose",
+            "value": "execution"
+          }
+        ],
+        "max_size": 3,
+        "min_size": 1,
+        "node_group_name": "execnodes",
+        "volume_size": 200
+      }
+    }
+  },
+  "gpu_operator_config": {
+    "enable": false
+  },
+  "infrastructure_name": "simphera-infra",
+  "ingress_nginx_config": {
+    "enable": false
+  },
+  "license_server": {
+    "codemeter": "https://www.wibu.com/support/user/user-software/file/download/15803.html?tx_wibudownloads_downloadlist%5BdirectDownload%5D=directDownload&tx_wibudownloads_downloadlist%5BuseAwsS3%5D=0&cHash=8dba7ab094dec6267346f04fce2a2bcd",
+    "enable": true,
+    "instance_type": "t3a.large"
+  },
+  "patching": {
+    "enable": false,
+    "install_schedule": "cron(0 3 * * ? *)",
+    "maintainance_duration": 3,
+    "scan_schedule": "cron(0 0 * * ? *)"
+  },
+  "s3_csi_config": {
+    "enable": false
+  },
+  "tags": {
+    "PRODUCT": "SIMPHERA",
+    "managed_by": "terraform"
+  },
+  "traefik_config": {
+    "enable": false
+  },
+  "vpc": {
+    "cidr_block": "10.1.0.0/18",
+    "private_subnets_cidrs": [
+      "10.1.0.0/22",
+      "10.1.4.0/22",
+      "10.1.8.0/22"
+    ],
+    "public_subnets_cidrs": [
+      "10.1.12.0/22",
+      "10.1.16.0/22",
+      "10.1.20.0/22"
+    ]
+  },
+  "vpc_cni_addon_configuration": "enableNetworkPolicy: \"true\"\n"
+}

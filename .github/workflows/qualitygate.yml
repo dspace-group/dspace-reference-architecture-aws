@@ -1,0 +1,73 @@
+name: qualitygate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  qualitygate:
+    name: Qualitygate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_version: 1.9.0
+
+      - name: Setup tflint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.52.0
+
+      - name: Terraform format
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Init TFLint
+        run: tflint --init
+
+      - name: Terraform lint Root
+        run: tflint --recursive
+
+      - name: tfsec action
+        uses: aquasecurity/tfsec-action@v1.0.2
+        with:
+          additional_args: --exclude-downloaded-modules --config-file tfsec.yaml
+          version: v1.28.14
+
+      - name: Terraform-docs Update README.md
+        uses: terraform-docs/gh-actions@v1.4.1
+        with:
+          working-dir: .
+          output-file: README.md
+          output-method: inject
+          git-push: "true"
+
+      - name: Terraform-docs Regenerate terraform.tfvars.example
+        uses: terraform-docs/gh-actions@v1.4.1
+        with:
+          working-dir: .
+          config-file: tfvars.hcl.terraform-docs.yml
+          output-file: terraform.tfvars.example
+          output-method: replace
+          template: |
+            {{ .Content }}
+          git-push: "true"
+
+      - name: Terraform-docs Regenerate terraform.json.example
+        uses: terraform-docs/gh-actions@v1.4.1
+        with:
+          working-dir: .
+          output-file: terraform.json.example
+          output-format: tfvars json
+          output-method: replace
+          template: |
+            {{ .Content }}
+          git-push: "true"

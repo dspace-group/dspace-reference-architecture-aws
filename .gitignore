@@ -12,7 +12,7 @@
 !instance/config_template.tfvars
 
 # all state-backends
-**/state-backend.tf
+**/state_backend.tf
 
 
 **/OLD_*
@@ -20,6 +20,8 @@
 **/kubeconfig
 
 **/charts
+
+.helm/
 
 wildcard.crt
 wildcard.key

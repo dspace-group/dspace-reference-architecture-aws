@@ -1,0 +1,18 @@
+- versions.tf with == version numbers
+    - terraform installed providers hcl lock file
+- providers
+    - use default_tags
+    - AWS account and region should be selected by ENV vars
+
+- state backend
+- VPC
+- EKS
+    - consider how helm release resources are applied
+- simphera_common module
+    - PostgreSQL database
+        - use plain security group, not one from VPC blueprint
+- data_management module
+- license server
+    - use plain security group, not one from VPC blueprint
+- logging
+- backup
